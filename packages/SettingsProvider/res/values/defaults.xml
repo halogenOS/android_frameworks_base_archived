@@ -293,4 +293,8 @@
          example "com.google.android.marvin.talkback/
          com.google.android.marvin.talkback.TalkBackService" -->
     <string name="def_enable_accessibility_services" translatable="false"></string>
+
+    <!-- Defaults for Settings.System.DEV_FORCE_SHOW_NAVBAR. -->
+    <integer name="def_force_disable_navkeys">0</integer>
+
 </resources>
