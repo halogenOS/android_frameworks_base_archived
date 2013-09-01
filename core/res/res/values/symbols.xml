@@ -2865,4 +2865,7 @@
   <java-symbol type="bool"    name="config_proximityCheckOnWakeEnabledByDefault" />
 
   <java-symbol type="bool" name="config_samsung_stk" />
+
+  <!-- Package Manager -->
+  <java-symbol type="array" name="config_disabledComponents" />
 </resources>
