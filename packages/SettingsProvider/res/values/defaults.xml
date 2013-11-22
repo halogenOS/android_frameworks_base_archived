@@ -155,7 +155,7 @@
     <integer name="def_download_manager_recommended_max_bytes_over_mobile">-1</integer>
 
     <!-- Default for Settings.Secure.LONG_PRESS_TIMEOUT_MILLIS -->
-    <integer name="def_long_press_timeout_millis">400</integer>
+    <integer name="def_long_press_timeout_millis">500</integer>
 
     <!-- Default for Settings.Secure.SHOW_IME_WITH_HARD_KEYBOARD -->
     <bool name="def_show_ime_with_hard_keyboard">false</bool>
@@ -295,4 +295,7 @@
     <string name="def_enable_input_methods" translatable="false"></string>
     <!-- Default for Settings.Global.CAPTIVE_PORTAL_DETECTION_ENABLED -->
     <integer name="def_captive_portal_detection_enabled" translatable="false">1</integer>
+
+    <!-- Default for Settings.Global.TETHER_DUN_REQUIRED -->
+    <integer name="def_tether_dun_required">0</integer>
 </resources>
