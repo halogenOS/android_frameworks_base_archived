@@ -2855,183 +2855,191 @@ public class MediaPlayer extends PlayerBase
                 Log.w(TAG, "mediaplayer went away with unhandled events");
                 return;
             }
-            switch(msg.what) {
-            case MEDIA_PREPARED:
-                try {
-                    scanInternalSubtitleTracks();
-                } catch (RuntimeException e) {
-                    // send error message instead of crashing;
-                    // send error message instead of inlining a call to onError
-                    // to avoid code duplication.
-                    Message msg2 = obtainMessage(
-                            MEDIA_ERROR, MEDIA_ERROR_UNKNOWN, MEDIA_ERROR_UNSUPPORTED, null);
-                    sendMessage(msg2);
-                }
-                OnPreparedListener onPreparedListener = mOnPreparedListener;
-                if (onPreparedListener != null)
-                    onPreparedListener.onPrepared(mMediaPlayer);
-                return;
+            try {
+                switch(msg.what) {
+                    case MEDIA_PREPARED:
+                        try {
+                            scanInternalSubtitleTracks();
+                        } catch (RuntimeException e) {
+                            // send error message instead of crashing;
+                            // send error message instead of inlining a call to onError
+                            // to avoid code duplication.
+                            Message msg2 = obtainMessage(
+                                    MEDIA_ERROR, MEDIA_ERROR_UNKNOWN, MEDIA_ERROR_UNSUPPORTED, null);
+                            sendMessage(msg2);
+                        }
+                        OnPreparedListener onPreparedListener = mOnPreparedListener;
+                        if (onPreparedListener != null)
+                            onPreparedListener.onPrepared(mMediaPlayer);
+                        return;
 
-            case MEDIA_PLAYBACK_COMPLETE:
-                {
-                    OnCompletionListener onCompletionListener = mOnCompletionListener;
-                    if (onCompletionListener != null)
-                        onCompletionListener.onCompletion(mMediaPlayer);
-                }
-                stayAwake(false);
-                return;
+                    case MEDIA_PLAYBACK_COMPLETE:
+                        {
+                            OnCompletionListener onCompletionListener = mOnCompletionListener;
+                            if (onCompletionListener != null)
+                                onCompletionListener.onCompletion(mMediaPlayer);
+                        }
+                        stayAwake(false);
+                        return;
 
-            case MEDIA_STOPPED:
-                {
-                    TimeProvider timeProvider = mTimeProvider;
-                    if (timeProvider != null) {
-                        timeProvider.onStopped();
-                    }
-                }
-                break;
+                    case MEDIA_STOPPED:
+                        {
+                            TimeProvider timeProvider = mTimeProvider;
+                            if (timeProvider != null) {
+                                timeProvider.onStopped();
+                            }
+                        }
+                        break;
 
-            case MEDIA_STARTED:
-            case MEDIA_PAUSED:
-                {
-                    TimeProvider timeProvider = mTimeProvider;
-                    if (timeProvider != null) {
-                        timeProvider.onPaused(msg.what == MEDIA_PAUSED);
-                    }
-                }
-                break;
+                    case MEDIA_STARTED:
+                    case MEDIA_PAUSED:
+                        {
+                            TimeProvider timeProvider = mTimeProvider;
+                            if (timeProvider != null) {
+                                timeProvider.onPaused(msg.what == MEDIA_PAUSED);
+                            }
+                        }
+                        break;
 
-            case MEDIA_BUFFERING_UPDATE:
-                OnBufferingUpdateListener onBufferingUpdateListener = mOnBufferingUpdateListener;
-                if (onBufferingUpdateListener != null)
-                    onBufferingUpdateListener.onBufferingUpdate(mMediaPlayer, msg.arg1);
-                return;
+                    case MEDIA_BUFFERING_UPDATE:
+                        OnBufferingUpdateListener onBufferingUpdateListener = mOnBufferingUpdateListener;
+                        if (onBufferingUpdateListener != null)
+                            onBufferingUpdateListener.onBufferingUpdate(mMediaPlayer, msg.arg1);
+                        return;
 
-            case MEDIA_SEEK_COMPLETE:
-                OnSeekCompleteListener onSeekCompleteListener = mOnSeekCompleteListener;
-                if (onSeekCompleteListener != null) {
-                    onSeekCompleteListener.onSeekComplete(mMediaPlayer);
-                }
-                // fall through
+                    case MEDIA_SEEK_COMPLETE:
+                        OnSeekCompleteListener onSeekCompleteListener = mOnSeekCompleteListener;
+                        if (onSeekCompleteListener != null) {
+                            onSeekCompleteListener.onSeekComplete(mMediaPlayer);
+                        }
+                        // fall through
 
-            case MEDIA_SKIPPED:
-                {
-                    TimeProvider timeProvider = mTimeProvider;
-                    if (timeProvider != null) {
-                        timeProvider.onSeekComplete(mMediaPlayer);
-                    }
-                }
-                return;
+                    case MEDIA_SKIPPED:
+                        {
+                            TimeProvider timeProvider = mTimeProvider;
+                            if (timeProvider != null) {
+                                timeProvider.onSeekComplete(mMediaPlayer);
+                            }
+                        }
+                        return;
 
-            case MEDIA_SET_VIDEO_SIZE:
-                OnVideoSizeChangedListener onVideoSizeChangedListener = mOnVideoSizeChangedListener;
-                if (onVideoSizeChangedListener != null) {
-                    onVideoSizeChangedListener.onVideoSizeChanged(
-                        mMediaPlayer, msg.arg1, msg.arg2);
-                }
-                return;
+                    case MEDIA_SET_VIDEO_SIZE:
+                        OnVideoSizeChangedListener onVideoSizeChangedListener = mOnVideoSizeChangedListener;
+                        if (onVideoSizeChangedListener != null) {
+                            onVideoSizeChangedListener.onVideoSizeChanged(
+                                mMediaPlayer, msg.arg1, msg.arg2);
+                        }
+                        return;
 
-            case MEDIA_ERROR:
-                Log.e(TAG, "Error (" + msg.arg1 + "," + msg.arg2 + ")");
-                boolean error_was_handled = false;
-                OnErrorListener onErrorListener = mOnErrorListener;
-                if (onErrorListener != null) {
-                    error_was_handled = onErrorListener.onError(mMediaPlayer, msg.arg1, msg.arg2);
-                }
-                {
-                    OnCompletionListener onCompletionListener = mOnCompletionListener;
-                    if (onCompletionListener != null && ! error_was_handled) {
-                        onCompletionListener.onCompletion(mMediaPlayer);
-                    }
-                }
-                stayAwake(false);
-                return;
+                    case MEDIA_ERROR:
+                        Log.e(TAG, "Error (" + msg.arg1 + "," + msg.arg2 + ")");
+                        boolean error_was_handled = false;
+                        OnErrorListener onErrorListener = mOnErrorListener;
+                        if (onErrorListener != null) {
+                            error_was_handled = onErrorListener.onError(mMediaPlayer, msg.arg1, msg.arg2);
+                        }
+                        {
+                            OnCompletionListener onCompletionListener = mOnCompletionListener;
+                            if (onCompletionListener != null && ! error_was_handled) {
+                                onCompletionListener.onCompletion(mMediaPlayer);
+                            }
+                        }
+                        stayAwake(false);
+                        return;
 
-            case MEDIA_INFO:
-                switch (msg.arg1) {
-                case MEDIA_INFO_VIDEO_TRACK_LAGGING:
-                    Log.i(TAG, "Info (" + msg.arg1 + "," + msg.arg2 + ")");
-                    break;
-                case MEDIA_INFO_METADATA_UPDATE:
-                    try {
-                        scanInternalSubtitleTracks();
-                    } catch (RuntimeException e) {
-                        Message msg2 = obtainMessage(
-                                MEDIA_ERROR, MEDIA_ERROR_UNKNOWN, MEDIA_ERROR_UNSUPPORTED, null);
-                        sendMessage(msg2);
-                    }
-                    // fall through
+                    case MEDIA_INFO:
+                        switch (msg.arg1) {
+                        case MEDIA_INFO_VIDEO_TRACK_LAGGING:
+                            Log.i(TAG, "Info (" + msg.arg1 + "," + msg.arg2 + ")");
+                            break;
+                        case MEDIA_INFO_METADATA_UPDATE:
+                            try {
+                                scanInternalSubtitleTracks();
+                            } catch (RuntimeException e) {
+                                Message msg2 = obtainMessage(
+                                        MEDIA_ERROR, MEDIA_ERROR_UNKNOWN, MEDIA_ERROR_UNSUPPORTED, null);
+                                sendMessage(msg2);
+                            }
+                            // fall through
 
-                case MEDIA_INFO_EXTERNAL_METADATA_UPDATE:
-                    msg.arg1 = MEDIA_INFO_METADATA_UPDATE;
-                    // update default track selection
-                    if (mSubtitleController != null) {
-                        mSubtitleController.selectDefaultTrack();
-                    }
-                    break;
-                case MEDIA_INFO_BUFFERING_START:
-                case MEDIA_INFO_BUFFERING_END:
-                    TimeProvider timeProvider = mTimeProvider;
-                    if (timeProvider != null) {
-                        timeProvider.onBuffering(msg.arg1 == MEDIA_INFO_BUFFERING_START);
-                    }
-                    break;
-                }
+                        case MEDIA_INFO_EXTERNAL_METADATA_UPDATE:
+                            msg.arg1 = MEDIA_INFO_METADATA_UPDATE;
+                            // update default track selection
+                            if (mSubtitleController != null) {
+                                mSubtitleController.selectDefaultTrack();
+                            }
+                            break;
+                        case MEDIA_INFO_BUFFERING_START:
+                        case MEDIA_INFO_BUFFERING_END:
+                            TimeProvider timeProvider = mTimeProvider;
+                            if (timeProvider != null) {
+                                timeProvider.onBuffering(msg.arg1 == MEDIA_INFO_BUFFERING_START);
+                            }
+                            break;
+                        }
 
-                OnInfoListener onInfoListener = mOnInfoListener;
-                if (onInfoListener != null) {
-                    onInfoListener.onInfo(mMediaPlayer, msg.arg1, msg.arg2);
-                }
-                // No real default action so far.
-                return;
-            case MEDIA_TIMED_TEXT:
-                OnTimedTextListener onTimedTextListener = mOnTimedTextListener;
-                if (onTimedTextListener == null)
-                    return;
-                if (msg.obj == null) {
-                    onTimedTextListener.onTimedText(mMediaPlayer, null);
-                } else {
-                    if (msg.obj instanceof Parcel) {
-                        Parcel parcel = (Parcel)msg.obj;
-                        TimedText text = new TimedText(parcel);
-                        parcel.recycle();
-                        onTimedTextListener.onTimedText(mMediaPlayer, text);
-                    }
-                }
-                return;
+                        OnInfoListener onInfoListener = mOnInfoListener;
+                        if (onInfoListener != null) {
+                            onInfoListener.onInfo(mMediaPlayer, msg.arg1, msg.arg2);
+                        }
+                        // No real default action so far.
+                        return;
+                    case MEDIA_TIMED_TEXT:
+                        OnTimedTextListener onTimedTextListener = mOnTimedTextListener;
+                        if (onTimedTextListener == null)
+                            return;
+                        if (msg.obj == null) {
+                            onTimedTextListener.onTimedText(mMediaPlayer, null);
+                        } else {
+                            if (msg.obj instanceof Parcel) {
+                                Parcel parcel = (Parcel)msg.obj;
+                                TimedText text = new TimedText(parcel);
+                                parcel.recycle();
+                                onTimedTextListener.onTimedText(mMediaPlayer, text);
+                            }
+                        }
+                        return;
 
-            case MEDIA_SUBTITLE_DATA:
-                OnSubtitleDataListener onSubtitleDataListener = mOnSubtitleDataListener;
-                if (onSubtitleDataListener == null) {
-                    return;
-                }
-                if (msg.obj instanceof Parcel) {
-                    Parcel parcel = (Parcel) msg.obj;
-                    SubtitleData data = new SubtitleData(parcel);
-                    parcel.recycle();
-                    onSubtitleDataListener.onSubtitleData(mMediaPlayer, data);
-                }
-                return;
+                    case MEDIA_SUBTITLE_DATA:
+                        OnSubtitleDataListener onSubtitleDataListener = mOnSubtitleDataListener;
+                        if (onSubtitleDataListener == null) {
+                            return;
+                        }
+                        if (msg.obj instanceof Parcel) {
+                            Parcel parcel = (Parcel) msg.obj;
+                            SubtitleData data = new SubtitleData(parcel);
+                            parcel.recycle();
+                            onSubtitleDataListener.onSubtitleData(mMediaPlayer, data);
+                        }
+                        return;
 
-            case MEDIA_META_DATA:
-                OnTimedMetaDataAvailableListener onTimedMetaDataAvailableListener =
-                    mOnTimedMetaDataAvailableListener;
-                if (onTimedMetaDataAvailableListener == null) {
-                    return;
-                }
-                if (msg.obj instanceof Parcel) {
-                    Parcel parcel = (Parcel) msg.obj;
-                    TimedMetaData data = TimedMetaData.createTimedMetaDataFromParcel(parcel);
-                    parcel.recycle();
-                    onTimedMetaDataAvailableListener.onTimedMetaDataAvailable(mMediaPlayer, data);
-                }
-                return;
+                    case MEDIA_META_DATA:
+                        OnTimedMetaDataAvailableListener onTimedMetaDataAvailableListener =
+                            mOnTimedMetaDataAvailableListener;
+                        if (onTimedMetaDataAvailableListener == null) {
+                            return;
+                        }
+                        if (msg.obj instanceof Parcel) {
+                            Parcel parcel = (Parcel) msg.obj;
+                            TimedMetaData data = TimedMetaData.createTimedMetaDataFromParcel(parcel);
+                            parcel.recycle();
+                            onTimedMetaDataAvailableListener.onTimedMetaDataAvailable(mMediaPlayer, data);
+                        }
+                        return;
 
-            case MEDIA_NOP: // interface test message - ignore
-                break;
+                    case MEDIA_NOP: // interface test message - ignore
+                        break;
 
-            default:
-                Log.e(TAG, "Unknown message type " + msg.what);
-                return;
+                    default:
+                        Log.e(TAG, "Unknown message type " + msg.what);
+                        return;
+                }
+            } catch (NullPointerException e) {
+                /**
+                 * We may get an NPE even with the null checks above due
+                 * to threading issues.  Just ignore it.
+                 */
+                Log.e(TAG, "Unhandled NPE from message type " + msg.what);
             }
         }
     }
