@@ -2771,10 +2771,6 @@
     
     <integer name="config_deviceHardwareKeys">83</integer>
     
-    <integer name="config_proximityCheckTimeout">320</integer>
-    <bool name="config_proximityCheckOnWake">true</bool>
-    <bool name="config_proximityCheckOnWakeEnabledByDefault">true</bool>
-    
     <bool name="config_deviceHasVariableButtonBrightness">false</bool>
     <integer name="config_buttonBrightnessSettingDefault">100</integer>
     
@@ -2785,4 +2781,7 @@
     <string-array name="config_disabledComponents" translatable="false">
     </string-array>
 
+    <bool name="config_proximityCheckOnWake">false</bool>
+    <integer name="config_proximityCheckTimeout">300</integer>
+    <bool name="config_proximityCheckOnWakeEnabledByDefault">true</bool>
 </resources>

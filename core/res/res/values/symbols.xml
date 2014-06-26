@@ -2855,10 +2855,6 @@
   
   <!-- Gesture Sensor -->
   <java-symbol type="bool" name="config_enableGestureService" />
-  
-  <java-symbol type="integer" name="config_proximityCheckTimeout" />
-  <java-symbol type="bool"    name="config_proximityCheckOnWake" />
-  <java-symbol type="bool"    name="config_proximityCheckOnWakeEnabledByDefault" />
 
   <java-symbol type="bool" name="config_samsung_stk" />
 
@@ -2877,4 +2873,8 @@
   <java-symbol type="string" name="reboot_to_recovery_message" />
   <java-symbol type="array" name="shutdown_reboot_options" />
   <java-symbol type="array" name="shutdown_reboot_actions" />
+
+  <java-symbol type="bool" name="config_proximityCheckOnWake" />
+  <java-symbol type="integer" name="config_proximityCheckTimeout" />
+  <java-symbol type="bool" name="config_proximityCheckOnWakeEnabledByDefault" />
 </resources>

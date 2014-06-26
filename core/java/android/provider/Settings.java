@@ -3598,14 +3598,6 @@ public final class Settings {
                                 "touchscreen_gesture_haptic_feedback";
         
         /**
-         * Whether proximity check is enabled
-         * 
-         * @hide
-         */
-        public static final String PROXIMITY_ON_WAKE =
-                                "proximity_on_wake";
-
-        /**
          * Set a device-specific setting
          *
          * @param key Key
@@ -3818,6 +3810,15 @@ public final class Settings {
          */
         public static final String ENABLE_MODERN_SERVICES =
                                 "enable_modern_services";
+
+        /**
+         * Whether the proximity sensor should be used to check whether to
+         * wake the device or not (e. g. for preventing pocket touches)
+         *
+         * @hide
+         */
+        public static final String PROXIMITY_ON_WAKE =
+                                "proximity_on_wake";
 
         /**
          * IMPORTANT: If you add a new public settings you also have to add it to
