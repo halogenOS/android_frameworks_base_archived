@@ -2744,10 +2744,6 @@
   
   <!-- Gesture Sensor -->
   <java-symbol type="bool" name="config_enableGestureService" />
-  
-  <java-symbol type="integer" name="config_proximityCheckTimeout" />
-  <java-symbol type="bool"    name="config_proximityCheckOnWake" />
-  <java-symbol type="bool"    name="config_proximityCheckOnWakeEnabledByDefault" />
 
   <!-- VoLTE preferred -->
   <java-symbol type="bool" name="config_volte_preferred" />
@@ -2775,4 +2771,8 @@
   <java-symbol type="array" name="shutdown_reboot_actions" />
 
   <java-symbol type="array" name="config_reenableComponents" />
+
+  <java-symbol type="bool" name="config_proximityCheckOnWake" />
+  <java-symbol type="integer" name="config_proximityCheckTimeout" />
+  <java-symbol type="bool" name="config_proximityCheckOnWakeEnabledByDefault" />
 </resources>
