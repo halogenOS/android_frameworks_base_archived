@@ -1444,7 +1444,12 @@ public class InputMethodManagerService extends IInputMethodManager.Stub
             }
         }
 
-        return startInputInnerLocked();
+        try {
+            return startInputInnerLocked();
+        } catch (IllegalArgumentException e) {
+            Slog.w(TAG, "Unexpected IllegalArgumentException", e);
+            return null;
+        }
     }
 
     InputBindResult startInputInnerLocked() {
