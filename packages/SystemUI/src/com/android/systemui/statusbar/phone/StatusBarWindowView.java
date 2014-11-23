@@ -37,10 +37,12 @@ import android.os.ServiceManager;
 import android.os.UserHandle;
 import android.provider.Settings;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewRootImpl;
 import android.view.WindowManager;
 import android.view.WindowManagerGlobal;
@@ -80,6 +82,9 @@ public class StatusBarWindowView extends FrameLayout {
         setMotionEventSplittingEnabled(false);
         mTransparentSrcPaint.setColor(0);
         mTransparentSrcPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
+        mStatusBarHeaderHeight = context
+                .getResources().getDimensionPixelSize(R.dimen.status_bar_header_height);
+        mSettingsObserver = new SettingsObserver(mHandler);
     }
 
     @Override
@@ -160,6 +165,21 @@ public class StatusBarWindowView extends FrameLayout {
     protected void onAttachedToWindow () {
         super.onAttachedToWindow();
 
+        mSettingsObserver.observe();
+        mDoubleTapGesture = new GestureDetector(mContext, new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onDoubleTap(MotionEvent e) {
+                PowerManager pm = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
+                Log.d(TAG, "Gesture!!");
+                if(pm != null)
+                    pm.goToSleep(e.getEventTime());
+                else
+                    Log.d(TAG, "getSystemService returned null PowerManager");
+
+                return true;
+            }
+        });
+
         // We really need to be able to animate while window animations are going on
         // so that activities may be started asynchronously from panel animations
         final ViewRootImpl root = getViewRootImpl();
@@ -180,6 +200,12 @@ public class StatusBarWindowView extends FrameLayout {
         } else {
             setWillNotDraw(!DEBUG);
         }
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        mSettingsObserver.unobserve();
     }
 
     @Override
