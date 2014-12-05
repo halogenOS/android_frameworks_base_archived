@@ -3226,6 +3226,12 @@ public final class Settings {
         public static final String ANIMATOR_DURATION_SCALE = Global.ANIMATOR_DURATION_SCALE;
 
         /**
+         * Show the pending notification counts as overlays on the status bar
+         * @hide
+         */
+        public static final String STATUS_BAR_NOTIF_COUNT = "status_bar_notif_count";
+
+        /**
          * Control whether the accelerometer will be used to change screen
          * orientation.  If 0, it will not be used unless explicitly requested
          * by the application; if 1, it will be used by default unless explicitly
@@ -3588,15 +3594,15 @@ public final class Settings {
                 }
             }
         };
-        
+
         /**
          * Whether touchscreen gestures give a haptic feedback
-         * 
+         *
          * @hide
          */
         public static final String TOUCHSCREEN_GESTURE_HAPTIC_FEEDBACK =
                                 "touchscreen_gesture_haptic_feedback";
-        
+
         /**
          * Set a device-specific setting
          *
@@ -3748,55 +3754,55 @@ public final class Settings {
 
         /**
          * Long press on home button behavior
-         * 
+         *
          * @hide
          */
         public static final String LONG_PRESS_HOME_BUTTON_BEHAVIOR =
                                 "long_press_home_button_behavior";
-        
+
         /**
          * Navbar toggle
-         * 
+         *
          * @hide
          */
         public static final String SHOW_NAVBAR =
                                 "user_wants_show_navbar";
-        
-        
+
+
         /**
          * Button backlight brightness
-         * 
+         *
          * @hide
          */
         public static final String BUTTON_BACKLIGHT_BRIGHTNESS =
                                 "button_backlight_brightness";
-        
+
         /**
          * Button backlight timeout
-         * 
+         *
          * @hide
          */
         public static final String BUTTON_BACKLIGHT_TIMEOUT =
                                 "button_backlight_timeout";
-        
+
         /**
          * Button backlight control type
-         * 
+         *
          * @hide
          */
         public static final String BUTTON_BACKLIGHT_CONTROL_TYPE =
                                 "button_backlight_control_type";
         /**
          * Hardware buttons toggle
-         * 
+         *
          * @hide
          */
         public static final String HARDWARE_BUTTONS_ENABLED =
                                 "hardware_buttons_enabled";
-        
+
         /**
          * Lockscreen Visualizer
-         * 
+         *
          * @hide
          */
         public static final String SHOW_LOCKSCREEN_VISUALIZER =
@@ -3805,7 +3811,7 @@ public final class Settings {
 
         /**
          * Modern Services
-         * 
+         *
          * @hide
          */
         public static final String ENABLE_MODERN_SERVICES =
@@ -6222,7 +6228,7 @@ public final class Settings {
          */
         public static final int INCALL_POWER_BUTTON_BEHAVIOR_DEFAULT =
                 INCALL_POWER_BUTTON_BEHAVIOR_SCREEN_OFF;
-                
+
         /**
          * Whether the device should wake when the wake gesture sensor detects motion.
          * @hide
@@ -6582,10 +6588,10 @@ public final class Settings {
          */
         public static final String MANAGED_PROFILE_CONTACT_REMOTE_SEARCH =
                 "managed_profile_contact_remote_search";
-        
+
         /**
          * Whether to disable dropbox
-         * 
+         *
          * @hide
          */
         public static final String DISABLE_DROPBOX =
