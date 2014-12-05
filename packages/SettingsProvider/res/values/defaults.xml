@@ -304,6 +304,5 @@
     <integer name="def_tether_dun_required">0</integer>
 
     <!-- Default for Settings.System.STATUS_BAR_NOTIF_COUNT. -->
-    <integer name="def_notif_count">1</integer>
-
+    <integer name="def_notif_count">0</integer>
 </resources>

@@ -70,7 +70,16 @@ public class StatusBarIconView extends AnimatedImageView {
             boolean blocked) {
         super(context);
         mBlocked = blocked;
+        Resources res = mContext.getResources();
+        final float densityMultiplier = res.getDisplayMetrics().density;
+        final float scaledPx = 8 * densityMultiplier;
         mSlot = slot;
+        mNumberPaint = new Paint();
+        mNumberPaint.setTextAlign(Paint.Align.CENTER);
+        mNumberPaint.setColor(context.getColor(R.drawable.notification_number_text_color));
+        mNumberPaint.setAntiAlias(true);
+        mNumberPaint.setTypeface(Typeface.DEFAULT_BOLD);
+        mNumberPaint.setTextSize(scaledPx);
         setNotification(notification);
         maybeUpdateIconScale();
         setScaleType(ScaleType.CENTER);
@@ -423,7 +432,7 @@ public class StatusBarIconView extends AnimatedImageView {
         void observe() {
             mContext.getContentResolver().registerContentObserver(
                     Settings.System.getUriFor(Settings.System.STATUS_BAR_NOTIF_COUNT),
-                    true, this);
+                    false, this);
         }
 
         void unobserve() {
