@@ -266,6 +266,7 @@ public class MediaFile {
         addFileType("AIF", FILE_TYPE_AIFF, "audio/x-aiff");
         addFileType("AIFF", FILE_TYPE_AIFF, "audio/x-aiff");
         addFileType("APE", FILE_TYPE_APE, "audio/x-ape");
+        addFileType("FLV", FILE_TYPE_FLV, "video/x-flv");
     }
 
     public static boolean isAudioFileType(int fileType) {
