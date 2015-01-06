@@ -958,6 +958,7 @@ public abstract class PanelView extends FrameLayout {
      * Phase 1: Move everything upwards.
      */
     private void startUnlockHintAnimationPhase1(final Runnable onAnimationFinished) {
+        mKeyguardBottomArea.requestVisualizer(false, 0);
         float target = Math.max(0, getMaxPanelHeight() - mHintDistance);
         ValueAnimator animator = createHeightAnimator(target);
         animator.setDuration(250);
@@ -975,6 +976,7 @@ public abstract class PanelView extends FrameLayout {
                 if (mCancelled) {
                     mHeightAnimator = null;
                     onAnimationFinished.run();
+                    mKeyguardBottomArea.requestVisualizer(true, 250);
                 } else {
                     startUnlockHintAnimationPhase2(onAnimationFinished);
                 }
@@ -1012,6 +1014,7 @@ public abstract class PanelView extends FrameLayout {
                 mHeightAnimator = null;
                 onAnimationFinished.run();
                 notifyBarPanelExpansionChanged();
+                mKeyguardBottomArea.requestVisualizer(true, 200);
             }
         });
         animator.start();

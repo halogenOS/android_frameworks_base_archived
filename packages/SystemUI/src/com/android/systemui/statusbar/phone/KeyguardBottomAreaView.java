@@ -29,6 +29,16 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
+import android.hardware.fingerprint.FingerprintManager;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.Canvas;
+import android.graphics.DashPathEffect;
+import android.graphics.Paint;
+import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.InsetDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -62,9 +72,14 @@ import com.android.systemui.assist.AssistManager;
 import com.android.systemui.statusbar.CommandQueue;
 import com.android.systemui.statusbar.KeyguardAffordanceView;
 import com.android.systemui.statusbar.KeyguardIndicationController;
+import com.android.systemui.statusbar.StatusBarState;
 import com.android.systemui.statusbar.policy.AccessibilityController;
 import com.android.systemui.statusbar.policy.FlashlightController;
 import com.android.systemui.statusbar.policy.PreviewInflater;
+import com.pheelicks.visualizer.AudioData;
+import com.pheelicks.visualizer.FFTData;
+import com.pheelicks.visualizer.VisualizerView;
+import com.pheelicks.visualizer.renderer.Renderer;
 
 import static android.view.accessibility.AccessibilityNodeInfo.ACTION_CLICK;
 import static android.view.accessibility.AccessibilityNodeInfo.AccessibilityAction;
@@ -85,6 +100,8 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
 
     public static final String EXTRA_CAMERA_LAUNCH_SOURCE
             = "com.android.systemui.camera_launch_source";
+    
+    private static final boolean DEBUG = true;
 
     private static final Intent SECURE_CAMERA_INTENT =
             new Intent(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA_SECURE)
@@ -95,7 +112,11 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
     private static final int DOZE_ANIMATION_STAGGER_DELAY = 48;
     private static final int DOZE_ANIMATION_ELEMENT_DURATION = 250;
 
+    // the length to animate the visualizer in and out
+    private static final int VISUALIZER_ANIMATION_DURATION = 300;
+    
     private EmergencyButton mEmergencyButton;
+
     private KeyguardAffordanceView mCameraImageView;
     private KeyguardAffordanceView mLeftAffordanceView;
     private LockIcon mLockIcon;
@@ -133,6 +154,10 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
 
     private boolean mLeftIsVoiceAssist;
     private AssistManager mAssistManager;
+
+    private VisualizerView mVisualizer;
+    private boolean mScreenOn;
+    private boolean mLinked;
 
     public KeyguardBottomAreaView(Context context) {
         this(context, null);
@@ -215,6 +240,25 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
         mLockIcon.setOnLongClickListener(this);
         mCameraImageView.setOnClickListener(this);
         mLeftAffordanceView.setOnClickListener(this);
+        mVisualizer = (VisualizerView) findViewById(R.id.visualizerView);
+        if (mVisualizer != null) {
+            Paint paint = new Paint();
+            Resources res = mContext.getResources();
+            paint.setStrokeWidth(res.getDimensionPixelSize(R.dimen.kg_visualizer_path_stroke_width));
+            paint.setAntiAlias(true);
+            paint.setColor(res.getColor(R.color.equalizer_fill_color));
+            paint.setPathEffect(new DashPathEffect(new float[] {
+                    res.getDimensionPixelSize(R.dimen.kg_visualizer_path_effect_1),
+                    res.getDimensionPixelSize(R.dimen.kg_visualizer_path_effect_2)
+            }, 0));
+
+            int bars = res.getInteger(R.integer.kg_visualizer_divisions);
+            mVisualizer.addRenderer(new LockscreenBarEqRenderer(bars, paint,
+                    res.getInteger(R.integer.kg_visualizer_db_fuzz),
+                    res.getInteger(R.integer.kg_visualizer_db_fuzz_factor)));
+
+        }
+
         initAccessibility();
     }
 
@@ -461,7 +505,6 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
                 }
             });
         } else {
-
             // We need to delay starting the activity because ResolverActivity finishes itself if
             // launched behind lockscreen.
             mActivityStarter.startActivity(intent, false /* dismissShade */,
@@ -526,12 +569,22 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
     @Override
     protected void onVisibilityChanged(View changedView, int visibility) {
         super.onVisibilityChanged(changedView, visibility);
+
+        if (!isShown())
+            requestVisualizer(false, 0);
+
         if (changedView == this && visibility == VISIBLE) {
             mLockIcon.update();
             updateCameraVisibility();
         }
     }
 
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        requestVisualizer(false, 0);
+    }
+    
     public KeyguardAffordanceView getLeftView() {
         return mLeftAffordanceView;
     }
@@ -653,6 +706,19 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
         @Override
         public void onScreenTurnedOn() {
             mLockIcon.setScreenOn(true);
+            requestVisualizer(true, 300);
+            mScreenOn = true;
+        }
+
+        @Override
+        public void onScreenTurnedOff() {
+            mLockIcon.setScreenOn(false);
+            requestVisualizer(false, 0);
+            mScreenOn = false;
+        }
+        
+        public void onKeyguardVisibilityChanged(boolean showing) {
+            mLockIcon.update();
         }
 
         @Override
@@ -698,4 +764,119 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
             }
         }
     }
+
+    public void requestVisualizer(boolean show, int delay) {
+        removeCallbacks(mStartVisualizer);
+        removeCallbacks(mStopVisualizer);
+        if (DEBUG) Log.d(TAG, "requestVisualizer(show: " + show + ", delay: " + delay + ")");
+        if (show
+                && mPhoneStatusBar.getBarState() == StatusBarState.KEYGUARD
+                && !mPhoneStatusBar.isKeyguardFadingAway()
+                && !mPhoneStatusBar.isGoingToNotificationShade()) {
+            if (DEBUG) Log.d(TAG, "--> starting visualizer");
+            postDelayed(mStartVisualizer, delay);
+        } else {
+            if (DEBUG) { 
+                Log.d(TAG, "--> stopping visualizer because:"); 
+                Log.d(TAG, "    show: " + show);
+                Log.d(TAG, "    mScreenOn: " + mScreenOn);
+                Log.d(TAG, "    mPhoneStatusBar.getBarState: "
+                    + mPhoneStatusBar.getBarState());
+                Log.d(TAG, "    !..isKeyguardFadingAway: " 
+                    + !mPhoneStatusBar.isKeyguardFadingAway());
+                Log.d(TAG, "    !..isGoingToNotificationShade: " 
+                    + !mPhoneStatusBar.isGoingToNotificationShade());
+            }
+            postDelayed(mStopVisualizer, delay);
+        }
+    }
+
+    private static class LockscreenBarEqRenderer extends Renderer {
+        private int mDivisions;
+        private Paint mPaint;
+        private int mDbFuzz;
+        private int mDbFuzzFactor;
+
+        /**
+         * Renders the FFT data as a series of lines, in histogram form
+         *
+         * @param divisions - must be a power of 2. Controls how many lines to draw
+         * @param paint - Paint to draw lines with
+         * @param dbfuzz - final dB display adjustment
+         * @param dbFactor - dbfuzz is multiplied by dbFactor.
+         */
+        public LockscreenBarEqRenderer(int divisions, Paint paint, int dbfuzz, int dbFactor) {
+            super();
+            if (DEBUG) {
+                Log.d(TAG, "Lockscreen EQ Renderer; divisions:" + divisions + ", dbfuzz: "
+                        + dbfuzz + "dbFactor: " + dbFactor);
+            }
+            mDivisions = divisions;
+            mPaint = paint;
+            mDbFuzz = dbfuzz;
+            mDbFuzzFactor = dbFactor;
+        }
+
+        @Override
+        public void onRender(Canvas canvas, AudioData data, Rect rect) {
+            // Do nothing, we only display FFT data
+        }
+
+        @Override
+        public void onRender(Canvas canvas, FFTData data, Rect rect) {
+            for (int i = 0; i < data.bytes.length / mDivisions; i++) {
+                mFFTPoints[i * 4] = i * 4 * mDivisions;
+                mFFTPoints[i * 4 + 2] = i * 4 * mDivisions;
+                byte rfk = data.bytes[mDivisions * i];
+                byte ifk = data.bytes[mDivisions * i + 1];
+                float magnitude = (rfk * rfk + ifk * ifk);
+                int dbValue = magnitude > 0 ? (int) (10 * Math.log10(magnitude)) : 0;
+
+                mFFTPoints[i * 4 + 1] = rect.height();
+                mFFTPoints[i * 4 + 3] = rect.height() - ((dbValue * mDbFuzzFactor) + mDbFuzz);
+            }
+
+            canvas.drawLines(mFFTPoints, mPaint);
+        }
+    }
+
+    private final Runnable mStartVisualizer = new Runnable() {
+        @Override
+        public void run() {
+            if (DEBUG) Log.w(TAG, "mStartVisualizer");
+
+            mVisualizer.animate()
+                    .alpha(1f)
+                    .setDuration(VISUALIZER_ANIMATION_DURATION);
+            AsyncTask.execute(new Runnable() {
+                @Override
+                public void run() {
+                    if (mVisualizer != null && !mLinked) {
+                        mVisualizer.link(0);
+                        mLinked = true;
+                    }
+                }
+            });
+        }
+    };
+
+    private final Runnable mStopVisualizer = new Runnable() {
+        @Override
+        public void run() {
+            if (DEBUG) Log.w(TAG, "mStopVisualizer");
+
+            mVisualizer.animate()
+                    .alpha(0f)
+                    .setDuration(VISUALIZER_ANIMATION_DURATION);
+            AsyncTask.execute(new Runnable() {
+                @Override
+                public void run() {
+                    if (mVisualizer != null && mLinked) {
+                        mVisualizer.unlink();
+                        mLinked = false;
+                    }
+                }
+            });
+        }
+    };
 }
