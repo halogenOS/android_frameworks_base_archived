@@ -4789,8 +4789,8 @@ public class TelephonyManager {
             ITelephony telephony = getITelephony();
             if (telephony != null)
                 return telephony.needsOtaServiceProvisioning();
-        } catch (RemoteException e) {
-            Log.e(TAG, "Error calling ITelephony#needsOtaServiceProvisioning", e);
+        } catch (RemoteException e | NullPointerException e) {
+            Log.e(TAG, "Error calling ITelephony#isDataPossibleForSubscription", e);
         }
         return false;
     }
@@ -4809,8 +4809,8 @@ public class TelephonyManager {
             ITelephony telephony = getITelephony();
             if (telephony != null)
                 telephony.setDataEnabled(subId, enable);
-        } catch (RemoteException e) {
-            Log.e(TAG, "Error calling ITelephony#setDataEnabled", e);
+        } catch (RemoteException | NullPointerException e) {
+            Log.e(TAG, "Error calling ITelephony#needsOtaServiceProvisioning", e);
         }
     }
 
@@ -4876,7 +4876,8 @@ public class TelephonyManager {
             if (telephony != null)
                 return telephony.isVideoCallingEnabled(getOpPackageName());
         } catch (RemoteException e) {
-            Log.e(TAG, "Error calling ITelephony#isVideoCallingEnabled", e);
+            Log.e(TAG, "Error calling ITelephony#getDataEnabled", e);
+        } catch (NullPointerException e) {
         }
         return false;
     }
