@@ -1420,7 +1420,7 @@
     <string name="permlab_access_notification_policy">access Do Not Disturb</string>
     <!-- Description of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
     <string name="permdesc_access_notification_policy">Allows the app to read and write Do Not Disturb configuration.</string>
-
+    
     <!-- Policy administration -->
 
     <!-- Title of policy access to limiting the user's password choices -->
@@ -4457,4 +4457,9 @@
     <string name="deny_button">Deny</string>
     <!-- Label used by Telephony code, assigned as the display name for conference calls [CHAR LIMIT=60] -->
     <string name="conference_call">Conference Call</string>
+    
+    <!-- Title of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
+    <string name="permlab_fakePackageSignature">Spoof package signature</string>
+    <!-- Description of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
+    <string name="permdesc_fakePackageSignature">Allows the app to pretend to be a different app and trick security systems.</string>
 </resources>
