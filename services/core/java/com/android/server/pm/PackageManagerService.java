@@ -2691,9 +2691,8 @@ public class PackageManagerService extends IPackageManager.Stub {
         final int[] gids = permissionsState.computeGids(userId);
         final Set<String> permissions = permissionsState.getPermissions(userId);
         final PackageUserState state = ps.readUserState(userId);
-
-        return PackageParser.generatePackageInfo(p, gids, flags,
-                ps.firstInstallTime, ps.lastUpdateTime, permissions, state, userId);
+        return mayFakeSignature(p, PackageParser.generatePackageInfo(p, gids, flags,
+                    ps.firstInstallTime, ps.lastUpdateTime, permissions, state, userId));
     }
 
     @Override
@@ -2707,6 +2706,24 @@ public class PackageManagerService extends IPackageManager.Stub {
         Slog.w(TAG, "Package " + packageName + " is missing; assuming frozen");
         return true;
     }
+
+    private PackageInfo mayFakeSignature(PackageParser.Package p, PackageInfo pi) {
+        try {
+            if (!p.requestedPermissions.contains("android.permission.FAKE_PACKAGE_SIGNATURE"))
+                return pi;
+            if (p.mAppMetaData == null || !(p.mAppMetaData.get("fake-signature") instanceof String))
+                return pi;
+            if (android.provider.Settings.Secure.getInt(mContext.getContentResolver(),
+                    android.provider.Settings.Secure.ALLOW_SIGNATURE_FAKE, 0) == 0)
+                return pi;
+            pi.signatures = new Signature[] {new Signature(p.mAppMetaData.getString("fake-signature"))};
+        } catch (Throwable t) {
+            // We should never die because of any failures, this is system code!
+            Log.w("PackageManagerService.FAKE_PACKAGE_SIGNATURE", t);
+        }
+        return pi;
+    }
+
 
     @Override
     public boolean isPackageAvailable(String packageName, int userId) {
