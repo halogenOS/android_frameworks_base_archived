@@ -379,14 +379,7 @@ public class ImmersiveModeConfirmation {
 
         @Override
         public void handleMessage(Message msg) {
-            switch(msg.what) {
-                case SHOW:
-                    handleShow();
-                    break;
-                case HIDE:
-                    handleHide();
-                    break;
-            }
+            handleHide();
         }
     }
 
