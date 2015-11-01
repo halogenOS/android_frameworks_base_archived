@@ -3831,6 +3831,14 @@ public final class Settings {
          */
 
         /**
+         * Whether user can enable/disable navigation bar.
+         * <p>
+         * Type: int (0 for false, 1 for true)
+         * @hide
+         */
+        public static final String NAVIGATION_BAR_ENABLED = "navigation_bar_enabled";
+
+        /**
          *  Enable statusbar double tap gesture on to put device to sleep
          * @hide
          */
@@ -3963,6 +3971,7 @@ public final class Settings {
             PUBLIC_SETTINGS.add(BUTTON_BACKLIGHT_TIMEOUT);
             PUBLIC_SETTINGS.add(SHOW_LOCKSCREEN_VISUALIZER);
             PUBLIC_SETTINGS.add(ENABLE_MODERN_SERVICES);
+            PUBLIC_SETTINGS.add(NAVIGATION_BAR_ENABLED);
         }
 
         /**
