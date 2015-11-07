@@ -14,22 +14,22 @@
 -->
 <resources>
 
-    <!-- config softap extention feature -->
-    <java-symbol type="bool" name="config_softap_extention" />
+  <!-- config softap extention feature -->
+  <java-symbol type="bool" name="config_softap_extention" />
 
-    <!-- Custom Carrier Label -->
-    <dimen name="status_bar_carrier_height">14dp</dimen>
+  <!-- Custom Carrier Label -->
+  <dimen name="status_bar_carrier_height">14dp</dimen>
 
-    <!-- One-Hand UI Mode -->
-    <java-symbol type="id" name="relative_top" />
-    <java-symbol type="id" name="hint_info" />
-    <java-symbol type="id" name="single_hand_window_title" />
-    <java-symbol type="id" name="click_hint" />
-    <java-symbol type="id" name="hint_section" />
-    <java-symbol type="id" name="relative_bottom" />
-    <java-symbol type="id" name="slide_hint_area" />
-    <java-symbol type="string" name="singlehandmode_click_hint_message" />
-    <java-symbol type="layout" name="single_hand_window" />
+  <!-- One-Hand UI Mode -->
+  <java-symbol type="id" name="relative_top" />
+  <java-symbol type="id" name="hint_info" />
+  <java-symbol type="id" name="single_hand_window_title" />
+  <java-symbol type="id" name="click_hint" />
+  <java-symbol type="id" name="hint_section" />
+  <java-symbol type="id" name="relative_bottom" />
+  <java-symbol type="id" name="slide_hint_area" />
+  <java-symbol type="string" name="singlehandmode_click_hint_message" />
+  <java-symbol type="layout" name="single_hand_window" />
 
   <!-- LuckyPatcher carnt dialog -->
   <java-symbol type="string" name="lucky_patcher_installed_title" />
@@ -39,7 +39,22 @@
   <!-- Whether device has dash charging support -->
   <java-symbol type="bool" name="config_hasDashCharger" />
  
-    <!-- Whether notify fingerprint client of successful cancelled authentication -->
-    <java-symbol type="bool" name="config_notifyClientOnFingerprintCancelSuccess" />
+  <!-- Whether notify fingerprint client of successful cancelled authentication -->
+  <java-symbol type="bool" name="config_notifyClientOnFingerprintCancelSuccess" />
+
+  <!-- Input policy constants  -->
+  <java-symbol type="integer" name="config_deviceHardwareKeys" />
+  <java-symbol type="integer" name="config_doubleTapOnHomeKeyBehavior" />
+  <java-symbol type="integer" name="config_doubleTapOnMenuKeyBehavior" />
+  <java-symbol type="integer" name="config_doubleTapOnBackKeyBehavior" />
+  <java-symbol type="integer" name="config_doubleTapOnAssistKeyBehavior" />
+  <java-symbol type="integer" name="config_doubleTapOnAppSwitchKeyBehavior" />
+  <java-symbol type="integer" name="config_doubleTapOnCameraKeyBehavior" />
+  <java-symbol type="integer" name="config_longPressOnHomeKeyBehavior" />
+  <java-symbol type="integer" name="config_longPressOnMenuKeyBehavior" />
+  <java-symbol type="integer" name="config_longPressOnBackKeyBehavior" />
+  <java-symbol type="integer" name="config_longPressOnAssistKeyBehavior" />
+  <java-symbol type="integer" name="config_longPressOnAppSwitchKeyBehavior" />
+  <java-symbol type="integer" name="config_longPressOnCameraKeyBehavior" />
 
 </resources>
