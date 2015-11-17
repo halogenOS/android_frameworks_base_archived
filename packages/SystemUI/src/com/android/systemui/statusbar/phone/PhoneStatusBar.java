@@ -233,12 +233,16 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             .setUsage(AudioAttributes.USAGE_ASSISTANCE_SONIFICATION)
             .build();
 
-    public static final int FADE_KEYGUARD_START_DELAY = 100;
-    public static final int FADE_KEYGUARD_DURATION = 300;
+    private static final float BRIGHTNESS_CONTROL_PADDING = 0.15f;
+    private static final int BRIGHTNESS_CONTROL_LONG_PRESS_TIMEOUT = 750; // ms
+    private static final int BRIGHTNESS_CONTROL_LINGER_THRESHOLD = 20;
+
+    public static final int FADE_KEYGUARD_START_DELAY = 80;
+    public static final int FADE_KEYGUARD_DURATION = 160;
     public static final int FADE_KEYGUARD_DURATION_PULSING = 96;
 
     /** Allow some time inbetween the long press for back and recents. */
-    private static final int LOCK_TO_APP_GESTURE_TOLERENCE = 200;
+    private static final int LOCK_TO_APP_GESTURE_TOLERENCE = 100;
 
     /**
      * A key that is used to retrieve the value of the checkbox
@@ -1852,7 +1856,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                                 + mBackdropBack.getDrawable());
                     }
                     mBackdropFront.animate()
-                            .setDuration(250)
+                            .setDuration(175)
                             .alpha(0f).withEndAction(mHideBackdropFront);
                 }
             }
@@ -1863,12 +1867,24 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                 if (DEBUG_MEDIA) {
                     Log.v(TAG, "DEBUG_MEDIA: Fading out album artwork");
                 }
-                if (mFingerprintUnlockController.getMode()
-                        == FingerprintUnlockController.MODE_WAKE_AND_UNLOCK_PULSING) {
-
-                    // We are unlocking directly - no animation!
-                    mBackdrop.setVisibility(View.GONE);
-                } else {
+                mBackdrop.animate()
+                        // Never let the alpha become zero - otherwise the RenderNode
+                        // won't draw anything and uninitialized memory will show through
+                        // if mScrimSrcModeEnabled. Note that 0.001 is rounded down to 0 in libhwui.
+                        .alpha(0.002f)
+                        .setInterpolator(mBackdropInterpolator)
+                        .setDuration(300)
+                        .setStartDelay(0)
+                        .withEndAction(new Runnable() {
+                            @Override
+                            public void run() {
+                                mBackdrop.setVisibility(View.GONE);
+                                mBackdropFront.animate().cancel();
+                                mBackdropBack.animate().cancel();
+                                mHandler.post(mHideBackdropFront);
+                            }
+                        });
+                if (mKeyguardFadingAway) {
                     mBackdrop.animate()
                             // Never let the alpha become zero - otherwise the RenderNode
                             // won't draw anything and uninitialized memory will show through
@@ -1876,7 +1892,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                             // libhwui.
                             .alpha(0.002f)
                             .setInterpolator(mBackdropInterpolator)
-                            .setDuration(300)
+                            .setDuration(200)
                             .setStartDelay(0)
                             .withEndAction(new Runnable() {
                                 @Override
