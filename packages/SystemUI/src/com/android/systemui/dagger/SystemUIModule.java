@@ -54,6 +54,7 @@ import com.android.systemui.flags.FeatureFlags;
 import com.android.systemui.flags.FlagsModule;
 import com.android.systemui.keyboard.KeyboardModule;
 import com.android.systemui.keyguard.data.BouncerViewModule;
+import com.android.systemui.derp.DerpFestModule;
 import com.android.systemui.log.dagger.LogModule;
 import com.android.systemui.log.dagger.MonitorLog;
 import com.android.systemui.log.table.TableLogBuffer;
@@ -169,6 +170,7 @@ import javax.inject.Named;
             DreamModule.class,
             ControlsModule.class,
             DemoModeModule.class,
+            DerpFestModule.class,
             FalsingModule.class,
             FlagsModule.class,
             SystemPropertiesFlagsModule.class,
