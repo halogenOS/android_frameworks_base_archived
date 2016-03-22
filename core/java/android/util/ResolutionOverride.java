@@ -1,4 +1,4 @@
-/* Copyright (c) 2015, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2015-2016 The Linux Foundation. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are
@@ -53,22 +53,25 @@ public class ResolutionOverride {
     /** @hide */
     public ResolutionOverride(SurfaceView view) {
         boolean enable = (view.getContext().getApplicationInfo().canOverrideRes() == 1);
+        String resStr = SystemProperties.get(RES_OVERRIDE, null);
+
+        if (!enable || resStr == null || resStr.length() == 0 ||
+                view.getResources() == null) {
+            return;
+        }
+
         int orientation = view.getResources().getConfiguration().orientation;
 
-        if(enable && (orientation == Configuration.ORIENTATION_PORTRAIT ||
-                orientation == Configuration.ORIENTATION_LANDSCAPE)) {
-            String resStr = SystemProperties.get(RES_OVERRIDE, null);
-
-            if (resStr != null && resStr.length() > 0) {
-                resStr = resStr.toLowerCase();
-                final int pos = resStr.indexOf('x');
-                if (pos > 0 && resStr.lastIndexOf('x') == pos) {
-                    try {
-                        mOverrideXres = Integer.parseInt(resStr.substring(0, pos));
-                        mOverrideYres = Integer.parseInt(resStr.substring(pos + 1));
-                    } catch (NumberFormatException ex) {
-                        Log.e(TAG, "Error in extracting the overriding xres and yres");
-                    }
+        if(orientation == Configuration.ORIENTATION_PORTRAIT ||
+                orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            resStr = resStr.toLowerCase();
+            final int pos = resStr.indexOf('x');
+            if (pos > 0 && resStr.lastIndexOf('x') == pos) {
+                try {
+                    mOverrideXres = Integer.parseInt(resStr.substring(0, pos));
+                    mOverrideYres = Integer.parseInt(resStr.substring(pos + 1));
+                } catch (NumberFormatException ex) {
+                    Log.e(TAG, "Error in extracting the overriding xres and yres");
                 }
             }
 
@@ -81,8 +84,8 @@ public class ResolutionOverride {
             if(mOverrideXres > 0 && mOverrideYres > 0) {
                 mIsEnabled = true;
                 if (DEBUG) Log.i(TAG, "Orientation: " + orientation +
-                    " Overriding resolution to" + " xres: " + mOverrideXres
-                    + " yres: " + mOverrideYres);
+                        " Overriding resolution to" + " xres: " + mOverrideXres
+                        + " yres: " + mOverrideYres);
             }
         }
     }
