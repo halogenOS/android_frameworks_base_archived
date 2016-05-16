@@ -93,8 +93,10 @@ public class MediaFile {
     public static final int FILE_TYPE_BMP     = 34;
     public static final int FILE_TYPE_WBMP    = 35;
     public static final int FILE_TYPE_WEBP    = 36;
+    public static final int FILE_TYPE_TIF     = 37;
+    public static final int FILE_TYPE_TGA     = 38;
     private static final int FIRST_IMAGE_FILE_TYPE = FILE_TYPE_JPEG;
-    private static final int LAST_IMAGE_FILE_TYPE = FILE_TYPE_WEBP;
+    private static final int  LAST_IMAGE_FILE_TYPE = FILE_TYPE_TGA;
    
     // Playlist file types
     public static final int FILE_TYPE_M3U      = 41;
@@ -104,7 +106,7 @@ public class MediaFile {
     public static final int FILE_TYPE_DASH     = 45;
 
     private static final int FIRST_PLAYLIST_FILE_TYPE = FILE_TYPE_M3U;
-    private static final int LAST_PLAYLIST_FILE_TYPE = FILE_TYPE_DASH;
+    private static final int  LAST_PLAYLIST_FILE_TYPE = FILE_TYPE_DASH;
 
     // Drm file types
     public static final int FILE_TYPE_FL      = 51;
@@ -234,6 +236,8 @@ public class MediaFile {
         addFileType("BMP", FILE_TYPE_BMP, "image/x-ms-bmp", MtpConstants.FORMAT_BMP);
         addFileType("WBMP", FILE_TYPE_WBMP, "image/vnd.wap.wbmp");
         addFileType("WEBP", FILE_TYPE_WEBP, "image/webp");
+        addFileType("TIF", FILE_TYPE_TIF,   "image/tiff");
+        addFileType("TGA", FILE_TYPE_TGA,   "image/x-tga");
  
         addFileType("M3U", FILE_TYPE_M3U, "audio/x-mpegurl", MtpConstants.FORMAT_M3U_PLAYLIST);
         addFileType("M3U", FILE_TYPE_M3U, "application/x-mpegurl", MtpConstants.FORMAT_M3U_PLAYLIST);
