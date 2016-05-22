@@ -7859,7 +7859,16 @@ public final class Settings {
          * @hide
          */
         public static final String LTE_SERVICE_FORCED = "lte_service_forced";
-
+        
+        /**
+         * Whether lockscreen visualizer is enabled or disabled.
+         * <p>
+         * Type: int (0 for false, 1 for true)
+         * @hide
+         */
+        public static final String LOCKSCREEN_VISUALIZER_ENABLED 
+                        = "lockscreen_visualizer_enabled";
+         
         /**
          * Settings to backup. This is here so that it's in the same place as the settings
          * keys and easy to update.
@@ -8040,6 +8049,20 @@ public final class Settings {
         public static boolean putInt(ContentResolver cr, String name, int value) {
             return putString(cr, name, Integer.toString(value));
         }
+        
+        /**
+         * Same as putInt(ContentResolver cr, String name, int value) but
+         * accepts boolean as value argument which is converted automatically
+         * to simplify.
+         * 
+         * @param cr The ContentResolver to access
+         * @param name The name of the setting to modify
+         * @param value The new value for the setting.
+         * @return true if the value was set, false on database errors
+         */
+         public static boolean putInt(ContentResolver cr, String name, boolean value) {
+             return putInt(cr, name, value ? 1 : 0);
+         }
 
         /**
          * Convenience function for retrieving a single secure settings value
