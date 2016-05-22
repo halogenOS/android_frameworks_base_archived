@@ -7868,6 +7868,15 @@ public final class Settings {
          */
         public static final String LOCKSCREEN_VISUALIZER_ENABLED 
                         = "lockscreen_visualizer_enabled";
+        
+        /**
+         * Whether searchbar should be shown in recents view or not.
+         * <p>
+         * Type: int (0 for false, 1 for true)
+         * @hide
+         */
+         public static final String RECENTS_SEARCHBAR_ENABLED
+                        = "recents_searchbar_enabled";
          
         /**
          * Settings to backup. This is here so that it's in the same place as the settings

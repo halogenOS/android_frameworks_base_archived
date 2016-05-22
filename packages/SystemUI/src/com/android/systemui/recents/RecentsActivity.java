@@ -28,10 +28,14 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.os.UserHandle;
+import android.provider.Settings;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewStub;
 import android.widget.Toast;
+import com.android.internal.logging.MetricsConstants;
+
+import static android.provider.Settings.Global.RECENTS_SEARCHBAR_ENABLED;
 
 import com.android.internal.logging.MetricsLogger;
 import com.android.systemui.Prefs;
@@ -290,6 +294,7 @@ public class RecentsActivity extends Activity implements RecentsView.RecentsView
             TaskStack stack = stacks.get(i);
             taskCount += stack.getTaskCount();
         }
+        refreshSearchWidgetView();
         MetricsLogger.histogram(this, "overview_task_count", taskCount);
     }
 
@@ -378,6 +383,7 @@ public class RecentsActivity extends Activity implements RecentsView.RecentsView
         filter.addAction(Intent.ACTION_SCREEN_OFF);
         filter.addAction(SearchManager.INTENT_GLOBAL_SEARCH_ACTIVITY_CHANGED);
         registerReceiver(mSystemBroadcastReceiver, filter);
+        refreshSearchWidgetView();
     }
 
     /** Inflates the debug overlay if debug mode is enabled. */
@@ -401,6 +407,8 @@ public class RecentsActivity extends Activity implements RecentsView.RecentsView
         if (mDebugOverlay != null) {
             mDebugOverlay.clear();
         }
+        
+        refreshSearchWidgetView();
     }
 
     @Override
@@ -653,6 +661,12 @@ public class RecentsActivity extends Activity implements RecentsView.RecentsView
 
     @Override
     public void refreshSearchWidgetView() {
+        if(Settings.Global.getInt(getContentResolver(),
+            RECENTS_SEARCHBAR_ENABLED, 0) == 0) {
+            mRecentsView.setSearchBar(null);
+            return;
+        }
+        
         if (mSearchWidgetInfo != null) {
             SystemServicesProxy ssp = RecentsTaskLoader.getInstance().getSystemServicesProxy();
             int searchWidgetId = ssp.getSearchAppWidgetId(this);
