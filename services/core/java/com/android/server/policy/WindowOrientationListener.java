@@ -25,6 +25,7 @@ import android.os.Handler;
 import android.os.SystemClock;
 import android.os.SystemProperties;
 import android.text.TextUtils;
+import android.view.OrientationEventListener;
 import android.util.Slog;
 
 import java.io.PrintWriter;
@@ -54,6 +55,9 @@ public abstract class WindowOrientationListener {
     private SensorManager mSensorManager;
     private boolean mEnabled;
     private int mRate;
+    
+    private SensorEventListener mSensorEventListener;
+
     private String mSensorType;
     private boolean mUseSystemClockforSensors;
     private Sensor mSensor;
@@ -88,12 +92,8 @@ public abstract class WindowOrientationListener {
         mHandler = handler;
         mSensorManager = (SensorManager)context.getSystemService(Context.SENSOR_SERVICE);
         mRate = rate;
-
         mSensorType = context.getResources().getString(
                 com.android.internal.R.string.config_orientationSensorType);
-        mUseSystemClockforSensors = context.getResources().getBoolean(
-                com.android.internal.R.bool.config_useSystemClockforSensors);
-
         if (!TextUtils.isEmpty(mSensorType)) {
             List<Sensor> sensors = mSensorManager.getSensorList(Sensor.TYPE_ALL);
             final int N = sensors.size();
