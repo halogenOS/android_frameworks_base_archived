@@ -725,16 +725,6 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
         }
 
         @Override
-        public void onScreenTurnedOff() {
-            mLockIcon.setScreenOn(false);
-        }
-
-        @Override
-        public void onKeyguardVisibilityChanged(boolean showing) {
-            mLockIcon.update();
-        }
-
-        @Override
         public void onFingerprintRunningStateChanged(boolean running) {
             mLockIcon.update();
         }
