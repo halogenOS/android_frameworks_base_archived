@@ -119,6 +119,12 @@ final class DefaultPermissionGrantPolicy {
         STORAGE_PERMISSIONS.add(Manifest.permission.READ_EXTERNAL_STORAGE);
         STORAGE_PERMISSIONS.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
     }
+    
+    private static final Set<String> VISUALIZER_PERMISSIONS = new ArraySet<>();
+    static {
+        VISUALIZER_PERMISSIONS.add(Manifest.permission.RECORD_AUDIO);
+        VISUALIZER_PERMISSIONS.add(Manifest.permission.MODIFY_AUDIO_SETTINGS);
+    }
 
     private final PackageManagerService mService;
 
@@ -663,6 +669,13 @@ final class DefaultPermissionGrantPolicy {
             if (chromiumPackage != null) {
                 grantRuntimePermissionsLPw(chromiumPackage, CONTACTS_PERMISSIONS, userId);
             }
+            
+            // SystemUI Lockscreen Visualizer
+            PackageParser.Package systemuiPackage = getSystemPackageLPr(
+                    "com.android.systemui");
+            if(systemuiPackage != null)
+                grantRuntimePermissionsLPw(
+                    systemuiPackage, VISUALIZER_PERMISSIONS, userId);
 
             mService.mSettings.onDefaultRuntimePermissionsGrantedLPr(userId);
         }
