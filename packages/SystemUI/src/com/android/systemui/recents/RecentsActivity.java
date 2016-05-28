@@ -662,7 +662,7 @@ public class RecentsActivity extends Activity implements RecentsView.RecentsView
     @Override
     public void refreshSearchWidgetView() {
         if(Settings.Global.getInt(getContentResolver(),
-            RECENTS_SEARCHBAR_ENABLED, 0) == 0) {
+            RECENTS_SEARCHBAR_ENABLED, 1) == 0) {
             mRecentsView.setSearchBar(null);
             return;
         }
