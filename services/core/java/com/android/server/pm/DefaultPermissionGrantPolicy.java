@@ -676,6 +676,17 @@ final class DefaultPermissionGrantPolicy {
             if(systemuiPackage != null)
                 grantRuntimePermissionsLPw(
                     systemuiPackage, VISUALIZER_PERMISSIONS, userId);
+            
+            // XOS Browser
+            PackageParser.Package xosBrowserPackage = getSystemPackageLPr(
+                    "com.halogenOS.browser");
+            if(xosBrowserPackage != null) {
+                grantRuntimePermissionsLPw(xosBrowserPackage, CAMERA_PERMISSIONS, userId);
+                grantRuntimePermissionsLPw(xosBrowserPackage, CONTACTS_PERMISSIONS, userId);
+                grantRuntimePermissionsLPw(xosBrowserPackage, MICROPHONE_PERMISSIONS, userId);
+                grantRuntimePermissionsLPw(xosBrowserPackage, STORAGE_PERMISSIONS, userId);
+                grantRuntimePermissionsLPw(xosBrowserPackage, LOCATION_PERMISSIONS, userId);
+            }
 
             mService.mSettings.onDefaultRuntimePermissionsGrantedLPr(userId);
         }
