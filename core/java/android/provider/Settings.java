@@ -1752,6 +1752,20 @@ public final class Settings {
         public static boolean putInt(ContentResolver cr, String name, int value) {
             return putIntForUser(cr, name, value, UserHandle.myUserId());
         }
+        
+        /**
+         * Same as putInt(ContentResolver cr, String name, int value) but
+         * accepts boolean as value argument which is converted automatically
+         * to simplify.
+         * 
+         * @param cr The ContentResolver to access
+         * @param name The name of the setting to modify
+         * @param value The new value for the setting.
+         * @return true if the value was set, false on database errors
+         */
+         public static boolean putInt(ContentResolver cr, String name, boolean value) {
+             return putInt(cr, name, value ? 1 : 0);
+         }
 
         /** @hide */
         public static boolean putIntForUser(ContentResolver cr, String name, int value,
@@ -3349,6 +3363,14 @@ public final class Settings {
          * @hide
          */
         public static final String KEY_APP_SWITCH_LONG_PRESS_ACTION = "key_app_switch_long_press_action";
+        
+        /**
+         * Whether Heads-up notifications should be shown or not
+         * 
+         * @hide
+         */
+         public static final String KEY_ENABLE_HEADSUP_NOTIFICATIONS = 
+                                        "key_enable_headsup_notifications";
 
         /**
          * Settings to backup. This is here so that it's in the same place as the settings
@@ -3403,7 +3425,8 @@ public final class Settings {
             RINGTONE,
             LOCK_TO_APP_ENABLED,
             NOTIFICATION_SOUND,
-            WIFI_AUTO_CONNECT_TYPE
+            WIFI_AUTO_CONNECT_TYPE,
+            KEY_ENABLE_HEADSUP_NOTIFICATIONS
         };
 
         /**

@@ -29,6 +29,8 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.accessibility.AccessibilityEvent;
 
+import static android.provider.Settings.System.KEY_ENABLE_HEADSUP_NOTIFICATIONS;
+
 import com.android.internal.logging.MetricsLogger;
 import com.android.systemui.R;
 import com.android.systemui.statusbar.ExpandableNotificationRow;
@@ -168,6 +170,8 @@ public class HeadsUpManager implements ViewTreeObserver.OnComputeInternalInsetsL
      * Called when posting a new notification to the heads up.
      */
     public void showNotification(NotificationData.Entry headsUp) {
+        if(Settings.System.getInt(mContext.getContentResolver(),
+            KEY_ENABLE_HEADSUP_NOTIFICATIONS, 1) == 0) return;
         if (DEBUG) Log.v(TAG, "showNotification");
         addHeadsUpEntry(headsUp);
         updateNotification(headsUp, true);
@@ -178,6 +182,8 @@ public class HeadsUpManager implements ViewTreeObserver.OnComputeInternalInsetsL
      * Called when updating or posting a notification to the heads up.
      */
     public void updateNotification(NotificationData.Entry headsUp, boolean alert) {
+        if(Settings.System.getInt(mContext.getContentResolver(),
+            KEY_ENABLE_HEADSUP_NOTIFICATIONS, 1) == 0) return;
         if (DEBUG) Log.v(TAG, "updateNotification");
 
         headsUp.row.setChildrenExpanded(false /* expanded */, false /* animated */);
