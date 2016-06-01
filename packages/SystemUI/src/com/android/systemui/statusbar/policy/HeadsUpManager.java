@@ -21,6 +21,7 @@ import android.content.res.Resources;
 import android.database.ContentObserver;
 import android.os.Handler;
 import android.os.SystemClock;
+import android.os.UserHandle;
 import android.provider.Settings;
 import android.util.ArrayMap;
 import android.util.Log;
@@ -28,6 +29,8 @@ import android.util.Pools;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.accessibility.AccessibilityEvent;
+
+import static android.provider.Settings.System.KEY_ENABLE_HEADSUP_NOTIFICATIONS;
 
 import com.android.internal.logging.MetricsLogger;
 import com.android.systemui.R;
@@ -103,6 +106,7 @@ public class HeadsUpManager implements ViewTreeObserver.OnComputeInternalInsetsL
     private boolean mWaitingOnCollapseWhenGoingAway;
     private boolean mIsObserving;
     private boolean mRemoteInputActive;
+    protected boolean mHeadsUpEnabled;
 
     public HeadsUpManager(final Context context, View statusBarWindowView,
                           NotificationGroupManager groupManager) {
@@ -127,10 +131,17 @@ public class HeadsUpManager implements ViewTreeObserver.OnComputeInternalInsetsL
                     mSnoozeLengthMs = packageSnoozeLengthMs;
                     if (DEBUG) Log.v(TAG, "mSnoozeLengthMs = " + mSnoozeLengthMs);
                 }
+                mHeadsUpEnabled = Settings.System.getIntForUser(
+                    context.getContentResolver(),
+                    KEY_ENABLE_HEADSUP_NOTIFICATIONS, 1,
+                    UserHandle.USER_CURRENT) == 1;
             }
         };
         context.getContentResolver().registerContentObserver(
                 Settings.Global.getUriFor(SETTING_HEADS_UP_SNOOZE_LENGTH_MS), false,
+                mSettingsObserver);
+        context.getContentResolver().registerContentObserver(
+                Settings.System.getUriFor(KEY_ENABLE_HEADSUP_NOTIFICATIONS), false,
                 mSettingsObserver);
         mStatusBarWindowView = statusBarWindowView;
         mGroupManager = groupManager;
@@ -169,6 +180,7 @@ public class HeadsUpManager implements ViewTreeObserver.OnComputeInternalInsetsL
      * Called when posting a new notification to the heads up.
      */
     public void showNotification(NotificationData.Entry headsUp) {
+        if(!mHeadsUpEnabled) return;
         if (DEBUG) Log.v(TAG, "showNotification");
         addHeadsUpEntry(headsUp);
         updateNotification(headsUp, true);
@@ -179,6 +191,7 @@ public class HeadsUpManager implements ViewTreeObserver.OnComputeInternalInsetsL
      * Called when updating or posting a notification to the heads up.
      */
     public void updateNotification(NotificationData.Entry headsUp, boolean alert) {
+        if(!mHeadsUpEnabled) return;
         if (DEBUG) Log.v(TAG, "updateNotification");
 
         headsUp.row.sendAccessibilityEvent(AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED);
