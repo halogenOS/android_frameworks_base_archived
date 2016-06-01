@@ -3805,6 +3805,14 @@ public final class Settings {
         public static final String DOUBLE_TAP_SLEEP_GESTURE = "double_tap_sleep_gesture";
 
         /**
+         * Whether Heads-up notifications should be shown or not
+         *
+         * @hide
+         */
+         public static final String KEY_ENABLE_HEADSUP_NOTIFICATIONS =
+                                        "key_enable_headsup_notifications";
+
+        /**
          * Settings to backup. This is here so that it's in the same place as the settings
          * keys and easy to update.
          *
@@ -3860,7 +3868,8 @@ public final class Settings {
             NOTIFICATION_SOUND,
             ACCELEROMETER_ROTATION,
             SHOW_NAVBAR,
-            SHOW_LOCKSCREEN_VISUALIZER
+            SHOW_LOCKSCREEN_VISUALIZER,
+            KEY_ENABLE_HEADSUP_NOTIFICATIONS
         };
 
         /**
