@@ -26,6 +26,7 @@ import com.android.systemui.R;
 public class DismissView extends StackScrollerDecorView {
     private boolean mDismissAllInProgress;
     private DismissViewButton mDismissButton;
+    private SwitchHeadsupButton mSwitchHeadsupButton;
 
     public DismissView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -40,10 +41,17 @@ public class DismissView extends StackScrollerDecorView {
     protected void onFinishInflate() {
         super.onFinishInflate();
         mDismissButton = (DismissViewButton) findContentView();
+        mSwitchHeadsupButton = (SwitchHeadsupButton) findViewById(R.id.switch_headsup_text);
+        
     }
 
     public void setOnButtonClickListener(OnClickListener listener) {
         mContent.setOnClickListener(listener);
+    }
+    
+    public void setOnHeadsupButtonClickListener(OnClickListener listener) {
+        mSwitchHeadsupButton.setOnClickListener(listener);
+        mSwitchHeadsupButton.showButton();
     }
 
     public boolean isOnEmptySpace(float touchX, float touchY) {
@@ -56,11 +64,14 @@ public class DismissView extends StackScrollerDecorView {
     public void showClearButton() {
         mDismissButton.showButton();
     }
+    
+    public void showHeadsUpButton() {
+        mSwitchHeadsupButton.showButton();
+    }
 
     public void setDismissAllInProgress(boolean dismissAllInProgress) {
-        if (dismissAllInProgress) {
+        if (dismissAllInProgress)
             setClipBounds(null);
-        }
         mDismissAllInProgress = dismissAllInProgress;
     }
 

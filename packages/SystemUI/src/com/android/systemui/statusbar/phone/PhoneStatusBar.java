@@ -826,10 +826,17 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         mDismissView.setOnButtonClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MetricsLogger.action(mContext, MetricsLogger.ACTION_DISMISS_ALL_NOTES);
                 clearAllNotifications();
             }
         });
+        
+        mDismissView.setOnHeadsupButtonClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switchHeadsUpNotifications();
+            }
+        });
+        
         mStackScroller.setDismissView(mDismissView);
         mExpandedContents = mStackScroller;
 
@@ -1024,6 +1031,16 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         return mStatusBarView;
     }
 
+    private void switchHeadsUpNotifications() {
+        int newEnableHeadsUp = Settings.System.getInt(
+            mContext.getContentResolver(),
+            Settings.System.KEY_ENABLE_HEADSUP_NOTIFICATIONS, 1) == 1 ? 0 : 1;
+        Settings.System.putInt(mContext.getContentResolver(),
+            Settings.System.KEY_ENABLE_HEADSUP_NOTIFICATIONS,
+            newEnableHeadsUp);
+        mDismissView.showHeadsUpButton();
+    }
+    
     private void clearAllNotifications() {
 
         // animate-swipe all dismissable notifications, then animate the shade closed
