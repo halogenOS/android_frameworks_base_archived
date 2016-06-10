@@ -23,7 +23,7 @@
     <!-- Height of each filled in block in each eq bar -->
     <dimen name="kg_visualizer_path_effect_1">8dp</dimen>
     <!-- Height of each empty block in each eq bar -->
-    <dimen name="kg_visualizer_path_effect_2">1dp</dimen>
+    <dimen name="kg_visualizer_path_effect_2">0dp</dimen>
     <!-- Width of each eq bar -->
     <dimen name="kg_visualizer_path_stroke_width">20dp</dimen>
 
