@@ -23,7 +23,7 @@ import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.provider.Settings.Global;
 
-import com.android.internal.logging.MetricsLogger;
+
 import com.android.systemui.R;
 import com.android.systemui.qs.GlobalSetting;
 import com.android.systemui.qs.QSTile;
@@ -56,7 +56,7 @@ public class AirplaneModeTile extends QSTile<QSTile.BooleanState> {
 
     @Override
     public void handleClick() {
-        MetricsLogger.action(mContext, getMetricsCategory(), !mState.value);
+
         setEnabled(!mState.value);
         mEnable.setAllowAnimation(true);
         mDisable.setAllowAnimation(true);
@@ -88,7 +88,7 @@ public class AirplaneModeTile extends QSTile<QSTile.BooleanState> {
 
     @Override
     public int getMetricsCategory() {
-        return MetricsLogger.QS_AIRPLANEMODE;
+        return 0;
     }
 
     @Override

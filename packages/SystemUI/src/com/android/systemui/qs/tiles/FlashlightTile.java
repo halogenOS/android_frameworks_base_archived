@@ -18,7 +18,7 @@ package com.android.systemui.qs.tiles;
 
 import android.app.ActivityManager;
 
-import com.android.internal.logging.MetricsLogger;
+
 import com.android.systemui.R;
 import com.android.systemui.qs.QSTile;
 import com.android.systemui.statusbar.policy.FlashlightController;
@@ -63,7 +63,7 @@ public class FlashlightTile extends QSTile<QSTile.BooleanState> implements
         if (ActivityManager.isUserAMonkey()) {
             return;
         }
-        MetricsLogger.action(mContext, getMetricsCategory(), !mState.value);
+
         boolean newState = !mState.value;
         refreshState(newState ? UserBoolean.USER_TRUE : UserBoolean.USER_FALSE);
         mFlashlightController.setFlashlight(newState);
@@ -93,7 +93,7 @@ public class FlashlightTile extends QSTile<QSTile.BooleanState> implements
 
     @Override
     public int getMetricsCategory() {
-        return MetricsLogger.QS_FLASHLIGHT;
+        return 0;
     }
 
     @Override

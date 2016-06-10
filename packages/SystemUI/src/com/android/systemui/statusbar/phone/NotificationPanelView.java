@@ -44,7 +44,7 @@ import android.view.animation.PathInterpolator;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
-import com.android.internal.logging.MetricsLogger;
+
 import com.android.keyguard.KeyguardStatusView;
 import com.android.systemui.DejankUtils;
 import com.android.systemui.EventLogConstants;
@@ -554,8 +554,8 @@ public class NotificationPanelView extends PanelView implements
         initDownStates(event);
         if (mHeadsUpTouchHelper.onInterceptTouchEvent(event)) {
             mIsExpansionFromHeadsUp = true;
-            MetricsLogger.count(mContext, COUNTER_PANEL_OPEN, 1);
-            MetricsLogger.count(mContext, COUNTER_PANEL_OPEN_PEEK, 1);
+
+
             return true;
         }
         if (!isFullyCollapsed() && onQsIntercept(event)) {
@@ -720,7 +720,7 @@ public class NotificationPanelView extends PanelView implements
         if (mListenForHeadsUp && !mHeadsUpTouchHelper.isTrackingHeadsUp()
                 && mHeadsUpTouchHelper.onInterceptTouchEvent(event)) {
             mIsExpansionFromHeadsUp = true;
-            MetricsLogger.count(mContext, COUNTER_PANEL_OPEN_PEEK, 1);
+
         }
         if ((!mIsExpanding || mHintAnimationRunning)
                 && !mQsExpanded
@@ -735,7 +735,7 @@ public class NotificationPanelView extends PanelView implements
             return true;
         }
         if (event.getActionMasked() == MotionEvent.ACTION_DOWN && isFullyCollapsed()) {
-            MetricsLogger.count(mContext, COUNTER_PANEL_OPEN, 1);
+
             updateVerticalPanelPosition(event.getX());
         }
         super.onTouchEvent(event);
@@ -774,7 +774,7 @@ public class NotificationPanelView extends PanelView implements
         }
         if (mTwoFingerQsExpandPossible && isOpenQsEvent(event)
                 && event.getY(event.getActionIndex()) < mStatusBarMinHeight) {
-            MetricsLogger.count(mContext, COUNTER_PANEL_OPEN_QS, 1);
+
             mQsExpandImmediate = true;
             requestPanelHeightUpdate();
 

@@ -40,7 +40,7 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ScrollView;
 
-import com.android.internal.logging.MetricsLogger;
+
 import com.android.systemui.R;
 import com.android.systemui.qs.QSPanel;
 import com.android.systemui.qs.QSTile;
@@ -82,12 +82,12 @@ public class QsTuner extends Fragment implements Callback {
 
     public void onResume() {
         super.onResume();
-        MetricsLogger.visibility(getContext(), MetricsLogger.TUNER_QS, true);
+
     }
 
     public void onPause() {
         super.onPause();
-        MetricsLogger.visibility(getContext(), MetricsLogger.TUNER_QS, false);
+
     }
 
     @Override
@@ -219,8 +219,7 @@ public class QsTuner extends Fragment implements Callback {
             if (oldTile.equals(newTile)) {
                 return;
             }
-            MetricsLogger.action(getContext(), MetricsLogger.TUNER_QS_REORDER, oldTile + ","
-                    + newTile);
+            
             List<String> order = new ArrayList<>(mTileSpecs);
             int index = order.indexOf(oldTile);
             if (index < 0) {
@@ -233,14 +232,14 @@ public class QsTuner extends Fragment implements Callback {
         }
 
         public void remove(String tile) {
-            MetricsLogger.action(getContext(), MetricsLogger.TUNER_QS_REMOVE, tile);
+
             List<String> tiles = new ArrayList<>(mTileSpecs);
             tiles.remove(tile);
             setTiles(tiles);
         }
 
         public void add(String tile) {
-            MetricsLogger.action(getContext(), MetricsLogger.TUNER_QS_ADD, tile);
+
             List<String> tiles = new ArrayList<>(mTileSpecs);
             tiles.add(tile);
             setTiles(tiles);

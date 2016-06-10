@@ -21,7 +21,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.provider.Settings;
 
-import com.android.internal.logging.MetricsLogger;
+
 import com.android.systemui.Prefs;
 import com.android.systemui.R;
 import com.android.systemui.qs.QSTile;
@@ -80,7 +80,7 @@ public class HotspotTile extends QSTile<QSTile.BooleanState> {
             return;
         }
         final boolean isEnabled = (Boolean) mState.value;
-        MetricsLogger.action(mContext, getMetricsCategory(), !isEnabled);
+
         mController.setHotspotEnabled(!isEnabled);
         mEnable.setAllowAnimation(true);
         mDisable.setAllowAnimation(true);
@@ -114,7 +114,7 @@ public class HotspotTile extends QSTile<QSTile.BooleanState> {
 
     @Override
     public int getMetricsCategory() {
-        return MetricsLogger.QS_HOTSPOT;
+        return 0;
     }
 
     @Override

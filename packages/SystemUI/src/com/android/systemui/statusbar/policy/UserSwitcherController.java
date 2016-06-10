@@ -45,7 +45,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
-import com.android.internal.logging.MetricsLogger;
+
 import com.android.internal.util.UserIcons;
 import com.android.systemui.BitmapHelper;
 import com.android.systemui.GuestResumeSessionReceiver;
@@ -597,7 +597,7 @@ public class UserSwitcherController {
 
         @Override
         public int getMetricsCategory() {
-            return MetricsLogger.QS_USERDETAIL;
+            return 0;
         }
     };
 

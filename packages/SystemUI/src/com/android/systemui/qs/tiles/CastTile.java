@@ -24,7 +24,7 @@ import android.view.View;
 import android.view.View.OnAttachStateChangeListener;
 import android.view.ViewGroup;
 
-import com.android.internal.logging.MetricsLogger;
+
 import com.android.systemui.R;
 import com.android.systemui.qs.QSDetailItems;
 import com.android.systemui.qs.QSDetailItems.Item;
@@ -86,7 +86,7 @@ public class CastTile extends QSTile<QSTile.BooleanState> {
 
     @Override
     protected void handleClick() {
-        MetricsLogger.action(mContext, getMetricsCategory());
+
         showDetail(true);
     }
 
@@ -117,7 +117,7 @@ public class CastTile extends QSTile<QSTile.BooleanState> {
 
     @Override
     public int getMetricsCategory() {
-        return MetricsLogger.QS_CAST;
+        return 0;
     }
 
     @Override
@@ -173,7 +173,7 @@ public class CastTile extends QSTile<QSTile.BooleanState> {
 
         @Override
         public int getMetricsCategory() {
-            return MetricsLogger.QS_CAST_DETAILS;
+            return 0;
         }
 
         @Override
@@ -247,7 +247,7 @@ public class CastTile extends QSTile<QSTile.BooleanState> {
         @Override
         public void onDetailItemClick(Item item) {
             if (item == null || item.tag == null) return;
-            MetricsLogger.action(mContext, MetricsLogger.QS_CAST_SELECT);
+
             final CastDevice device = (CastDevice) item.tag;
             mController.startCasting(device);
         }
@@ -255,7 +255,7 @@ public class CastTile extends QSTile<QSTile.BooleanState> {
         @Override
         public void onDetailItemDisconnect(Item item) {
             if (item == null || item.tag == null) return;
-            MetricsLogger.action(mContext, MetricsLogger.QS_CAST_DISCONNECT);
+
             final CastDevice device = (CastDevice) item.tag;
             mController.stopCasting(device);
         }

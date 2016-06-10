@@ -16,7 +16,7 @@
 
 package com.android.server.dreams;
 
-import com.android.internal.logging.MetricsLogger;
+
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -130,8 +130,8 @@ final class DreamController {
             mCurrentDream = new DreamRecord(token, name, isTest, canDoze, userId);
 
             mDreamStartTime = SystemClock.elapsedRealtime();
-            MetricsLogger.visible(mContext,
-                    mCurrentDream.mCanDoze ? MetricsLogger.DOZING : MetricsLogger.DREAMING);
+
+
 
             try {
                 mIWindowManager.addWindowToken(token, WindowManager.LayoutParams.TYPE_DREAM);
@@ -195,11 +195,6 @@ final class DreamController {
             Slog.i(TAG, "Stopping dream: name=" + oldDream.mName
                     + ", isTest=" + oldDream.mIsTest + ", canDoze=" + oldDream.mCanDoze
                     + ", userId=" + oldDream.mUserId);
-            MetricsLogger.hidden(mContext,
-                    oldDream.mCanDoze ? MetricsLogger.DOZING : MetricsLogger.DREAMING);
-            MetricsLogger.histogram(mContext,
-                    oldDream.mCanDoze ? "dozing_minutes" : "dreaming_minutes" ,
-                    (int) ((SystemClock.elapsedRealtime() - mDreamStartTime) / (1000L * 60L)));
 
             mHandler.removeCallbacks(mStopUnconnectedDreamRunnable);
             mHandler.removeCallbacks(mStopStubbornDreamRunnable);

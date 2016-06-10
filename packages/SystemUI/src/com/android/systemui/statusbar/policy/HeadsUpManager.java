@@ -31,7 +31,7 @@ import android.view.accessibility.AccessibilityEvent;
 
 import static android.provider.Settings.System.KEY_ENABLE_HEADSUP_NOTIFICATIONS;
 
-import com.android.internal.logging.MetricsLogger;
+
 import com.android.systemui.R;
 import com.android.systemui.statusbar.ExpandableNotificationRow;
 import com.android.systemui.statusbar.NotificationData;
@@ -252,7 +252,7 @@ public class HeadsUpManager implements ViewTreeObserver.OnComputeInternalInsetsL
         }
         mHasPinnedNotification = hasPinnedNotification;
         if (mHasPinnedNotification) {
-            MetricsLogger.count(mContext, "note_peek", 1);
+
         }
         updateTouchableRegionListener();
         for (OnHeadsUpChangedListener listener : mListeners) {

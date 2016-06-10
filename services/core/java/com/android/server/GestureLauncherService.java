@@ -37,7 +37,7 @@ import android.provider.Settings;
 import android.util.Slog;
 import android.view.KeyEvent;
 
-import com.android.internal.logging.MetricsLogger;
+
 import com.android.server.statusbar.StatusBarManagerInternal;
 
 /**
@@ -269,12 +269,8 @@ public class GestureLauncherService extends SystemService {
                     + doubleTapInterval + "ms");
             launched = handleCameraLaunchGesture(false /* useWakelock */,
                     StatusBarManager.CAMERA_LAUNCH_SOURCE_POWER_DOUBLE_TAP);
-            if (launched) {
-                MetricsLogger.action(mContext, MetricsLogger.ACTION_DOUBLE_TAP_POWER_CAMERA_GESTURE,
-                        (int) doubleTapInterval);
-            }
         }
-        MetricsLogger.histogram(mContext, "power_double_tap_interval", (int) doubleTapInterval);
+
         return intercept && launched;
     }
 
@@ -341,7 +337,7 @@ public class GestureLauncherService extends SystemService {
                 }
                 if (handleCameraLaunchGesture(true /* useWakelock */,
                         StatusBarManager.CAMERA_LAUNCH_SOURCE_WIGGLE)) {
-                    MetricsLogger.action(mContext, MetricsLogger.ACTION_WIGGLE_CAMERA_GESTURE);
+
                     trackCameraLaunchEvent(event);
                 }
                 return;

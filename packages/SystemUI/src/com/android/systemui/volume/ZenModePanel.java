@@ -50,7 +50,7 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
-import com.android.internal.logging.MetricsLogger;
+
 import com.android.systemui.Prefs;
 import com.android.systemui.R;
 import com.android.systemui.statusbar.policy.ZenModeController;
@@ -621,7 +621,7 @@ public class ZenModePanel extends LinearLayout {
                         if (childTag == null || childTag == tag) continue;
                         childTag.rb.setChecked(false);
                     }
-                    MetricsLogger.action(mContext, MetricsLogger.QS_DND_CONDITION_SELECT);
+
                     select(tag.condition);
                     announceConditionSelection(tag);
                 }
@@ -726,7 +726,7 @@ public class ZenModePanel extends LinearLayout {
     }
 
     private void onClickTimeButton(View row, ConditionTag tag, boolean up, int rowId) {
-        MetricsLogger.action(mContext, MetricsLogger.QS_DND_TIME, up);
+
         Condition newCondition = null;
         final int N = MINUTE_BUCKETS.length;
         if (mBucketIndex == -1) {
@@ -929,7 +929,7 @@ public class ZenModePanel extends LinearLayout {
             if (value != null && mZenButtons.isShown() && isAttachedToWindow()) {
                 final int zen = (Integer) value;
                 if (fromClick) {
-                    MetricsLogger.action(mContext, MetricsLogger.QS_DND_ZEN_SELECT, zen);
+
                 }
                 if (DEBUG) Log.d(mTag, "mZenButtonsCallback selected=" + zen);
                 final Uri realConditionId = getRealConditionId(mSessionExitCondition);

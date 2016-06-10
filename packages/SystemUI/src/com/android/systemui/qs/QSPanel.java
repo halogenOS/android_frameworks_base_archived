@@ -33,7 +33,7 @@ import android.view.accessibility.AccessibilityEvent;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.android.internal.logging.MetricsLogger;
+
 import com.android.systemui.FontSizeUtils;
 import com.android.systemui.R;
 import com.android.systemui.qs.QSTile.DetailAdapter;
@@ -188,7 +188,7 @@ public class QSPanel extends ViewGroup {
     public void setExpanded(boolean expanded) {
         if (mExpanded == expanded) return;
         mExpanded = expanded;
-        MetricsLogger.visibility(mContext, MetricsLogger.QS_PANEL, mExpanded);
+
         if (!mExpanded) {
             closeDetail();
         } else {
@@ -400,7 +400,7 @@ public class QSPanel extends ViewGroup {
             mDetailContent.removeAllViews();
             mDetail.bringToFront();
             mDetailContent.addView(r.detailView);
-            MetricsLogger.visible(mContext, detailAdapter.getMetricsCategory());
+
             announceForAccessibility(mContext.getString(
                     R.string.accessibility_quick_settings_detail,
                     mContext.getString(detailAdapter.getTitle())));
@@ -411,7 +411,7 @@ public class QSPanel extends ViewGroup {
             }
         } else {
             if (mDetailRecord != null) {
-                MetricsLogger.hidden(mContext, mDetailRecord.detailAdapter.getMetricsCategory());
+
             }
             mClosingDetail = true;
             setGridContentVisibility(true);
@@ -435,7 +435,7 @@ public class QSPanel extends ViewGroup {
         }
         mBrightnessView.setVisibility(newVis);
         if (mGridContentVisible != visible) {
-            MetricsLogger.visibility(mContext, MetricsLogger.QS_PANEL, newVis);
+
         }
         mGridContentVisible = visible;
     }
@@ -444,7 +444,7 @@ public class QSPanel extends ViewGroup {
         for (int i = 0; i < mRecords.size(); i++) {
             TileRecord tileRecord = mRecords.get(i);
             if (tileRecord.tile.getState().visible) {
-                MetricsLogger.visible(mContext, tileRecord.tile.getMetricsCategory());
+
             }
         }
     }

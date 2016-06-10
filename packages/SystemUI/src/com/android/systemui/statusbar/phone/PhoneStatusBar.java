@@ -97,7 +97,7 @@ import android.view.animation.PathInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.android.internal.logging.MetricsLogger;
+
 import com.android.internal.statusbar.NotificationVisibility;
 import com.android.internal.statusbar.StatusBarIcon;
 import com.android.keyguard.KeyguardHostView.OnDismissAction;
@@ -1178,7 +1178,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             if (shouldDisableNavbarGestures()) {
                 return false;
             }
-            MetricsLogger.action(mContext, MetricsLogger.ACTION_ASSIST_LONG_PRESS);
+
             mAssistManager.startAssist(new Bundle() /* args */);
             awakenDreams();
             if (mNavigationBarView != null) {
@@ -1313,7 +1313,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                         notification.getKey());
                 notification.getNotification().fullScreenIntent.send();
                 shadeEntry.notifyFullScreenIntentLaunched();
-                MetricsLogger.count(mContext, "note_fullscreen", 1);
+
             } catch (PendingIntent.CanceledException e) {
             }
         }

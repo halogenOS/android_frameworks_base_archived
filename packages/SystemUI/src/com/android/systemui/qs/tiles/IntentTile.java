@@ -29,7 +29,7 @@ import android.os.UserHandle;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.android.internal.logging.MetricsLogger;
+
 import com.android.systemui.qs.QSTile;
 
 import java.util.Arrays;
@@ -92,7 +92,7 @@ public class IntentTile extends QSTile<QSTile.State> {
 
     @Override
     protected void handleClick() {
-        MetricsLogger.action(mContext, getMetricsCategory(), mIntentPackage);
+
         sendIntent("click", mOnClick, mOnClickUri);
     }
 
@@ -164,7 +164,7 @@ public class IntentTile extends QSTile<QSTile.State> {
 
     @Override
     public int getMetricsCategory() {
-        return MetricsLogger.QS_INTENT;
+        return 0;
     }
 
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {

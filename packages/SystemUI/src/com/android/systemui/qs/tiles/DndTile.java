@@ -30,7 +30,7 @@ import android.view.View.OnAttachStateChangeListener;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.android.internal.logging.MetricsLogger;
+
 import com.android.systemui.Prefs;
 import com.android.systemui.R;
 import com.android.systemui.SysUIToast;
@@ -110,7 +110,7 @@ public class DndTile extends QSTile<QSTile.BooleanState> {
         }
         mDisable.setAllowAnimation(true);
         mDisableTotalSilence.setAllowAnimation(true);
-        MetricsLogger.action(mContext, getMetricsCategory(), !mState.value);
+
         if (mState.value) {
             mController.setZen(Global.ZEN_MODE_OFF, null, TAG);
         } else {
@@ -163,7 +163,7 @@ public class DndTile extends QSTile<QSTile.BooleanState> {
 
     @Override
     public int getMetricsCategory() {
-        return MetricsLogger.QS_DND;
+        return 0;
     }
 
     @Override
@@ -234,7 +234,7 @@ public class DndTile extends QSTile<QSTile.BooleanState> {
 
         @Override
         public void setToggleState(boolean state) {
-            MetricsLogger.action(mContext, MetricsLogger.QS_DND_TOGGLE, state);
+
             if (!state) {
                 mController.setZen(Global.ZEN_MODE_OFF, null, TAG);
                 showDetail(false);
@@ -243,7 +243,7 @@ public class DndTile extends QSTile<QSTile.BooleanState> {
 
         @Override
         public int getMetricsCategory() {
-            return MetricsLogger.QS_DND_DETAILS;
+            return 0;
         }
 
         @Override
