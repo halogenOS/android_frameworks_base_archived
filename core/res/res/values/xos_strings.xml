@@ -35,5 +35,7 @@
     <string name="reboot_fastboot">Fastboot</string>
     <!-- Button to reboot the phone into download, within the Reboot Options dialog -->
     <string name="reboot_download">Download</string>
+    <!-- Button to restart the system server, aka "hot reboot" or "soft reboot" -->
+    <string name="reboot_soft">Soft reboot</string>
 
 </resources>
