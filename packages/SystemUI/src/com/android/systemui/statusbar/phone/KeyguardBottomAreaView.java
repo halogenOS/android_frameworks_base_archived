@@ -761,29 +761,15 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
     public void requestVisualizer(boolean show, int delay) {
         removeCallbacks(mStartVisualizer);
         removeCallbacks(mStopVisualizer);
-        if (DEBUG) Log.d(TAG, "requestVisualizer(show: " + show + ", delay: " + delay + ")");
         if (show
                 && mPhoneStatusBar.getBarState() == StatusBarState.KEYGUARD
                 && !mPhoneStatusBar.isKeyguardFadingAway()
                 && !mPhoneStatusBar.isGoingToNotificationShade()
                 && Settings.Global.getInt(getContext().getContentResolver(),
-                    LOCKSCREEN_VISUALIZER_ENABLED, 1) != 0) {
-            if (DEBUG) Log.d(TAG, "--> starting visualizer");
+                    LOCKSCREEN_VISUALIZER_ENABLED, 1) != 0)
             postDelayed(mStartVisualizer, delay);
-        } else {
-            if (DEBUG) { 
-                Log.d(TAG, "--> stopping visualizer because:"); 
-                Log.d(TAG, "    show: " + show);
-                Log.d(TAG, "    mScreenOn: " + mScreenOn);
-                Log.d(TAG, "    mPhoneStatusBar.getBarState: "
-                    + mPhoneStatusBar.getBarState());
-                Log.d(TAG, "    !..isKeyguardFadingAway: " 
-                    + !mPhoneStatusBar.isKeyguardFadingAway());
-                Log.d(TAG, "    !..isGoingToNotificationShade: " 
-                    + !mPhoneStatusBar.isGoingToNotificationShade());
-            }
-            postDelayed(mStopVisualizer, delay);
-        }
+        else
+            postDelayed(mStopVisualizer,  delay);
     }
 
     private static class LockscreenBarEqRenderer extends Renderer {
