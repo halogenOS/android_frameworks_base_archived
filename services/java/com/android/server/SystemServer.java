@@ -761,15 +761,6 @@ public final class SystemServer {
         }
         Trace.traceEnd(Trace.TRACE_TAG_SYSTEM_SERVER);
 
-        try {
-            ActivityManagerNative.getDefault().showBootMessage(
-                    context.getResources().getText(
-                            com.android.internal.R.string.android_upgrading_starting_apps),
-                    false);
-        } catch (RemoteException e) {
-            Slog.w(TAG, "Not showing boot message: " + e.getMessage());
-        }
-
         if (mFactoryTestMode != FactoryTest.FACTORY_TEST_LOW_LEVEL) {
             if (!disableNonCoreServices) {
                 traceBeginAndSlog("StartLockSettingsService");
