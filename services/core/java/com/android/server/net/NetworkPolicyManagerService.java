@@ -2137,6 +2137,8 @@ public class NetworkPolicyManagerService extends INetworkPolicyManager.Stub {
     }
 
     void updateRulesForAppIdleLocked() {
+        final SparseIntArray uidRules = mUidFirewallStandbyRules;
+        uidRules.clear();
         // Fully update the app idle firewall chain.
         final IPackageManager ipm = AppGlobals.getPackageManager();
         final List<UserInfo> users = mUserManager.getUsers();
