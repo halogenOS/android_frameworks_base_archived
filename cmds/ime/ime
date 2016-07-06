@@ -1,4 +1,6 @@
-# Script to start "pm" on the device, which has a very rudimentary
+#!/system/bin/sh
+#
+# Script to start "ime" on the device, which has a very rudimentary
 # shell.
 #
 base=/system

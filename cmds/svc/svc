@@ -1,4 +1,6 @@
-# Script to start "am" on the device, which has a very rudimentary
+#!/system/bin/sh
+#
+# Script to start "svc" on the device, which has a very rudimentary
 # shell.
 #
 base=/system
