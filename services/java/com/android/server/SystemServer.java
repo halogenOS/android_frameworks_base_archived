@@ -456,7 +456,8 @@ public final class SystemServer {
         boolean disableNonCoreServices = SystemProperties.getBoolean("config.disable_noncore", false);
         boolean disableNetwork = SystemProperties.getBoolean("config.disable_network", false);
         boolean disableNetworkTime = SystemProperties.getBoolean("config.disable_networktime", false);
-        boolean isEmulator = SystemProperties.get("ro.kernel.qemu").equals("1");
+        boolean isEmulator = SystemProperties.get("ro.kernel.qemu").equals("1") ||
+                            SystemProperties.get("ro.hw.bt.nosupport").equals("1");
         boolean disableAtlas = SystemProperties.getBoolean("config.disable_atlas", true);
 
         try {
@@ -531,8 +532,6 @@ public final class SystemServer {
             mDisplayManagerService.windowManagerAndInputReady();
 
             // Skip Bluetooth if we have an emulator kernel
-            // TODO: Use a more reliable check to see if this product should
-            // support Bluetooth - see bug 988521
             if (isEmulator) {
                 Slog.i(TAG, "No Bluetooh Service (emulator)");
             } else if (mFactoryTestMode == FactoryTest.FACTORY_TEST_LOW_LEVEL) {
