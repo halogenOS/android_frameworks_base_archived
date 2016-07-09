@@ -1017,9 +1017,11 @@ public final class SystemServer {
         // Before things start rolling, be sure we have decided whether
         // we are in safe mode.
         final boolean safeMode = wm.detectSafeMode() ||
-                    SystemProperties.get("debug.sw.safemode", "0").equals("1");
+                    SystemProperties.get("debug.sw.safemode", "0").equals("1") ||
+                    SystemProperties.get("persist.sw.safemode", "0").equals("1");
         if (safeMode) {
             mActivityManagerService.enterSafeMode();
+            SystemProperties.set("persist.sw.safemode", "0");
             // Disable the JIT for the system_server process
             VMRuntime.getRuntime().disableJitCompilation();
         } else {
