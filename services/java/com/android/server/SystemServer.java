@@ -289,9 +289,8 @@ public final class SystemServer {
         }
 
         // For debug builds, log event loop stalls to dropbox for analysis.
-        if (StrictMode.conditionallyEnableDebugLogging()) {
+        if (StrictMode.conditionallyEnableDebugLogging())
             Slog.i(TAG, "Enabled StrictMode for system server main thread.");
-        }
 
         // Loop forever.
         Looper.loop();
@@ -425,6 +424,7 @@ public final class SystemServer {
      */
     private void startOtherServices() {
         final Context context = mSystemContext;
+
         AccountManagerService accountManager = null;
         ContentService contentService = null;
         VibratorService vibrator = null;
@@ -783,6 +783,7 @@ public final class SystemServer {
             mSystemServiceManager.startService(NotificationManagerService.class);
             notification = INotificationManager.Stub.asInterface(
                     ServiceManager.getService(Context.NOTIFICATION_SERVICE));
+
             networkPolicy.bindNotificationManager(notification);
 
             mSystemServiceManager.startService(DeviceStorageMonitorService.class);
@@ -1143,36 +1144,43 @@ public final class SystemServer {
                 } catch (Throwable e) {
                     reportWtf("starting System UI", e);
                 }
+                
                 try {
                     if (networkScoreF != null) networkScoreF.systemReady();
                 } catch (Throwable e) {
                     reportWtf("making Network Score Service ready", e);
                 }
+                
                 try {
                     if (networkManagementF != null) networkManagementF.systemReady();
                 } catch (Throwable e) {
                     reportWtf("making Network Managment Service ready", e);
                 }
+                
                 try {
                     if (networkStatsF != null) networkStatsF.systemReady();
                 } catch (Throwable e) {
                     reportWtf("making Network Stats Service ready", e);
                 }
+                
                 try {
                     if (networkPolicyF != null) networkPolicyF.systemReady();
                 } catch (Throwable e) {
                     reportWtf("making Network Policy Service ready", e);
                 }
+                
                 try {
                     if (connectivityF != null) connectivityF.systemReady();
                 } catch (Throwable e) {
                     reportWtf("making Connectivity Service ready", e);
                 }
+                
                 try {
                     if (audioServiceF != null) audioServiceF.systemReady();
                 } catch (Throwable e) {
                     reportWtf("Notifying AudioService running", e);
                 }
+                
                 Watchdog.getInstance().start();
 
                 // It is now okay to let the various system services start their
@@ -1185,54 +1193,64 @@ public final class SystemServer {
                 } catch (Throwable e) {
                     reportWtf("Notifying WallpaperService running", e);
                 }
+                
                 try {
                     if (immF != null) immF.systemRunning(statusBarF);
                 } catch (Throwable e) {
                     reportWtf("Notifying InputMethodService running", e);
                 }
+                
                 try {
                     if (locationF != null) locationF.systemRunning();
                 } catch (Throwable e) {
                     reportWtf("Notifying Location Service running", e);
                 }
+                
                 try {
                     if (countryDetectorF != null) countryDetectorF.systemRunning();
                 } catch (Throwable e) {
                     reportWtf("Notifying CountryDetectorService running", e);
                 }
+                
                 try {
                     if (networkTimeUpdaterF != null) networkTimeUpdaterF.systemRunning();
                 } catch (Throwable e) {
                     reportWtf("Notifying NetworkTimeService running", e);
                 }
+                
                 try {
                     if (commonTimeMgmtServiceF != null)
                         commonTimeMgmtServiceF.systemRunning();
                 } catch (Throwable e) {
                     reportWtf("Notifying CommonTimeManagementService running", e);
                 }
+                
                 try {
                     if (textServiceManagerServiceF != null)
                         textServiceManagerServiceF.systemRunning();
                 } catch (Throwable e) {
                     reportWtf("Notifying TextServicesManagerService running", e);
                 }
+                
                 try {
                     if (atlasF != null) atlasF.systemRunning();
                 } catch (Throwable e) {
                     reportWtf("Notifying AssetAtlasService running", e);
                 }
+                
                 try {
                     // TODO(BT) Pass parameter to input manager
                     if (inputManagerF != null) inputManagerF.systemRunning();
                 } catch (Throwable e) {
                     reportWtf("Notifying InputManagerService running", e);
                 }
+                
                 try {
                     if (telephonyRegistryF != null) telephonyRegistryF.systemRunning();
                 } catch (Throwable e) {
                     reportWtf("Notifying TelephonyRegistry running", e);
                 }
+                
                 try {
                     if (mediaRouterF != null) mediaRouterF.systemRunning();
                 } catch (Throwable e) {
