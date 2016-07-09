@@ -105,8 +105,9 @@ import java.util.TimerTask;
 public final class SystemServer {
     private static final String TAG = "SystemServer";
 
-    private static final String ENCRYPTING_STATE = "trigger_restart_min_framework";
-    private static final String ENCRYPTED_STATE = "1";
+    private static final String
+            ENCRYPTING_STATE = "trigger_restart_min_framework",
+            ENCRYPTED_STATE  = "1";
 
     private static final long SNAPSHOT_INTERVAL = 60 * 60 * 1000; // 1hr
 
@@ -118,29 +119,38 @@ public final class SystemServer {
      * Implementation class names. TODO: Move them to a codegen class or load
      * them from the build system somehow.
      */
-    private static final String BACKUP_MANAGER_SERVICE_CLASS =
-            "com.android.server.backup.BackupManagerService$Lifecycle";
-    private static final String APPWIDGET_SERVICE_CLASS =
-            "com.android.server.appwidget.AppWidgetService";
-    private static final String VOICE_RECOGNITION_MANAGER_SERVICE_CLASS =
-            "com.android.server.voiceinteraction.VoiceInteractionManagerService";
-    private static final String PRINT_MANAGER_SERVICE_CLASS =
-            "com.android.server.print.PrintManagerService";
-    private static final String USB_SERVICE_CLASS =
-            "com.android.server.usb.UsbService$Lifecycle";
-    private static final String MIDI_SERVICE_CLASS =
-            "com.android.server.midi.MidiService$Lifecycle";
-    private static final String WIFI_SERVICE_CLASS =
-            "com.android.server.wifi.WifiService";
-    private static final String WIFI_P2P_SERVICE_CLASS =
-            "com.android.server.wifi.p2p.WifiP2pService";
-    private static final String ETHERNET_SERVICE_CLASS =
-            "com.android.server.ethernet.EthernetService";
-    private static final String JOB_SCHEDULER_SERVICE_CLASS =
-            "com.android.server.job.JobSchedulerService";
-    private static final String MOUNT_SERVICE_CLASS =
-            "com.android.server.MountService$Lifecycle";
-    private static final String PERSISTENT_DATA_BLOCK_PROP = "ro.frp.pst";
+    private static final String
+            // Services
+            BACKUP_MANAGER_SERVICE_CLASS =              // Backup Manager
+                "com.android.server.backup.BackupManagerService$Lifecycle",
+            APPWIDGET_SERVICE_CLASS =                   // App Widget Service
+                "com.android.server.appwidget.AppWidgetService",
+            VOICE_RECOGNITION_MANAGER_SERVICE_CLASS =   // Voice Recognition Manager
+                "com.android.server.voiceinteraction.VoiceInteractionManagerService",
+            PRINT_MANAGER_SERVICE_CLASS =               // Print Manager
+                "com.android.server.print.PrintManagerService",
+            USB_SERVICE_CLASS =                         // USB Service
+                "com.android.server.usb.UsbService$Lifecycle",
+            MIDI_SERVICE_CLASS =                        // MIDI Service
+                "com.android.server.midi.MidiService$Lifecycle",
+            WIFI_SERVICE_CLASS =                        // WiFi Service
+                "com.android.server.wifi.WifiService",
+            WIFI_P2P_SERVICE_CLASS =                    // WiFi P2P Service
+                "com.android.server.wifi.p2p.WifiP2pService",
+            ETHERNET_SERVICE_CLASS =                    // Ethernet Service
+                "com.android.server.ethernet.EthernetService",
+            JOB_SCHEDULER_SERVICE_CLASS =               // Job Scheduler Service
+                "com.android.server.job.JobSchedulerService",
+            MOUNT_SERVICE_CLASS =                       // Mount Service
+                "com.android.server.MountService$Lifecycle",
+            WIFI_SCANNING_SERVICE_CLASS =               // WiFi Scanning Service
+                "com.android.server.wifi.WifiScanningService",
+            RTT_SERVICE_CLASS =                         // GPS RTT Clock Service
+                "com.android.server.wifi.RttService",
+
+            // Peristent data block property
+            PERSISTENT_DATA_BLOCK_PROP = "ro.frp.pst"
+            ;
 
     private final int mFactoryTestMode;
     private Timer mProfilerSnapshotTimer;
@@ -300,11 +310,10 @@ public final class SystemServer {
             boolean reboot = (shutdownAction.charAt(0) == '1');
 
             final String reason;
-            if (shutdownAction.length() > 1) {
+            if (shutdownAction.length() > 1)
                 reason = shutdownAction.substring(1, shutdownAction.length());
-            } else {
+            else
                 reason = null;
-            }
 
             ShutdownThread.rebootOrShutdown(null, reboot, reason);
         }
@@ -448,7 +457,7 @@ public final class SystemServer {
         boolean disableNetwork = SystemProperties.getBoolean("config.disable_network", false);
         boolean disableNetworkTime = SystemProperties.getBoolean("config.disable_networktime", false);
         boolean isEmulator = SystemProperties.get("ro.kernel.qemu").equals("1");
-	boolean disableAtlas = SystemProperties.getBoolean("config.disable_atlas", true);
+        boolean disableAtlas = SystemProperties.getBoolean("config.disable_atlas", true);
 
         try {
             Slog.i(TAG, "Reading configuration...");
@@ -456,7 +465,6 @@ public final class SystemServer {
 
             Slog.i(TAG, "Scheduling Policy");
             ServiceManager.addService("scheduling_policy", new SchedulingPolicyService());
-
             mSystemServiceManager.startService(TelecomLoaderService.class);
 
             Slog.i(TAG, "Telephony Registry");
@@ -613,6 +621,7 @@ public final class SystemServer {
                             com.android.internal.R.string.android_upgrading_starting_apps),
                     false);
         } catch (RemoteException e) {
+
         }
 
         if (mFactoryTestMode != FactoryTest.FACTORY_TEST_LOW_LEVEL) {
@@ -625,9 +634,8 @@ public final class SystemServer {
                     reportWtf("starting LockSettingsService service", e);
                 }
 
-                if (!SystemProperties.get(PERSISTENT_DATA_BLOCK_PROP).equals("")) {
+                if (!SystemProperties.get(PERSISTENT_DATA_BLOCK_PROP).equals(""))
                     mSystemServiceManager.startService(PersistentDataBlockService.class);
-                }
 
                 mSystemServiceManager.startService(DeviceIdleController.class);
 
@@ -660,7 +668,8 @@ public final class SystemServer {
                 try {
                     Slog.i(TAG, "NetworkManagement Service");
                     networkManagement = NetworkManagementService.create(context);
-                    ServiceManager.addService(Context.NETWORKMANAGEMENT_SERVICE, networkManagement);
+                    ServiceManager.addService(
+                        Context.NETWORKMANAGEMENT_SERVICE, networkManagement);
                 } catch (Throwable e) {
                     reportWtf("starting NetworkManagement Service", e);
                 }
@@ -706,15 +715,13 @@ public final class SystemServer {
 
                 mSystemServiceManager.startService(WIFI_P2P_SERVICE_CLASS);
                 mSystemServiceManager.startService(WIFI_SERVICE_CLASS);
-                mSystemServiceManager.startService(
-                            "com.android.server.wifi.WifiScanningService");
+                mSystemServiceManager.startService(WIFI_SCANNING_SERVICE_CLASS);
 
-                mSystemServiceManager.startService("com.android.server.wifi.RttService");
+                mSystemServiceManager.startService(RTT_SERVICE_CLASS);
 
                 if (mPackageManager.hasSystemFeature(PackageManager.FEATURE_ETHERNET) ||
-                    mPackageManager.hasSystemFeature(PackageManager.FEATURE_USB_HOST)) {
+                    mPackageManager.hasSystemFeature(PackageManager.FEATURE_USB_HOST))
                     mSystemServiceManager.startService(ETHERNET_SERVICE_CLASS);
-                }
 
                 try {
                     Slog.i(TAG, "Connectivity Service");
@@ -756,6 +763,7 @@ public final class SystemServer {
                 try {
                     mountService.waitForAsecScan();
                 } catch (RemoteException ignored) {
+
                 }
             }
 
@@ -835,9 +843,8 @@ public final class SystemServer {
                 reportWtf("starting Audio Service", e);
             }
 
-            if (!disableNonCoreServices) {
+            if (!disableNonCoreServices)
                 mSystemServiceManager.startService(DockObserver.class);
-            }
 
             try {
                 Slog.i(TAG, "Wired Accessory Manager");
@@ -876,17 +883,14 @@ public final class SystemServer {
             mSystemServiceManager.startService(JobSchedulerService.class);
 
             if (!disableNonCoreServices) {
-                if (mPackageManager.hasSystemFeature(PackageManager.FEATURE_BACKUP)) {
+                if (mPackageManager.hasSystemFeature(PackageManager.FEATURE_BACKUP))
                     mSystemServiceManager.startService(BACKUP_MANAGER_SERVICE_CLASS);
-                }
 
-                if (mPackageManager.hasSystemFeature(PackageManager.FEATURE_APP_WIDGETS)) {
+                if (mPackageManager.hasSystemFeature(PackageManager.FEATURE_APP_WIDGETS))
                     mSystemServiceManager.startService(APPWIDGET_SERVICE_CLASS);
-                }
 
-                if (mPackageManager.hasSystemFeature(PackageManager.FEATURE_VOICE_RECOGNIZERS)) {
+                if (mPackageManager.hasSystemFeature(PackageManager.FEATURE_VOICE_RECOGNIZERS))
                     mSystemServiceManager.startService(VOICE_RECOGNITION_MANAGER_SERVICE_CLASS);
-                }
 
                 if (GestureLauncherService.isGestureLauncherEnabled(context.getResources())) {
                     Slog.i(TAG, "Gesture Launcher Service");
@@ -954,10 +958,9 @@ public final class SystemServer {
                 }
             }
 
-            if (!disableNonCoreServices) {
+            if (!disableNonCoreServices)
                 ServiceManager.addService(GraphicsStatsService.GRAPHICS_STATS_SERVICE,
                         new GraphicsStatsService(context));
-            }
 
             if (context.getResources().getBoolean(
                     com.android.internal.R.bool.config_enableGestureService)) {
@@ -970,21 +973,18 @@ public final class SystemServer {
                 }
             }
 
-            if (mPackageManager.hasSystemFeature(PackageManager.FEATURE_PRINTING)) {
+            if (mPackageManager.hasSystemFeature(PackageManager.FEATURE_PRINTING))
                 mSystemServiceManager.startService(PRINT_MANAGER_SERVICE_CLASS);
-            }
 
             mSystemServiceManager.startService(RestrictionsManagerService.class);
 
             mSystemServiceManager.startService(MediaSessionService.class);
 
-            if (mPackageManager.hasSystemFeature(PackageManager.FEATURE_HDMI_CEC)) {
+            if (mPackageManager.hasSystemFeature(PackageManager.FEATURE_HDMI_CEC))
                 mSystemServiceManager.startService(HdmiControlService.class);
-            }
 
-            if (mPackageManager.hasSystemFeature(PackageManager.FEATURE_LIVE_TV)) {
+            if (mPackageManager.hasSystemFeature(PackageManager.FEATURE_LIVE_TV))
                 mSystemServiceManager.startService(TvInputManagerService.class);
-            }
 
             if (!disableNonCoreServices) {
                 try {
@@ -1011,9 +1011,8 @@ public final class SystemServer {
             mSystemServiceManager.startService(LauncherAppsService.class);
         }
 
-        if (!disableNonCoreServices) {
+        if (!disableNonCoreServices)
             mSystemServiceManager.startService(MediaProjectionManagerService.class);
-        }
 
         // Before things start rolling, be sure we have decided whether
         // we are in safe mode.
@@ -1057,9 +1056,8 @@ public final class SystemServer {
             reportWtf("making Window Manager Service ready", e);
         }
 
-        if (safeMode) {
+        if (safeMode)
             mActivityManagerService.showSafeModeOverlay();
-        }
 
         // Update the configuration for this context by hand, because we're going
         // to start using it before the config change done in wm.systemReady() will
@@ -1208,9 +1206,8 @@ public final class SystemServer {
                     reportWtf("Notifying NetworkTimeService running", e);
                 }
                 try {
-                    if (commonTimeMgmtServiceF != null) {
+                    if (commonTimeMgmtServiceF != null)
                         commonTimeMgmtServiceF.systemRunning();
-                    }
                 } catch (Throwable e) {
                     reportWtf("Notifying CommonTimeManagementService running", e);
                 }
@@ -1255,7 +1252,7 @@ public final class SystemServer {
         Intent intent = new Intent();
         intent.setComponent(new ComponentName("com.android.systemui",
                     "com.android.systemui.SystemUIService"));
-        //Slog.d(TAG, "Starting service: " + intent);
         context.startServiceAsUser(intent, UserHandle.OWNER);
     }
+
 }
