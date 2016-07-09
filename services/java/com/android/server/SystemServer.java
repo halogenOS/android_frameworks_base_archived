@@ -205,6 +205,7 @@ public final class SystemServer {
 
         // Here we go!
         Slog.i(TAG, "Entered the Android system server!");
+        Slog.i(TAG, "Welcome to halogenOS! The system is booting. ROCK ON!");
         EventLog.writeEvent(EventLogTags.BOOT_PROGRESS_SYSTEM_RUN, SystemClock.uptimeMillis());
 
         // In case the runtime switched since last boot (such as when
