@@ -62,4 +62,8 @@
   <java-symbol type="drawable" name="ic_audio_notification_mute_new" />
 
   <java-symbol type="array" name="config_blockPackagesSensorDrain" />
+
+  <!-- Dash charging support -->
+  <java-symbol type="bool" name="config_hasDashCharger" />
+
 </resources>

@@ -80,4 +80,8 @@
         <item>com.snapchat.android</item>
         <item>org.ilwt.lagatgram</item>
     </string-array>
+
+    <!-- Wether device has dash charging support -->
+    <bool name="config_hasDashCharger">false</bool>
+
 </resources>
