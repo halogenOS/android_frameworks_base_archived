@@ -36,4 +36,7 @@
   <java-symbol type="string" name="lucky_patcher_installed_message" />
   <java-symbol type="string" name="lucky_patcher_admit" />
 
+  <!-- Whether device has dash charging support -->
+  <java-symbol type="bool" name="config_hasDashCharger" />
+
 </resources>
