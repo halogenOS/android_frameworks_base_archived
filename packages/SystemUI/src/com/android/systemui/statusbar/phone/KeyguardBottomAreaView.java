@@ -38,7 +38,6 @@ import android.os.RemoteException;
 import android.os.SystemProperties;
 import android.os.UserHandle;
 import android.provider.MediaStore;
-import android.provider.Settings;
 import android.service.media.CameraPrewarmService;
 import android.telecom.TelecomManager;
 import android.util.AttributeSet;
@@ -69,8 +68,6 @@ import com.android.systemui.statusbar.policy.PreviewInflater;
 
 import static android.view.accessibility.AccessibilityNodeInfo.ACTION_CLICK;
 import static android.view.accessibility.AccessibilityNodeInfo.AccessibilityAction;
-
-import static android.provider.Settings.Global.LOCKSCREEN_VISUALIZER_ENABLED;
 
 /**
  * Implementation for the bottom area of the Keyguard, including camera/phone affordance and status
