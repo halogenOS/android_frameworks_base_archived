@@ -329,7 +329,6 @@ public class KeyguardAffordanceHelper {
         snapBack |= Math.abs(vel) > mMinFlingVelocity && velIsInWrongDirection;
         vel = snapBack ^ velIsInWrongDirection ? 0 : vel;
         fling(vel, snapBack || forceSnapBack, mTranslation < 0);
-        mCallback.onSwipingAnimationFinished(snapBack || forceSnapBack);
     }
 
     private boolean isBelowFalsingThreshold() {
@@ -567,8 +566,6 @@ public class KeyguardAffordanceHelper {
         void onSwipingAborted();
 
         void onIconClicked(boolean rightIcon);
-
-        void onSwipingAnimationFinished(boolean snappingBack);
 
         KeyguardAffordanceView getLeftIcon();
 
