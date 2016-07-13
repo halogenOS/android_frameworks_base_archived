@@ -75,6 +75,7 @@ public class TunerService extends SystemUI {
             }
         };
         mUserTracker.startTracking();
+        if(!isTunerEnabled(mContext)) setTunerEnabled(mContext, true);
     }
 
     public void addTunable(Tunable tunable, String... keys) {
@@ -180,8 +181,6 @@ public class TunerService extends SystemUI {
             public void onClick(DialogInterface dialog, int which) {
                 // Tell the tuner (in main SysUI process) to clear all its settings.
                 context.sendBroadcast(new Intent(TunerService.ACTION_CLEAR));
-                // Disable access to tuner.
-                TunerService.setTunerEnabled(context, false);
                 // Make them sit through the warning dialog again.
                 Settings.Secure.putInt(context.getContentResolver(),
                         TunerFragment.SETTING_SEEN_TUNER_WARNING, 0);
@@ -194,17 +193,12 @@ public class TunerService extends SystemUI {
     }
 
     public static final void setTunerEnabled(Context context, boolean enabled) {
-        userContext(context).getPackageManager().setComponentEnabledSetting(
-                new ComponentName(context, TunerActivity.class),
-                enabled ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED
-                        : PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-                        PackageManager.DONT_KILL_APP);
+        // Leave this empty because we are activated forever!
     }
 
     public static final boolean isTunerEnabled(Context context) {
-        return userContext(context).getPackageManager().getComponentEnabledSetting(
-                new ComponentName(context, TunerActivity.class))
-                == PackageManager.COMPONENT_ENABLED_STATE_ENABLED;
+        // As I said, we are activated forever.
+        return true;
     }
 
     private static Context userContext(Context context) {
