@@ -36,6 +36,7 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.ContentObserver;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;
 import android.graphics.PixelFormat;
@@ -849,20 +850,18 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         mBackdropFront = (ImageView) mBackdrop.findViewById(R.id.backdrop_front);
         mBackdropBack = (ImageView) mBackdrop.findViewById(R.id.backdrop_back);
 
-        FrameLayout scrimView = (FrameLayout) mStatusBarWindowContent.findViewById(R.id.scrimview);
-        ScrimView scrimBehind = (ScrimView) scrimView.findViewById(R.id.scrim_behind);
-        ScrimView scrimInFront =
-                (ScrimView) mStatusBarWindowContent.findViewById(R.id.scrim_in_front);
-        View headsUpScrim = mStatusBarWindowContent.findViewById(R.id.heads_up_scrim);
-        
+        ScrimView scrimBehind = (ScrimView) mStatusBarWindow.findViewById(R.id.scrim_behind);
+        ScrimView scrimInFront = (ScrimView) mStatusBarWindow.findViewById(R.id.scrim_in_front);
+        View headsUpScrim = mStatusBarWindow.findViewById(R.id.heads_up_scrim);
         mScrimController = new ScrimController(scrimBehind, scrimInFront, headsUpScrim,
                 mScrimSrcModeEnabled);
+        
         mHeadsUpManager.addListener(mScrimController);
         mStackScroller.setScrimController(mScrimController);
         mScrimController.setBackDropView(mBackdrop);
         mStatusBarView.setScrimController(mScrimController);
         mDozeScrimController = new DozeScrimController(mScrimController, context);
-        mVisualizerView = (VisualizerView) scrimView.findViewById(R.id.visualizerview);
+        mVisualizerView = (VisualizerView) mStatusBarView.findViewById(R.id.visualizerview);
 
         mHeader = (StatusBarHeaderView) mStatusBarWindow.findViewById(R.id.header);
         mHeader.setActivityStarter(this);
@@ -1004,7 +1003,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         ((BatteryMeterView) mStatusBarView.findViewById(R.id.battery)).setBatteryController(
                 mBatteryController);
         mKeyguardStatusBar.setBatteryController(mBatteryController);
-        mVisualizerView.setKeyguardMonitor(mKeyguardMonitor);
         mHeader.setNextAlarmController(mNextAlarmController);
 
         PowerManager pm = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
@@ -1809,7 +1807,23 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
      * Refresh or remove lockscreen artwork from media metadata.
      */
     public void updateMediaMetaData(boolean metaDataChanged) {
-        if (!SHOW_LOCKSCREEN_MEDIA_ARTWORK) return;
+        if(mVisualizerView != null && mVisualizerView.getParent() == null) {
+            mKeyguardBottomArea.addView(mVisualizerView);
+            mVisualizerView.setTranslationZ(-16);
+        }
+        
+        boolean keyguardVisible = false;
+        if (!SHOW_LOCKSCREEN_MEDIA_ARTWORK) {
+            // Let's show the visualizer even though we don't have any artwork
+            keyguardVisible = (mState != StatusBarState.SHADE); // try it
+            if (!mKeyguardFadingAway && keyguardVisible && mScreenOn) {
+                mVisualizerView.setPlaying(mMediaController != null
+                        && mMediaController.getPlaybackState() != null
+                        && mMediaController.getPlaybackState().getState()
+                                == PlaybackState.STATE_PLAYING);
+            }
+            return;
+        }
 
         if (mBackdrop == null) return; // called too early
 
@@ -1836,32 +1850,20 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
         final boolean hasArtwork = artworkBitmap != null;
 
-        boolean keyguardVisible = (mState != StatusBarState.SHADE);
+        keyguardVisible = (mState != StatusBarState.SHADE);
 
-        if (!mKeyguardFadingAway && keyguardVisible && backdropBitmap != null && mScreenOn) {
+        if (!mKeyguardFadingAway && keyguardVisible && mScreenOn) {
             // if there's album art, ensure visualizer is visible
+            if(hasArtwork) mVisualizerView.setBitmap(artworkBitmap);
             mVisualizerView.setPlaying(mMediaController != null
                     && mMediaController.getPlaybackState() != null
                     && mMediaController.getPlaybackState().getState()
                             == PlaybackState.STATE_PLAYING);
         }
 
-        if (backdropBitmap == null && mMediaMetadata == null) {
-            backdropBitmap = mKeyguardWallpaper;
-        }
+        final boolean hasBackdrop = false;
+        boolean mKeyguardShowingMedia = hasBackdrop;
 
-        if (keyguardVisible) {
-            // always use current backdrop to color eq
-            mVisualizerView.setBitmap(backdropBitmap);
-        }
-
-        final boolean hasBackdrop = backdropBitmap != null;
-        mKeyguardShowingMedia = hasBackdrop;
-        if (mStatusBarWindowManager != null) {
-            mStatusBarWindowManager.setShowingMedia(mKeyguardShowingMedia);
-        }
-
-        if ((hasBackdrop || DEBUG_MEDIA_FAKE_ARTWORK)
         if ((hasArtwork || DEBUG_MEDIA_FAKE_ARTWORK)
                 && (mState == StatusBarState.KEYGUARD || mState == StatusBarState.SHADE_LOCKED)
                 && mFingerprintUnlockController.getMode()
@@ -3929,6 +3931,10 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
      * @param state The {@link StatusBarState} to set.
      */
     public void setBarState(int state) {
+        if(mVisualizerView == null) {
+            mVisualizerView = new VisualizerView(mContext);
+            Log.d(TAG, "Ready to rock with visualizer!");
+        }
         // If we're visible and switched to SHADE_LOCKED (the user dragged
         // down on the lockscreen), clear notification LED, vibration,
         // ringing.

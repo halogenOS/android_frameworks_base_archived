@@ -27,12 +27,10 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.UserHandle;
 import android.support.v7.graphics.Palette;
+import android.provider.Settings;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
-
-import com.android.systemui.cm.UserContentObserver;
-import cyanogenmod.providers.CMSettings;
 
 public class VisualizerView extends View implements Palette.PaletteAsyncListener {
 
@@ -139,6 +137,8 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
     public VisualizerView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
 
+        mObserver = new SettingsObserver(null);
+
         mColor = Color.TRANSPARENT;
 
         mPaint = new Paint();
@@ -167,6 +167,7 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
 
     public VisualizerView(Context context) {
         this(context, null, 0);
+        if(DEBUG) Log.d(TAG, "We got called!");
     }
 
     private void updateViewVisibility() {
@@ -310,19 +311,14 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
     }
 
     private void setColor(int color) {
-        if (color == Color.TRANSPARENT) {
-            color = Color.WHITE;
-        }
-
         color = Color.argb(140, Color.red(color), Color.green(color), Color.blue(color));
 
         if (mColor != color) {
             mColor = color;
 
             if (mVisualizer != null) {
-                if (mVisualizerColorAnimator != null) {
+                if (mVisualizerColorAnimator != null)
                     mVisualizerColorAnimator.cancel();
-                }
 
                 mVisualizerColorAnimator = ObjectAnimator.ofArgb(mPaint, "color",
                         mPaint.getColor(), mColor);
@@ -333,9 +329,24 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
                 mPaint.setColor(mColor);
             }
         }
+
+        if (color == Color.TRANSPARENT) {
+            color = Color.WHITE;
+        }
     }
 
     private void checkStateChanged() {
+        mVisualizerEnabled = mObserver.updateWr();
+        if(mVisible && mPlaying && !mDozing && mVisualizerEnabled &&
+            getVisibility() == View.GONE)
+            setVisibility(View.VISIBLE);
+        if(DEBUG) Log.d(TAG, "getVisibility: " + getVisibility() + ", " +
+                             "mVisible: " + mVisible + ", " +
+                             "mPlaying: " + mPlaying + ", " +
+                             "mDozing: " + mDozing + ", " +
+                             "mPowerSaveMode: " + mPowerSaveMode + ", " +
+                             "mVisualizerEnabled: " + mVisualizerEnabled + ", " +
+                             "mOccluded: " + mOccluded);
         if (getVisibility() == View.VISIBLE && mVisible && mPlaying && !mDozing && !mPowerSaveMode
                 && mVisualizerEnabled && !mOccluded) {
             if (!mDisplaying) {
@@ -364,32 +375,27 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
         }
     }
 
-    private class SettingsObserver extends UserContentObserver {
+    private class SettingsObserver {
 
         public SettingsObserver(Handler handler) {
-            super(handler);
+
         }
 
-        @Override
         protected void update() {
-            mVisualizerEnabled = CMSettings.Secure.getInt(getContext().getContentResolver(),
-                    CMSettings.Secure.LOCKSCREEN_VISUALIZER_ENABLED, 1) != 0;
-            checkStateChanged();
-            updateViewVisibility();
+
+        }
+        
+        protected boolean updateWr() {
+            return Settings.Global.getInt(getContext().getContentResolver(),
+                    Settings.Global.LOCKSCREEN_VISUALIZER_ENABLED, 1) == 1;
         }
 
-        @Override
         protected void observe() {
-            super.observe();
-            getContext().getContentResolver().registerContentObserver(
-                    CMSettings.Secure.getUriFor(CMSettings.Secure.LOCKSCREEN_VISUALIZER_ENABLED),
-                    false, this, UserHandle.USER_CURRENT);
+
         }
 
-        @Override
         protected void unobserve() {
-            super.unobserve();
-            getContext().getContentResolver().unregisterContentObserver(this);
+
         }
     }
 }
