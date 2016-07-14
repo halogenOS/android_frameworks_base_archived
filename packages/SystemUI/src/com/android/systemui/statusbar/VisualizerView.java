@@ -334,6 +334,10 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
             color = Color.WHITE;
         }
     }
+    
+    public void resetColor() {
+        setColor(Color.WHITE);
+    }
 
     private void checkStateChanged() {
         mVisualizerEnabled = mObserver.updateWr();
@@ -356,6 +360,8 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
                         .alpha(1f)
                         .withEndAction(null)
                         .setDuration(800);
+            } else {
+                setBitmap(mCurrentBitmap);
             }
         } else {
             if (mDisplaying) {

@@ -1817,10 +1817,15 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             // Let's show the visualizer even though we don't have any artwork
             keyguardVisible = (mState != StatusBarState.SHADE); // try it
             if (!mKeyguardFadingAway && keyguardVisible && mScreenOn) {
+                mVisualizerView.setVisible(mMediaController != null
+                        && mMediaController.getPlaybackState() != null
+                        && mMediaController.getPlaybackState().getState()
+                                == PlaybackState.STATE_PLAYING);
                 mVisualizerView.setPlaying(mMediaController != null
                         && mMediaController.getPlaybackState() != null
                         && mMediaController.getPlaybackState().getState()
                                 == PlaybackState.STATE_PLAYING);
+                mVisualizerView.resetColor();
             }
             return;
         }
@@ -1863,6 +1868,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
         final boolean hasBackdrop = false;
         boolean mKeyguardShowingMedia = hasBackdrop;
+        
+        if (!hasArtwork && mVisualizerView != null)
+            mVisualizerView.resetColor();
 
         if ((hasArtwork || DEBUG_MEDIA_FAKE_ARTWORK)
                 && (mState == StatusBarState.KEYGUARD || mState == StatusBarState.SHADE_LOCKED)
