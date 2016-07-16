@@ -395,20 +395,16 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         public void onChange(boolean selfChange) {
             boolean visible = Settings.System.getIntForUser(mContext.getContentResolver(),
                     Settings.System.DEV_FORCE_SHOW_NAVBAR, 0, UserHandle.USER_CURRENT) == 1;
-            if (visible) {
-                forceAddNavigationBar();
-            } else {
-                removeNavigationBar();
-            }
+            if (visible)forceAddNavigationBar();
+            else          removeNavigationBar();
         }
     }
 
     private void forceAddNavigationBar() {
         // If we have no Navbar view and we should have one, create it
-        if (mNavigationBarView != null) {
+        if (mNavigationBarView != null)
             return;
-        }
-
+        
         mNavigationBarView =
                 (NavigationBarView) View.inflate(mContext, R.layout.navigation_bar, null);
 
