@@ -1332,7 +1332,11 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     }
 
     public void addIcon(String slot, int index, int viewIndex, StatusBarIcon icon) {
-        mIconController.addSystemIcon(slot, index, viewIndex, icon);
+        try {
+            mIconController.addSystemIcon(slot, index, viewIndex, icon);
+        } catch(Exception ex) {
+            Log.w(TAG, "Warning: adding system icon failed. Avoided systemui crash.");
+        }
     }
 
     public void updateIcon(String slot, int index, int viewIndex,
