@@ -18,10 +18,12 @@ package com.android.systemui.statusbar;
 
 import android.content.Context;
 import android.content.ContentResolver;
+import android.database.ContentObserver;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.drawable.AnimatedVectorDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Handler;
 import android.provider.Settings;
 import android.util.AttributeSet;
 import android.view.View;
@@ -33,6 +35,11 @@ import com.android.systemui.statusbar.stack.NotificationStackScrollLayout;
 public class SwitchHeadsupButton extends Button {
     private final Drawable mStaticEnableDrawable, mStaticDisableDrawable;
     private Drawable mActiveDrawable;
+    
+    private HeadsUpEnabledObserver mHeadsUpEnabledObserver;
+    
+    private int mHeadsUpEnabled = 0;
+    private Context mContext;
 
     public SwitchHeadsupButton(Context context) {
         this(context, null);
@@ -49,6 +56,7 @@ public class SwitchHeadsupButton extends Button {
     public SwitchHeadsupButton(Context context, AttributeSet attrs, int defStyleAttr,
             int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
+        mContext = context;
         mStaticEnableDrawable = getContext().getDrawable(R.drawable.ic_notification_on);
         mStaticEnableDrawable.setBounds(0, 0,
                 mStaticEnableDrawable.getIntrinsicWidth(),
@@ -59,6 +67,7 @@ public class SwitchHeadsupButton extends Button {
                 mStaticDisableDrawable.getIntrinsicWidth(),
                 mStaticDisableDrawable.getIntrinsicHeight());
         mStaticDisableDrawable.setCallback(this);
+        mHeadsUpEnabledObserver = new HeadsUpEnabledObserver(new Handler());
     }
 
     @Override
@@ -121,9 +130,45 @@ public class SwitchHeadsupButton extends Button {
     }
 
     public void showButton() {
-        setDrawableWithSwitch(Settings.System.getInt(getContext().getContentResolver(),
-            Settings.System.KEY_ENABLE_HEADSUP_NOTIFICATIONS, 1));
+        setDrawableWithSwitch(mHeadsUpEnabled);
         invalidate();
+    }
+    
+    protected void setHeadsUpEnabled(int enabled) {
+        mHeadsUpEnabled = enabled;
+    }
+    
+    protected int fetchHeadsUpEnabled() {
+        return Settings.System.getInt(getContext().getContentResolver(),
+                Settings.System.KEY_ENABLE_HEADSUP_NOTIFICATIONS, 1);
+    }
+    
+    protected void updateHeadsUpEnabled() {
+        setHeadsUpEnabled(fetchHeadsUpEnabled());
+    }
+    
+    /**
+     * Get called when setting is changed, don't pull for it.
+     * Reduces storage usage.
+     */
+    private class HeadsUpEnabledObserver extends ContentObserver {
+        HeadsUpEnabledObserver(Handler handler) {
+            super(handler);
+            observe();
+        }
+
+        void observe() {
+            ContentResolver resolver = mContext.getContentResolver();
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.KEY_ENABLE_HEADSUP_NOTIFICATIONS),
+                    false, this);
+            updateHeadsUpEnabled();
+        }
+
+        @Override
+        public void onChange(boolean selfChange) {
+            updateHeadsUpEnabled();
+        }
     }
 
     /**
