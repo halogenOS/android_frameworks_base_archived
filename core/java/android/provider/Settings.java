@@ -7936,6 +7936,14 @@ public final class Settings {
          */
          public static final String RECENTS_SEARCHBAR_ENABLED
                         = "recents_searchbar_enabled";
+        
+        /**
+         * Whether heads-up switch button should be shown
+         * 
+         * @hide
+         */
+         public static final String HEADSUP_SWITCH_BUTTON_ENABLED
+                        = "headsup_switch_button_enabled";
          
         /**
          * Settings to backup. This is here so that it's in the same place as the settings
@@ -7969,7 +7977,8 @@ public final class Settings {
             EMERGENCY_TONE,
             CALL_AUTO_RETRY,
             DOCK_AUDIO_MEDIA_ENABLED,
-            LOW_POWER_MODE_TRIGGER_LEVEL
+            LOW_POWER_MODE_TRIGGER_LEVEL,
+            HEADSUP_SWITCH_BUTTON_ENABLED
         };
 
         // Populated lazily, guarded by class object:

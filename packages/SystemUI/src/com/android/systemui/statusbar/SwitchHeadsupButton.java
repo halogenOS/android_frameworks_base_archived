@@ -37,9 +37,11 @@ public class SwitchHeadsupButton extends Button {
     private Drawable mActiveDrawable;
     
     private HeadsUpEnabledObserver mHeadsUpEnabledObserver;
+    private  ButtonEnabledObserver  mButtonEnabledObserver;
     
-    private int mHeadsUpEnabled = 0;
+    private int mHeadsUpEnabled = 0, mButtonEnabled = 1;
     private Context mContext;
+    private Handler mHandler;
 
     public SwitchHeadsupButton(Context context) {
         this(context, null);
@@ -57,6 +59,7 @@ public class SwitchHeadsupButton extends Button {
             int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         mContext = context;
+        mHandler = new Handler();
         mStaticEnableDrawable = getContext().getDrawable(R.drawable.ic_notification_on);
         mStaticEnableDrawable.setBounds(0, 0,
                 mStaticEnableDrawable.getIntrinsicWidth(),
@@ -67,7 +70,10 @@ public class SwitchHeadsupButton extends Button {
                 mStaticDisableDrawable.getIntrinsicWidth(),
                 mStaticDisableDrawable.getIntrinsicHeight());
         mStaticDisableDrawable.setCallback(this);
-        mHeadsUpEnabledObserver = new HeadsUpEnabledObserver(new Handler());
+        
+        // Initialize observers to handle settings changes
+        mHeadsUpEnabledObserver = new HeadsUpEnabledObserver(mHandler);
+        mButtonEnabledObserver  = new  ButtonEnabledObserver(mHandler);
     }
 
     @Override
@@ -89,6 +95,8 @@ public class SwitchHeadsupButton extends Button {
     }
     
     public void setDrawableWithSwitch(int headsUpEnabled) {
+        setVisibility(mButtonEnabled == 1 ? View.VISIBLE : View.GONE);
+        if(mButtonEnabled != 1) return;
         mActiveDrawable = headsUpEnabled == 0 ? 
             mStaticEnableDrawable : mStaticDisableDrawable;
     }
@@ -147,6 +155,12 @@ public class SwitchHeadsupButton extends Button {
         setHeadsUpEnabled(fetchHeadsUpEnabled());
     }
     
+    protected void updateButtonEnabled() {
+        mButtonEnabled = Settings.Global.getInt(getContext().getContentResolver(),
+                            Settings.Global.HEADSUP_SWITCH_BUTTON_ENABLED, 1);
+        if(mButtonEnabled == 1) showButton();
+    }
+    
     /**
      * Get called when setting is changed, don't pull for it.
      * Reduces storage usage.
@@ -168,6 +182,26 @@ public class SwitchHeadsupButton extends Button {
         @Override
         public void onChange(boolean selfChange) {
             updateHeadsUpEnabled();
+        }
+    }
+    
+    private class ButtonEnabledObserver extends ContentObserver {
+        ButtonEnabledObserver(Handler handler) {
+            super(handler);
+            observe();
+        }
+        
+        public void observe() {
+            ContentResolver resolver = mContext.getContentResolver();
+            resolver.registerContentObserver(Settings.Global.getUriFor(
+                    Settings.Global.HEADSUP_SWITCH_BUTTON_ENABLED),
+                    false, this);
+            updateButtonEnabled();
+        }
+        
+        @Override
+        public void onChange(boolean selfChange) {
+            updateButtonEnabled();
         }
     }
 
