@@ -4236,11 +4236,11 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     public void onScreenTurnedOn() {
         mScreenTurningOn = false;
         mDozeScrimController.onScreenTurnedOn();
-        mVisualizerView.setVisible(true);
+        if(mVisualizerView != null) mVisualizerView.setVisible(true);
     }
 
     public void onScreenTurnedOff() {
-        mVisualizerView.setVisible(false);
+        if(mVisualizerView != null) mVisualizerView.setVisible(false);
     }
 
     /**
