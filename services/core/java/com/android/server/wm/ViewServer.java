@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
+ * Copyright (C) 2016 halogenOS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +16,6 @@
  */
 
 package com.android.server.wm;
-
 
 import android.util.Slog;
 
@@ -97,9 +97,8 @@ class ViewServer implements Runnable {
      * @see WindowManagerService#startViewServer(int)
      */
     boolean start() throws IOException {
-        if (mThread != null) {
+        if (mThread != null)
             return false;
-        }
 
         mServer = new ServerSocket(mPort, VIEW_SERVER_MAX_CONNECTIONS, InetAddress.getLocalHost());
         mThread = new Thread(this, "Remote View Server [port=" + mPort + "]");
@@ -205,8 +204,7 @@ class ViewServer implements Runnable {
 
     class ViewServerWorker implements Runnable, WindowManagerService.WindowChangeListener {
         private Socket mClient;
-        private boolean mNeedWindowListUpdate;
-        private boolean mNeedFocusedWindowUpdate;
+        private boolean mNeedWindowListUpdate, mNeedFocusedWindowUpdate;
 
         public ViewServerWorker(Socket client) {
             mClient = client;
@@ -222,8 +220,7 @@ class ViewServer implements Runnable {
 
                 final String request = in.readLine();
 
-                String command;
-                String parameters;
+                String command, parameters;
 
                 int index = request.indexOf(' ');
                 if (index == -1) {
@@ -235,31 +232,30 @@ class ViewServer implements Runnable {
                 }
 
                 boolean result;
-                if (COMMAND_PROTOCOL_VERSION.equalsIgnoreCase(command)) {
+                if (COMMAND_PROTOCOL_VERSION.equalsIgnoreCase(command))
                     result = writeValue(mClient, VALUE_PROTOCOL_VERSION);
-                } else if (COMMAND_SERVER_VERSION.equalsIgnoreCase(command)) {
+                else if (COMMAND_SERVER_VERSION.equalsIgnoreCase(command))
                     result = writeValue(mClient, VALUE_SERVER_VERSION);
-                } else if (COMMAND_WINDOW_MANAGER_LIST.equalsIgnoreCase(command)) {
+                else if (COMMAND_WINDOW_MANAGER_LIST.equalsIgnoreCase(command))
                     result = mWindowManager.viewServerListWindows(mClient);
-                } else if (COMMAND_WINDOW_MANAGER_GET_FOCUS.equalsIgnoreCase(command)) {
+                else if (COMMAND_WINDOW_MANAGER_GET_FOCUS.equalsIgnoreCase(command))
                     result = mWindowManager.viewServerGetFocusedWindow(mClient);
-                } else if (COMMAND_WINDOW_MANAGER_AUTOLIST.equalsIgnoreCase(command)) {
+                else if (COMMAND_WINDOW_MANAGER_AUTOLIST.equalsIgnoreCase(command))
                     result = windowManagerAutolistLoop();
-                } else {
+                else
                     result = mWindowManager.viewServerWindowCommand(mClient,
                             command, parameters);
-                }
+                
 
-                if (!result) {
-                    Slog.w(LOG_TAG, "An error occurred with the command: " + command);
-                }
+                if (!result)
+                    Slog.w(LOG_TAG, "An error occurred with the command: " +
+                                    command);
             } catch(IOException e) {
                 Slog.w(LOG_TAG, "Connection error: ", e);
             } finally {
                 if (in != null) {
                     try {
                         in.close();
-
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -294,25 +290,28 @@ class ViewServer implements Runnable {
             try {
                 out = new BufferedWriter(new OutputStreamWriter(mClient.getOutputStream()));
                 while (!Thread.interrupted()) {
-                    boolean needWindowListUpdate = false;
-                    boolean needFocusedWindowUpdate = false;
+                    boolean needWindowListUpdate    = false,
+                            needFocusedWindowUpdate = false;
+                    
                     synchronized (this) {
-                        while (!mNeedWindowListUpdate && !mNeedFocusedWindowUpdate) {
+                        while (!mNeedWindowListUpdate && !mNeedFocusedWindowUpdate)
                             wait();
-                        }
+                        
                         if (mNeedWindowListUpdate) {
                             mNeedWindowListUpdate = false;
-                            needWindowListUpdate = true;
+                             needWindowListUpdate = true;
                         }
                         if (mNeedFocusedWindowUpdate) {
                             mNeedFocusedWindowUpdate = false;
-                            needFocusedWindowUpdate = true;
+                             needFocusedWindowUpdate = true;
                         }
                     }
+                    
                     if (needWindowListUpdate) {
                         out.write("LIST UPDATE\n");
                         out.flush();
                     }
+                    
                     if (needFocusedWindowUpdate) {
                         out.write("ACTION_FOCUS UPDATE\n");
                         out.flush();
@@ -333,4 +332,5 @@ class ViewServer implements Runnable {
             return true;
         }
     }
+
 }
