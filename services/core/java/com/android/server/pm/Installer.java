@@ -45,12 +45,12 @@ public final class Installer extends SystemService {
     }
 
     private static String escapeNull(String arg) {
-        if (TextUtils.isEmpty(arg)) {
+        if (TextUtils.isEmpty(arg))
             return "!";
-        } else {
-            if (arg.indexOf('\0') != -1 || arg.indexOf(' ') != -1) {
+        else {
+            if (arg.indexOf('\0') != -1 || arg.indexOf(' ') != -1)
                 throw new IllegalArgumentException(arg);
-            }
+            
             return arg;
         }
     }
@@ -61,17 +61,16 @@ public final class Installer extends SystemService {
     }
 
     public int install(String uuid, String name, int uid, int gid, String seinfo) {
-        StringBuilder builder = new StringBuilder("install");
-        builder.append(' ');
-        builder.append(escapeNull(uuid));
-        builder.append(' ');
-        builder.append(name);
-        builder.append(' ');
-        builder.append(uid);
-        builder.append(' ');
-        builder.append(gid);
-        builder.append(' ');
-        builder.append(seinfo != null ? seinfo : "!");
+        StringBuilder builder = new StringBuilder();
+        builder
+                .append("install")          .append(' ')
+                .append(escapeNull(uuid))   .append(' ')
+                .append(name)               .append(' ')
+                .append(uid)                .append(' ')
+                .append(gid)                .append(' ')
+                .append(seinfo != null ? seinfo : "!")
+            ;
+        
         return mInstaller.execute(builder.toString());
     }
 
@@ -105,19 +104,20 @@ public final class Installer extends SystemService {
             Slog.e(TAG, "Invalid instruction set: " + instructionSet);
             return -1;
         }
+        
         return mInstaller.dexopt(apkPath, uid, isPublic, pkgName,
                 instructionSet, dexoptNeeded, vmSafeMode,
                 debuggable, outputPath, bootComplete);
     }
 
     public int idmap(String targetApkPath, String overlayApkPath, int uid) {
-        StringBuilder builder = new StringBuilder("idmap");
-        builder.append(' ');
-        builder.append(targetApkPath);
-        builder.append(' ');
-        builder.append(overlayApkPath);
-        builder.append(' ');
-        builder.append(uid);
+        StringBuilder builder = new StringBuilder();
+        builder
+                .append("idmap")        .append(' ')
+                .append(targetApkPath)  .append(' ')
+                .append(overlayApkPath) .append(' ')
+                .append(uid)
+            ;
         return mInstaller.execute(builder.toString());
     }
 
@@ -127,13 +127,14 @@ public final class Installer extends SystemService {
             return -1;
         }
 
-        StringBuilder builder = new StringBuilder("movedex");
-        builder.append(' ');
-        builder.append(srcPath);
-        builder.append(' ');
-        builder.append(dstPath);
-        builder.append(' ');
-        builder.append(instructionSet);
+        StringBuilder builder = new StringBuilder();
+        builder
+                .append("movedex")      .append(' ')
+                .append(srcPath)        .append(' ')
+                .append(dstPath)        .append(' ')
+                .append(instructionSet)
+            ;
+        
         return mInstaller.execute(builder.toString());
     }
 
@@ -143,11 +144,13 @@ public final class Installer extends SystemService {
             return -1;
         }
 
-        StringBuilder builder = new StringBuilder("rmdex");
-        builder.append(' ');
-        builder.append(codePath);
-        builder.append(' ');
-        builder.append(instructionSet);
+        StringBuilder builder = new StringBuilder();
+        builder
+                .append("rmdex")        .append(' ')
+                .append(codePath)       .append(' ')
+                .append(instructionSet)
+            ;
+        
         return mInstaller.execute(builder.toString());
     }
 
@@ -155,9 +158,12 @@ public final class Installer extends SystemService {
      * Removes packageDir or its subdirectory
      */
     public int rmPackageDir(String packageDir) {
-        StringBuilder builder = new StringBuilder("rmpackagedir");
-        builder.append(' ');
-        builder.append(packageDir);
+        StringBuilder builder = new StringBuilder();
+        builder
+                .append("rmpackagedir") .append(' ')
+                .append(packageDir)
+            ;
+        
         return mInstaller.execute(builder.toString());
     }
 
@@ -167,22 +173,25 @@ public final class Installer extends SystemService {
     }
 
     public int remove(String uuid, String name, int userId) {
-        StringBuilder builder = new StringBuilder("remove");
-        builder.append(' ');
-        builder.append(escapeNull(uuid));
-        builder.append(' ');
-        builder.append(name);
-        builder.append(' ');
-        builder.append(userId);
+        StringBuilder builder = new StringBuilder();
+        builder
+                .append("remove")           .append(' ')
+                .append(escapeNull(uuid))   .append(' ')
+                .append(name)               .append(' ')
+                .append(userId)
+            ;
+        
         return mInstaller.execute(builder.toString());
     }
 
     public int rename(String oldname, String newname) {
-        StringBuilder builder = new StringBuilder("rename");
-        builder.append(' ');
-        builder.append(oldname);
-        builder.append(' ');
-        builder.append(newname);
+        StringBuilder builder = new StringBuilder();
+        builder
+                .append("rename")   .append(' ')
+                .append(oldname)    .append(' ')
+                .append(newname)
+            ;
+        
         return mInstaller.execute(builder.toString());
     }
 
@@ -192,15 +201,15 @@ public final class Installer extends SystemService {
     }
 
     public int fixUid(String uuid, String name, int uid, int gid) {
-        StringBuilder builder = new StringBuilder("fixuid");
-        builder.append(' ');
-        builder.append(escapeNull(uuid));
-        builder.append(' ');
-        builder.append(name);
-        builder.append(' ');
-        builder.append(uid);
-        builder.append(' ');
-        builder.append(gid);
+        StringBuilder builder = new StringBuilder();
+        builder
+                .append("fixuid")           .append(' ')
+                .append(escapeNull(uuid))   .append(' ')
+                .append(name)               .append(' ')
+                .append(uid)                .append(' ')
+                .append(gid)
+            ;
+        
         return mInstaller.execute(builder.toString());
     }
 
@@ -210,13 +219,14 @@ public final class Installer extends SystemService {
     }
 
     public int deleteCacheFiles(String uuid, String name, int userId) {
-        StringBuilder builder = new StringBuilder("rmcache");
-        builder.append(' ');
-        builder.append(escapeNull(uuid));
-        builder.append(' ');
-        builder.append(name);
-        builder.append(' ');
-        builder.append(userId);
+        StringBuilder builder = new StringBuilder();
+        builder
+                .append("rmcache")          .append(' ')
+                .append(escapeNull(uuid))   .append(' ')
+                .append(name)               .append(' ')
+                .append(userId)
+            ;
+        
         return mInstaller.execute(builder.toString());
     }
 
@@ -226,13 +236,14 @@ public final class Installer extends SystemService {
     }
 
     public int deleteCodeCacheFiles(String uuid, String name, int userId) {
-        StringBuilder builder = new StringBuilder("rmcodecache");
-        builder.append(' ');
-        builder.append(escapeNull(uuid));
-        builder.append(' ');
-        builder.append(name);
-        builder.append(' ');
-        builder.append(userId);
+        StringBuilder builder = new StringBuilder();
+        builder
+                .append("rmcodecache")      .append(' ')
+                .append(escapeNull(uuid))   .append(' ')
+                .append(name)               .append(' ')
+                .append(userId)
+            ;
+        
         return mInstaller.execute(builder.toString());
     }
 
@@ -242,24 +253,26 @@ public final class Installer extends SystemService {
     }
 
     public int createUserData(String uuid, String name, int uid, int userId, String seinfo) {
-        StringBuilder builder = new StringBuilder("mkuserdata");
-        builder.append(' ');
-        builder.append(escapeNull(uuid));
-        builder.append(' ');
-        builder.append(name);
-        builder.append(' ');
-        builder.append(uid);
-        builder.append(' ');
-        builder.append(userId);
-        builder.append(' ');
-        builder.append(seinfo != null ? seinfo : "!");
+        StringBuilder builder = new StringBuilder();
+        builder
+                .append("mkuserdata")       .append(' ')
+                .append(escapeNull(uuid))   .append(' ')
+                .append(name)               .append(' ')
+                .append(uid)                .append(' ')
+                .append(userId)             .append(' ')
+                .append(seinfo != null ? seinfo : "!")
+            ;
+        
         return mInstaller.execute(builder.toString());
     }
 
     public int createUserConfig(int userId) {
-        StringBuilder builder = new StringBuilder("mkuserconfig");
-        builder.append(' ');
-        builder.append(userId);
+        StringBuilder builder = new StringBuilder();
+        builder
+                .append("mkuserconfig") .append(' ')
+                .append(userId)
+            ;
+        
         return mInstaller.execute(builder.toString());
     }
 
@@ -269,29 +282,28 @@ public final class Installer extends SystemService {
     }
 
     public int removeUserDataDirs(String uuid, int userId) {
-        StringBuilder builder = new StringBuilder("rmuser");
-        builder.append(' ');
-        builder.append(escapeNull(uuid));
-        builder.append(' ');
-        builder.append(userId);
+        StringBuilder builder = new StringBuilder();
+        builder
+                .append("rmuser")           .append(' ')
+                .append(escapeNull(uuid))   .append(' ')
+                .append(userId)
+            ;
+        
         return mInstaller.execute(builder.toString());
     }
 
     public int copyCompleteApp(String fromUuid, String toUuid, String packageName,
             String dataAppName, int appId, String seinfo) {
-        StringBuilder builder = new StringBuilder("cpcompleteapp");
-        builder.append(' ');
-        builder.append(escapeNull(fromUuid));
-        builder.append(' ');
-        builder.append(escapeNull(toUuid));
-        builder.append(' ');
-        builder.append(packageName);
-        builder.append(' ');
-        builder.append(dataAppName);
-        builder.append(' ');
-        builder.append(appId);
-        builder.append(' ');
-        builder.append(seinfo);
+        StringBuilder builder = new StringBuilder();
+        builder
+                .append("cpcompleteapp")        .append(' ')
+                .append(escapeNull(fromUuid))   .append(' ')
+                .append(escapeNull(toUuid))     .append(' ')
+                .append(packageName)            .append(' ')
+                .append(dataAppName)            .append(' ')
+                .append(appId)                  .append(' ')
+                .append(seinfo)
+            ;
         return mInstaller.execute(builder.toString());
     }
 
@@ -301,13 +313,14 @@ public final class Installer extends SystemService {
     }
 
     public int clearUserData(String uuid, String name, int userId) {
-        StringBuilder builder = new StringBuilder("rmuserdata");
-        builder.append(' ');
-        builder.append(escapeNull(uuid));
-        builder.append(' ');
-        builder.append(name);
-        builder.append(' ');
-        builder.append(userId);
+        StringBuilder builder = new StringBuilder();
+        builder
+                .append("rmuserdata")       .append(' ')
+                .append(escapeNull(uuid))   .append(' ')
+                .append(name)               .append(' ')
+                .append(userId)
+            ;
+        
         return mInstaller.execute(builder.toString());
     }
 
@@ -317,9 +330,12 @@ public final class Installer extends SystemService {
             return -1;
         }
 
-        StringBuilder builder = new StringBuilder("markbootcomplete");
-        builder.append(' ');
-        builder.append(instructionSet);
+        StringBuilder builder = new StringBuilder();
+        builder
+                .append("markbootcomplete") .append(' ')
+                .append(instructionSet)
+            ;
+        
         return mInstaller.execute(builder.toString());
     }
 
@@ -329,11 +345,13 @@ public final class Installer extends SystemService {
     }
 
     public int freeCache(String uuid, long freeStorageSize) {
-        StringBuilder builder = new StringBuilder("freecache");
-        builder.append(' ');
-        builder.append(escapeNull(uuid));
-        builder.append(' ');
-        builder.append(String.valueOf(freeStorageSize));
+        StringBuilder builder = new StringBuilder();
+        builder
+                .append("freecache")        .append(' ')
+                .append(escapeNull(uuid))   .append(' ')
+                .append(String.valueOf(freeStorageSize))
+            ;
+        
         return mInstaller.execute(builder.toString());
     }
 
@@ -354,38 +372,33 @@ public final class Installer extends SystemService {
             }
         }
 
-        StringBuilder builder = new StringBuilder("getsize");
-        builder.append(' ');
-        builder.append(escapeNull(uuid));
-        builder.append(' ');
-        builder.append(pkgName);
-        builder.append(' ');
-        builder.append(persona);
-        builder.append(' ');
-        builder.append(apkPath);
-        builder.append(' ');
-        // TODO: Extend getSizeInfo to look at the full subdirectory tree,
-        // not just the first level.
-        builder.append(libDirPath != null ? libDirPath : "!");
-        builder.append(' ');
-        builder.append(fwdLockApkPath != null ? fwdLockApkPath : "!");
-        builder.append(' ');
-        builder.append(asecPath != null ? asecPath : "!");
-        builder.append(' ');
-        // TODO: Extend getSizeInfo to look at *all* instrution sets, not
-        // just the primary.
-        builder.append(instructionSets[0]);
+        StringBuilder builder = new StringBuilder();
+        builder
+                .append("getsize")          .append(' ')
+                .append(escapeNull(uuid))   .append(' ')
+                .append(pkgName)            .append(' ')
+                .append(persona)            .append(' ')
+                .append(apkPath)            .append(' ')
+                // TODO: Extend getSizeInfo to look at the full subdirectory tree,
+                // not just the first level.
+                .append(libDirPath != null ? libDirPath : "!")         .append(' ')
+                .append(fwdLockApkPath != null ? fwdLockApkPath : "!") .append(' ')
+                .append(asecPath != null ? asecPath : "!")             .append(' ')
+                // TODO: Extend getSizeInfo to look at *all* instrution sets, not
+                // just the primary.
+                .append(instructionSets[0])
+            ;
 
         String s = mInstaller.transact(builder.toString());
         String res[] = s.split(" ");
 
-        if ((res == null) || (res.length != 5)) {
+        if ((res == null) || (res.length != 5))
             return -1;
-        }
+        
         try {
-            pStats.codeSize = Long.parseLong(res[1]);
-            pStats.dataSize = Long.parseLong(res[2]);
-            pStats.cacheSize = Long.parseLong(res[3]);
+            pStats.codeSize         = Long.parseLong(res[1]);
+            pStats.dataSize         = Long.parseLong(res[2]);
+            pStats.cacheSize        = Long.parseLong(res[3]);
             pStats.externalCodeSize = Long.parseLong(res[4]);
             return Integer.parseInt(res[0]);
         } catch (NumberFormatException e) {
@@ -419,15 +432,14 @@ public final class Installer extends SystemService {
             return -1;
         }
 
-        StringBuilder builder = new StringBuilder("linklib");
-        builder.append(' ');
-        builder.append(escapeNull(uuid));
-        builder.append(' ');
-        builder.append(dataPath);
-        builder.append(' ');
-        builder.append(nativeLibPath32);
-        builder.append(' ');
-        builder.append(userId);
+        StringBuilder builder = new StringBuilder();
+        builder
+                .append("linklib")          .append(' ')
+                .append(escapeNull(uuid))   .append(' ')
+                .append(dataPath)           .append(' ')
+                .append(nativeLibPath32)    .append(' ')
+                .append(userId)
+            ;
 
         return mInstaller.execute(builder.toString());
     }
@@ -438,53 +450,54 @@ public final class Installer extends SystemService {
     }
 
     public boolean restoreconData(String uuid, String pkgName, String seinfo, int uid) {
-        StringBuilder builder = new StringBuilder("restorecondata");
-        builder.append(' ');
-        builder.append(escapeNull(uuid));
-        builder.append(' ');
-        builder.append(pkgName);
-        builder.append(' ');
-        builder.append(seinfo != null ? seinfo : "!");
-        builder.append(' ');
-        builder.append(uid);
+        StringBuilder builder = new StringBuilder();
+        builder
+                .append("restorecondata")               .append(' ')
+                .append(escapeNull(uuid))               .append(' ')
+                .append(pkgName)                        .append(' ')
+                .append(seinfo != null ? seinfo : "!")  .append(' ')
+                .append(uid)
+            ;
+        
         return (mInstaller.execute(builder.toString()) == 0);
     }
 
     public int createOatDir(String oatDir, String dexInstructionSet) {
-        StringBuilder builder = new StringBuilder("createoatdir");
-        builder.append(' ');
-        builder.append(oatDir);
-        builder.append(' ');
-        builder.append(dexInstructionSet);
+        StringBuilder builder = new StringBuilder();
+        builder
+                .append("createoatdir") .append(' ')
+                .append(oatDir)         .append(' ')
+                .append(dexInstructionSet)
+            ;
+        
         return mInstaller.execute(builder.toString());
     }
 
 
     public int linkFile(String relativePath, String fromBase, String toBase) {
-        StringBuilder builder = new StringBuilder("linkfile");
-        builder.append(' ');
-        builder.append(relativePath);
-        builder.append(' ');
-        builder.append(fromBase);
-        builder.append(' ');
-        builder.append(toBase);
+        StringBuilder builder = new StringBuilder();
+        builder
+                .append("linkfile")     .append(' ')
+                .append(relativePath)   .append(' ')
+                .append(fromBase)       .append(' ')
+                .append(toBase)
+            ;
+        
         return mInstaller.execute(builder.toString());
     }
 
     /**
-     * Returns true iff. {@code instructionSet} is a valid instruction set.
+     * Returns true if {@code instructionSet} is a valid instruction set.
      */
     private static boolean isValidInstructionSet(String instructionSet) {
-        if (instructionSet == null) {
+        if (instructionSet == null) 
             return false;
-        }
 
-        for (String abi : Build.SUPPORTED_ABIS) {
-            if (instructionSet.equals(VMRuntime.getInstructionSet(abi))) {
+        for (String abi : Build.SUPPORTED_ABIS)
+            if (instructionSet.equals(VMRuntime.getInstructionSet(abi)))
                 return true;
-            }
-        }
 
         return false;
     }
+
 }
