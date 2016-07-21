@@ -1285,15 +1285,30 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         if (mNavigationBarView == null) return;
 
         prepareNavigationBarView();
-
-        mWindowManager.addView(mNavigationBarView, getNavigationBarLayoutParams());
+        
+        try {
+            mWindowManager.removeView(mNavigationBarView);
+        } catch(Exception ex) {
+            // Ignore, this is just to make sure it is removed before adding again
+        }
+        try {
+            mWindowManager.addView(mNavigationBarView, getNavigationBarLayoutParams());
+        } catch(Exception ex) {
+            // Prevent SystemUI crash if something gets weird while the user spams the
+            // toggle for navbar. In that way it gets normalized again when the
+            // user stops spamming.
+        }
     }
 
     private void removeNavigationBar() {
         if (DEBUG) Log.d(TAG, "removeNavigationBar: about to remove " + mNavigationBarView);
         if (mNavigationBarView == null) return;
 
-        mWindowManager.removeView(mNavigationBarView);
+        try {
+            mWindowManager.removeView(mNavigationBarView);
+        } catch(Exception ex) {
+            // Again, just ignore that, the user might be spamming the toggle.
+        }
         mNavigationBarView = null;
     }
 
