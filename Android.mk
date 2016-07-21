@@ -40,6 +40,10 @@ include $(CLEAR_VARS)
 # FRAMEWORKS_BASE_SUBDIRS comes from build/core/pathmap.mk
 LOCAL_SRC_FILES := $(call find-other-java-files,$(FRAMEWORKS_BASE_SUBDIRS))
 
+# For KeyDisabler support
+LOCAL_SRC_FILES += \
+	../../$(shell find device/*/*/cmhw/org/cyanogenmod/hardware/KeyDisabler.java)
+
 # EventLogTags files.
 LOCAL_SRC_FILES += \
        core/java/android/content/EventLogTags.logtags \

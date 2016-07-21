@@ -17,15 +17,19 @@
 package com.android.server.statusbar;
 
 import android.app.StatusBarManager;
+import android.database.ContentObserver;
+import android.content.ContentResolver;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.os.UserHandle;
-import android.content.Context;
-import android.content.pm.PackageManager;
-import android.content.res.Resources;
+import android.provider.Settings;
+import android.util.Log;
 import android.util.Slog;
 
 import com.android.internal.statusbar.IStatusBar;
@@ -39,9 +43,12 @@ import com.android.server.wm.WindowManagerService;
 
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.xdevs23.debugutils.StackTraceParser;
 
 /**
  * A note on locking:  We rely on the fact that calls onto mBar are oneway or
@@ -57,6 +64,9 @@ public class StatusBarManagerService extends IStatusBarService.Stub {
     private NotificationDelegate mNotificationDelegate;
     private volatile IStatusBar mBar;
     private StatusBarIconList mIcons = new StatusBarIconList();
+    
+    // To disable hw keys on navbar
+    private DevForceNavbarObserver mDevForceNavbarObserver;
 
     // for disabling the status bar
     private final ArrayList<DisableRecord> mDisableRecords = new ArrayList<DisableRecord>();
@@ -100,6 +110,8 @@ public class StatusBarManagerService extends IStatusBarService.Stub {
         mIcons.defineSlots(res.getStringArray(com.android.internal.R.array.config_statusBarIcons));
 
         LocalServices.addService(StatusBarManagerInternal.class, mInternalService);
+        
+        mDevForceNavbarObserver = new DevForceNavbarObserver(new Handler());
     }
 
     /**
@@ -187,6 +199,40 @@ public class StatusBarManagerService extends IStatusBarService.Stub {
             }
         }
     };
+    
+    private void setHwKeysEnabled(boolean enabled) {
+        try {
+            Class keyDisabler = Class.forName("org.cyanogenmod.hardware.KeyDisabler");
+    	    Method setActiveMethod = 
+    	        keyDisabler.getDeclaredMethod("setActive", boolean.class);
+            setActiveMethod.invoke(null, enabled);
+        } catch(Exception ex) {
+            Log.w(TAG, StackTraceParser.parse(ex));
+            // KeyDisabler not found or not usable, skipping.
+        }
+    }
+    
+    class DevForceNavbarObserver extends ContentObserver {
+        DevForceNavbarObserver(Handler handler) {
+            super(handler);
+            observe();
+            onChange(false);
+        }
+
+        void observe() {
+            ContentResolver resolver = mContext.getContentResolver();
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.DEV_FORCE_SHOW_NAVBAR), false, this);
+        }
+
+        @Override
+        public void onChange(boolean selfChange) {
+            boolean visible = Settings.System.getIntForUser(mContext.getContentResolver(),
+                    Settings.System.DEV_FORCE_SHOW_NAVBAR, 0, UserHandle.USER_CURRENT) == 1;
+            Log.d(TAG, "Received change of navbar, handling hw keys");
+            setHwKeysEnabled(visible);
+        }
+    }
 
     // ================================================================================
     // From IStatusBarService

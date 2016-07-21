@@ -8,7 +8,9 @@ LOCAL_SRC_FILES := $(call all-java-files-under, src) \
 
 LOCAL_STATIC_JAVA_LIBRARIES := Keyguard \
     android-support-v7-palette \
-    android-support-v4
+    android-support-v4 \
+    xdjlib
+
 LOCAL_JAVA_LIBRARIES := telephony-common
 
 LOCAL_PACKAGE_NAME := SystemUI
