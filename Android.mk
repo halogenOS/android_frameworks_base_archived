@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
 LOCAL_PATH := $(call my-dir)
 
 # We have a special case here where we build the library's resources
@@ -47,6 +48,9 @@ LOCAL_SRC_FILES += \
        core/java/android/speech/tts/EventLogTags.logtags \
        core/java/android/webkit/EventLogTags.logtags \
        core/java/com/android/internal/logging/EventLogTags.logtags \
+
+# For KeyDisabler support
+LOCAL_SRC_FILES += $(shell echo -en "../../`find device/*/*/cmhw/org/cyanogenmod/hardware/KeyDisabler.java`")
 
 ## READ ME: ########################################################
 ##
