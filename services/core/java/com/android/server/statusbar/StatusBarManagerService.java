@@ -48,8 +48,6 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.xdevs23.debugutils.StackTraceParser;
-
 /**
  * A note on locking:  We rely on the fact that calls onto mBar are oneway or
  * if they are local, that they just enqueue messages to not deadlock.
@@ -58,15 +56,16 @@ public class StatusBarManagerService extends IStatusBarService.Stub {
     private static final String TAG = "StatusBarManagerService";
     private static final boolean SPEW = false;
 
-    private final Context mContext;
+    private Context mContext;
     private final WindowManagerService mWindowManager;
     private Handler mHandler = new Handler();
     private NotificationDelegate mNotificationDelegate;
     private volatile IStatusBar mBar;
     private StatusBarIconList mIcons = new StatusBarIconList();
     
-    // To disable hw keys on navbar
+    // To disable hw keys
     private DevForceNavbarObserver mDevForceNavbarObserver;
+    private HwKeysEnabledObserver  mHwKeysEnabledObserver;
 
     // for disabling the status bar
     private final ArrayList<DisableRecord> mDisableRecords = new ArrayList<DisableRecord>();
@@ -111,7 +110,14 @@ public class StatusBarManagerService extends IStatusBarService.Stub {
 
         LocalServices.addService(StatusBarManagerInternal.class, mInternalService);
         
-        mDevForceNavbarObserver = new DevForceNavbarObserver(new Handler());
+        mDevForceNavbarObserver = new DevForceNavbarObserver(mHandler);
+        if(areHwKeysSupported()) {
+            mHwKeysEnabledObserver = new  HwKeysEnabledObserver(mHandler);
+            if(Settings.System.getInt(mContext.getContentResolver(),
+                    Settings.System.HARDWARE_BUTTONS_SUPPORTED, 0) == 0)
+                Settings.System.putInt(mContext.getContentResolver(),
+                    Settings.System.HARDWARE_BUTTONS_SUPPORTED, 1);
+        }
     }
 
     /**
@@ -200,26 +206,38 @@ public class StatusBarManagerService extends IStatusBarService.Stub {
         }
     };
     
-    private void setHwKeysEnabled(boolean enabled) {
+    private static void setHwKeysEnabled(boolean enabled) {
         try {
             Class keyDisabler = Class.forName("org.cyanogenmod.hardware.KeyDisabler");
     	    Method setActiveMethod = 
     	        keyDisabler.getDeclaredMethod("setActive", boolean.class);
-            setActiveMethod.invoke(null, enabled);
+            setActiveMethod.invoke(null, !enabled);
         } catch(Exception ex) {
-            Log.w(TAG, StackTraceParser.parse(ex));
             // KeyDisabler not found or not usable, skipping.
         }
     }
     
-    class DevForceNavbarObserver extends ContentObserver {
+    private static boolean areHwKeysSupported() {
+        try {
+            Class keyDisabler = Class.forName("org.cyanogenmod.hardware.KeyDisabler");
+            Method isSupportedMethod =
+                keyDisabler.getDeclaredMethod("isSupported", null);
+            Object result = isSupportedMethod.invoke(null, null);
+            return ((boolean)result);
+        } catch(Exception ex) {
+            ex.printStackTrace();
+            return false;
+        }
+    }
+    
+    private class DevForceNavbarObserver extends ContentObserver {
         DevForceNavbarObserver(Handler handler) {
             super(handler);
             observe();
             onChange(false);
         }
 
-        void observe() {
+        public void observe() {
             ContentResolver resolver = mContext.getContentResolver();
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.DEV_FORCE_SHOW_NAVBAR), false, this);
@@ -229,8 +247,32 @@ public class StatusBarManagerService extends IStatusBarService.Stub {
         public void onChange(boolean selfChange) {
             boolean visible = Settings.System.getIntForUser(mContext.getContentResolver(),
                     Settings.System.DEV_FORCE_SHOW_NAVBAR, 0, UserHandle.USER_CURRENT) == 1;
-            Log.d(TAG, "Received change of navbar, handling hw keys");
+            Log.d(TAG, "Received change of navbar: " + visible + ", handling hw keys");
             setHwKeysEnabled(visible);
+        }
+    }
+    
+    private class HwKeysEnabledObserver extends ContentObserver {
+        HwKeysEnabledObserver(Handler handler) {
+            super(handler);
+            observe();
+            onChange(false);
+        }
+        
+        public void observe() {
+            ContentResolver resolver = mContext.getContentResolver();
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.HARDWARE_BUTTONS_ENABLED), false, this);
+        }
+        
+        @Override
+        public void onChange(boolean selfChange) {
+            Log.d(TAG, "Received change of hardware keys setting");
+            boolean enabled = Settings.System.getIntForUser(mContext.getContentResolver(),
+                    Settings.System.HARDWARE_BUTTONS_ENABLED, areHwKeysSupported() ? 1 : 0,
+                    UserHandle.USER_CURRENT) == 1;
+            Log.d(TAG, "Hardware keys: " + enabled);
+            setHwKeysEnabled(enabled);
         }
     }
 

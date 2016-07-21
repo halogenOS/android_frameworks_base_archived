@@ -2852,6 +2852,23 @@ public final class Settings {
         * @hide
         */
         public static final String DEV_FORCE_SHOW_NAVBAR = "dev_force_show_navbar";
+        
+                
+        /**
+         * Whether hardware buttons should be turned on
+         * 
+         * @hide
+         */
+         public static final String HARDWARE_BUTTONS_ENABLED =
+                        "hardware_buttons_enabled";
+        
+        /**
+         * Whether hardware buttons are supported (for global access)
+         * 
+         * @hide
+         */
+         public static final String HARDWARE_BUTTONS_SUPPORTED =
+                        "hardware_buttons_supported";
 
 
         /**
