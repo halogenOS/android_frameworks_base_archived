@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
 LOCAL_PATH := $(call my-dir)
 
 # We have a special case here where we build the library's resources
@@ -40,16 +41,15 @@ include $(CLEAR_VARS)
 # FRAMEWORKS_BASE_SUBDIRS comes from build/core/pathmap.mk
 LOCAL_SRC_FILES := $(call find-other-java-files,$(FRAMEWORKS_BASE_SUBDIRS))
 
-# For KeyDisabler support
-LOCAL_SRC_FILES += \
-	../../$(shell find device/*/*/cmhw/org/cyanogenmod/hardware/KeyDisabler.java)
-
 # EventLogTags files.
 LOCAL_SRC_FILES += \
        core/java/android/content/EventLogTags.logtags \
        core/java/android/speech/tts/EventLogTags.logtags \
        core/java/android/webkit/EventLogTags.logtags \
        core/java/com/android/internal/logging/EventLogTags.logtags \
+
+# For KeyDisabler support
+LOCAL_SRC_FILES += $(shell echo -en "../../`find device/*/*/cmhw/org/cyanogenmod/hardware/KeyDisabler.java`")
 
 ## READ ME: ########################################################
 ##
