@@ -49,8 +49,14 @@ LOCAL_SRC_FILES += \
        core/java/android/webkit/EventLogTags.logtags \
        core/java/com/android/internal/logging/EventLogTags.logtags \
 
-# For KeyDisabler support
-LOCAL_SRC_FILES += $(shell echo -en "../../`find device/*/*/cmhw/org/cyanogenmod/hardware/KeyDisabler.java`")
+# Specify the KeyDisabler file
+LOCAL_KEYDISABLER_FILE = ../../$(shell find device/*/$(TARGET_DEVICE)/cmhw/org/cyanogenmod/hardware/KeyDisabler.java)
+
+# If KeyDisabler exists, include it.
+ifneq ($(LOCAL_KEYDISABLER_FILE),)
+	# For KeyDisabler support
+	LOCAL_SRC_FILES += $(LOCAL_KEYDISABLER_FILE)
+endif
 
 ## READ ME: ########################################################
 ##
