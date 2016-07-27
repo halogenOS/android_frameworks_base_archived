@@ -2869,6 +2869,14 @@ public final class Settings {
          */
          public static final String HARDWARE_BUTTONS_SUPPORTED =
                         "hardware_buttons_supported";
+        
+        /**
+         * Network mode
+         * 
+         * @hide
+         */
+         public static final String NETWORK_PREFERRED_MODE =
+                        "network_preferred_mode";
 
 
         /**
