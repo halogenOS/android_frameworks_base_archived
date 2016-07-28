@@ -908,7 +908,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         mScrimController.setBackDropView(mBackdrop);
         mStatusBarView.setScrimController(mScrimController);
         mDozeScrimController = new DozeScrimController(mScrimController, context);
-        mVisualizerView = (VisualizerView) mStatusBarView.findViewById(R.id.visualizerview);
+        mVisualizerView = new VisualizerView(context);
 
         mHeader = (StatusBarHeaderView) mStatusBarWindow.findViewById(R.id.header);
         mHeader.setActivityStarter(this);
@@ -1820,7 +1820,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
         if (metaDataChanged) {
             updateNotifications();
+            updateArtwork();
         }
+        
         updateMediaMetaData(metaDataChanged);
     }
 
@@ -1876,6 +1878,46 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             mBackdropFront.setImageDrawable(null);
         }
     };
+    
+    /**
+     * Get artwork bitmap
+     */
+    protected Bitmap getArtworkBitmap() {
+        Bitmap artworkBitmap = null;
+        if (mMediaMetadata != null) {
+            artworkBitmap = mMediaMetadata.getBitmap(MediaMetadata.METADATA_KEY_ART);
+            if (artworkBitmap == null) {
+                artworkBitmap = mMediaMetadata.getBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART);
+                // might still be null
+            }
+        }
+        return artworkBitmap;
+    }
+    
+    /**
+     * Update artwork
+     */
+    protected boolean updateArtwork() {
+        Bitmap artworkBitmap = getArtworkBitmap();
+
+        final boolean hasArtwork = artworkBitmap != null;
+
+        boolean keyguardVisible = (mState != StatusBarState.SHADE);
+
+        if (!mKeyguardFadingAway && keyguardVisible && mScreenOn) {
+            // if there's album art, ensure visualizer is visible
+            if(hasArtwork) mVisualizerView.setBitmap(artworkBitmap);
+            mVisualizerView.setPlaying(mMediaController != null
+                && mMediaController.getPlaybackState() != null
+                && mMediaController.getPlaybackState().getState()
+                        == PlaybackState.STATE_PLAYING);
+        }
+        
+        if (!hasArtwork && mVisualizerView != null)
+            mVisualizerView.resetColor();
+        
+        return hasArtwork;
+    }
 
     /**
      * Refresh or remove lockscreen artwork from media metadata.
@@ -1885,6 +1927,8 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             mKeyguardBottomArea.addView(mVisualizerView);
             mVisualizerView.setTranslationZ(-16);
         }
+        
+        if (mBackdrop == null) return; // called too early
         
         boolean keyguardVisible = false;
         if (!SHOW_LOCKSCREEN_MEDIA_ARTWORK) {
@@ -1904,8 +1948,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             return;
         }
 
-        if (mBackdrop == null) return; // called too early
-
         if (mLaunchTransitionFadingAway) {
             mBackdrop.setVisibility(View.INVISIBLE);
             return;
@@ -1917,34 +1959,12 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                     + " metaDataChanged=" + metaDataChanged
                     + " state=" + mState);
         }
-
-        Bitmap artworkBitmap = null;
-        if (mMediaMetadata != null) {
-            artworkBitmap = mMediaMetadata.getBitmap(MediaMetadata.METADATA_KEY_ART);
-            if (artworkBitmap == null) {
-                artworkBitmap = mMediaMetadata.getBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART);
-                // might still be null
-            }
-        }
-
-        final boolean hasArtwork = artworkBitmap != null;
-
-        keyguardVisible = (mState != StatusBarState.SHADE);
-
-        if (!mKeyguardFadingAway && keyguardVisible && mScreenOn) {
-            // if there's album art, ensure visualizer is visible
-            if(hasArtwork) mVisualizerView.setBitmap(artworkBitmap);
-            mVisualizerView.setPlaying(mMediaController != null
-                    && mMediaController.getPlaybackState() != null
-                    && mMediaController.getPlaybackState().getState()
-                            == PlaybackState.STATE_PLAYING);
-        }
+        
+        Bitmap artworkBitmap = getArtworkBitmap();
+        final boolean hasArtwork = updateArtwork();
 
         final boolean hasBackdrop = false;
         boolean mKeyguardShowingMedia = hasBackdrop;
-        
-        if (!hasArtwork && mVisualizerView != null)
-            mVisualizerView.resetColor();
 
         if ((hasArtwork || DEBUG_MEDIA_FAKE_ARTWORK)
                 && (mState == StatusBarState.KEYGUARD || mState == StatusBarState.SHADE_LOCKED)
@@ -3131,6 +3151,16 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             final boolean dismissShade,
             final boolean afterKeyguardGone) {
         final boolean keyguardShowing = mStatusBarKeyguardViewManager.isShowing();
+        final Runnable removeVisualizerRunnable = new Runnable() {
+            @Override
+            public void run() {
+                // Remove lockscreen visualizer from Keyguard
+                // here to prevent QS issues
+                if(mVisualizerView != null &&
+                    mVisualizerView.getParent() != null)
+                    mKeyguardBottomArea.removeView(mVisualizerView);
+            }
+        };
         dismissKeyguardThenExecute(new OnDismissAction() {
             @Override
             public boolean onDismiss() {
@@ -3141,10 +3171,12 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                                 ActivityManagerNative.getDefault()
                                         .keyguardWaitingForActivityDrawn();
                             }
+                            mHandler.post(removeVisualizerRunnable);
                             if (runnable != null) {
                                 runnable.run();
                             }
                         } catch (RemoteException e) {
+                            
                         }
                     }
                 });
@@ -4015,6 +4047,14 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     public void setBarState(int state) {
         if(mVisualizerView == null) {
             mVisualizerView = new VisualizerView(mContext);
+            mVisualizerView.setOnArtworkRequestListener(
+                new VisualizerView.OnArtworkRequestListener() {
+                    @Override
+                    public void onRequestArtwork() {
+                        if(mVisualizerView != null)
+                            mVisualizerView.setBitmap(getArtworkBitmap());
+                    }
+                });
             Log.d(TAG, "Ready to rock with visualizer!");
         }
         // If we're visible and switched to SHADE_LOCKED (the user dragged
@@ -4251,7 +4291,10 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     public void onScreenTurnedOn() {
         mScreenTurningOn = false;
         mDozeScrimController.onScreenTurnedOn();
-        if(mVisualizerView != null) mVisualizerView.setVisible(true);
+        if(mVisualizerView != null) {
+            updateArtwork();
+            mVisualizerView.setVisible(true);
+        }
     }
 
     public void onScreenTurnedOff() {

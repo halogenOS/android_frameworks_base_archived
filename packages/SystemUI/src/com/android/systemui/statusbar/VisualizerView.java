@@ -18,6 +18,7 @@ package com.android.systemui.statusbar;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.database.ContentObserver;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -57,6 +58,16 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
     private Bitmap mCurrentBitmap;
 
     private SettingsObserver mObserver;
+    
+    private OnArtworkRequestListener mOnArtworkRequestListener =
+        new OnArtworkRequestListener() {
+        
+        @Override
+        public void onRequestArtwork() {
+            // Just a placeholder while this is not set otherwise
+        }
+        
+    };
 
     private Visualizer.OnDataCaptureListener mVisualizerListener =
             new Visualizer.OnDataCaptureListener() {
@@ -66,6 +77,7 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
 
         @Override
         public void onWaveFormDataCapture(Visualizer visualizer, byte[] bytes, int samplingRate) {
+            
         }
 
         @Override
@@ -87,9 +99,7 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
     private final Runnable mLinkVisualizer = new Runnable() {
         @Override
         public void run() {
-            if (DEBUG) {
-                Log.w(TAG, "+++ mLinkVisualizer run()");
-            }
+            if (DEBUG) Log.w(TAG, "+++ mLinkVisualizer run()");
 
             try {
                 mVisualizer = new Visualizer(0);
@@ -100,13 +110,11 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
 
             mVisualizer.setEnabled(false);
             mVisualizer.setCaptureSize(66);
-            mVisualizer.setDataCaptureListener(mVisualizerListener,Visualizer.getMaxCaptureRate(),
-                    false, true);
+            mVisualizer.setDataCaptureListener(mVisualizerListener,
+                    Visualizer.getMaxCaptureRate(), false, true);
             mVisualizer.setEnabled(true);
 
-            if (DEBUG) {
-                Log.w(TAG, "--- mLinkVisualizer run()");
-            }
+            if (DEBUG) Log.w(TAG, "--- mLinkVisualizer run()");
         }
     };
 
@@ -120,24 +128,23 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
     private final Runnable mUnlinkVisualizer = new Runnable() {
         @Override
         public void run() {
-            if (DEBUG) {
+            if (DEBUG)
                 Log.w(TAG, "+++ mUnlinkVisualizer run(), mVisualizer: " + mVisualizer);
-            }
+            
             if (mVisualizer != null) {
                 mVisualizer.setEnabled(false);
                 mVisualizer.release();
                 mVisualizer = null;
             }
-            if (DEBUG) {
-                Log.w(TAG, "--- mUninkVisualizer run()");
-            }
+            
+            if (DEBUG) Log.w(TAG, "--- mUninkVisualizer run()");
         }
     };
 
     public VisualizerView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
 
-        mObserver = new SettingsObserver(null);
+        mObserver = new SettingsObserver(new Handler());
 
         mColor = Color.TRANSPARENT;
 
@@ -169,6 +176,10 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
         this(context, null, 0);
         if(DEBUG) Log.d(TAG, "We got called!");
     }
+    
+    public void setOnArtworkRequestListener(OnArtworkRequestListener listener) {
+        mOnArtworkRequestListener = listener;
+    }
 
     private void updateViewVisibility() {
         final int curVis = getVisibility();
@@ -183,16 +194,11 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        mObserver = new SettingsObserver(new Handler());
-        mObserver.observe();
-        mObserver.update();
     }
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        mObserver.unobserve();
-        mObserver = null;
         mCurrentBitmap = null;
     }
 
@@ -221,26 +227,25 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        if (mVisualizer != null) {
-            canvas.drawLines(mFFTPoints, mPaint);
-        }
+        if (mVisualizer != null) canvas.drawLines(mFFTPoints, mPaint);
     }
 
     public void setVisible(boolean visible) {
         if (mVisible != visible) {
-            if (DEBUG) {
+            if (DEBUG)
                 Log.i(TAG, "setVisible() called with visible = [" + visible + "]");
-            }
+            
             mVisible = visible;
+            if(visible) mOnArtworkRequestListener.onRequestArtwork();
             checkStateChanged();
         }
     }
 
     public void setDozing(boolean dozing) {
         if (mDozing != dozing) {
-            if (DEBUG) {
+            if (DEBUG)
                 Log.i(TAG, "setDozing() called with dozing = [" + dozing + "]");
-            }
+            
             mDozing = dozing;
             checkStateChanged();
         }
@@ -248,9 +253,9 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
 
     public void setPlaying(boolean playing) {
         if (mPlaying != playing) {
-            if (DEBUG) {
+            if (DEBUG)
                 Log.i(TAG, "setPlaying() called with playing = [" + playing + "]");
-            }
+            
             mPlaying = playing;
             checkStateChanged();
         }
@@ -258,9 +263,9 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
 
     public void setPowerSaveMode(boolean powerSaveMode) {
         if (mPowerSaveMode != powerSaveMode) {
-            if (DEBUG) {
+            if (DEBUG)
                 Log.i(TAG, "setPowerSaveMode() called with powerSaveMode = [" + powerSaveMode + "]");
-            }
+            
             mPowerSaveMode = powerSaveMode;
             checkStateChanged();
         }
@@ -268,9 +273,9 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
 
     public void setOccluded(boolean occluded) {
         if (mOccluded != occluded) {
-            if (DEBUG) {
+            if (DEBUG)
                 Log.i(TAG, "setOccluded() called with occluded = [" + occluded + "]");
-            }
+            
             mOccluded = occluded;
             checkStateChanged();
         }
@@ -284,9 +289,8 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
     }
 
     public void setBitmap(Bitmap bitmap) {
-        if (mCurrentBitmap == bitmap) {
-            return;
-        }
+        if (mCurrentBitmap == bitmap) return;
+        
         mCurrentBitmap = bitmap;
         if (bitmap != null) {
             Palette.generateAsync(bitmap, this);
@@ -302,10 +306,13 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
         color = palette.getVibrantColor(color);
         if (color == Color.TRANSPARENT) {
             color = palette.getLightVibrantColor(color);
-            if (color == Color.TRANSPARENT) {
+            if (color == Color.TRANSPARENT)
                 color = palette.getDarkVibrantColor(color);
-            }
         }
+        
+        // Did you ever notice that black on black looks weird?
+        if(color == Color.BLACK)
+            color = Color.GRAY;  // Change to white if you feel better with that
 
         setColor(color);
     }
@@ -322,7 +329,7 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
 
                 mVisualizerColorAnimator = ObjectAnimator.ofArgb(mPaint, "color",
                         mPaint.getColor(), mColor);
-                mVisualizerColorAnimator.setStartDelay(600);
+                mVisualizerColorAnimator.setStartDelay(400);
                 mVisualizerColorAnimator.setDuration(1200);
                 mVisualizerColorAnimator.start();
             } else {
@@ -330,9 +337,8 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
             }
         }
 
-        if (color == Color.TRANSPARENT) {
+        if (color == Color.TRANSPARENT)
             color = Color.WHITE;
-        }
     }
     
     public void resetColor() {
@@ -340,7 +346,6 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
     }
 
     private void checkStateChanged() {
-        mVisualizerEnabled = mObserver.updateWr();
         if(mVisible && mPlaying && !mDozing && mVisualizerEnabled &&
             getVisibility() == View.GONE)
             setVisibility(View.VISIBLE);
@@ -381,27 +386,35 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
         }
     }
 
-    private class SettingsObserver {
+    /**
+     * Class to observe changes to the Lockscreen Visualizer setting
+     */
+    private class SettingsObserver extends ContentObserver {
 
         public SettingsObserver(Handler handler) {
-
-        }
-
-        protected void update() {
-
-        }
-        
-        protected boolean updateWr() {
-            return Settings.Global.getInt(getContext().getContentResolver(),
-                    Settings.Global.LOCKSCREEN_VISUALIZER_ENABLED, 1) == 1;
+            super(handler);
+            observe();
+            onChange(false);
         }
 
         protected void observe() {
-
+            getContext().getContentResolver().registerContentObserver(
+                Settings.Global.getUriFor(
+                    Settings.Global.LOCKSCREEN_VISUALIZER_ENABLED
+                ), false, this
+            );
         }
-
-        protected void unobserve() {
-
+        
+        @Override
+        public void onChange(boolean selfChange) {
+            mVisualizerEnabled = Settings.Global.getInt(getContext().getContentResolver(),
+                Settings.Global.LOCKSCREEN_VISUALIZER_ENABLED, 1) == 1;
         }
+        
     }
+    
+    public static interface OnArtworkRequestListener {
+        void onRequestArtwork();
+    }
+    
 }
