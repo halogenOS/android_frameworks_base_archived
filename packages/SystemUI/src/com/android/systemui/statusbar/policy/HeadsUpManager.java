@@ -90,6 +90,7 @@ public class HeadsUpManager implements ViewTreeObserver.OnComputeInternalInsetsL
     private PhoneStatusBar mBar;
     private int mSnoozeLengthMs;
     private ContentObserver mSettingsObserver;
+    private HeadsupObserver mHeadsupObserver;
     private HashMap<String, HeadsUpEntry> mHeadsUpEntries = new HashMap<>();
     private TreeSet<HeadsUpEntry> mSortedEntries = new TreeSet<>();
     private HashSet<String> mSwipedOutKeys = new HashSet<>();
@@ -104,6 +105,7 @@ public class HeadsUpManager implements ViewTreeObserver.OnComputeInternalInsetsL
     private boolean mHeadsUpGoingAway;
     private boolean mWaitingOnCollapseWhenGoingAway;
     private boolean mIsObserving;
+    private boolean mHeadsupEnabled = true;
 
     public HeadsUpManager(final Context context, View statusBarWindowView) {
         mContext = context;
@@ -129,6 +131,9 @@ public class HeadsUpManager implements ViewTreeObserver.OnComputeInternalInsetsL
                 }
             }
         };
+        
+        mHeadsupObserver = new HeadsupObserver(mHandler);
+        
         context.getContentResolver().registerContentObserver(
                 Settings.Global.getUriFor(SETTING_HEADS_UP_SNOOZE_LENGTH_MS), false,
                 mSettingsObserver);
@@ -137,6 +142,7 @@ public class HeadsUpManager implements ViewTreeObserver.OnComputeInternalInsetsL
                 com.android.internal.R.dimen.status_bar_height);
         mNotificationsTopPadding = context.getResources()
                 .getDimensionPixelSize(R.dimen.notifications_top_padding);
+        
     }
 
     private void updateTouchableRegionListener() {
@@ -170,20 +176,42 @@ public class HeadsUpManager implements ViewTreeObserver.OnComputeInternalInsetsL
      * Called when posting a new notification to the heads up.
      */
     public void showNotification(NotificationData.Entry headsUp) {
-        if(Settings.System.getInt(mContext.getContentResolver(),
-            KEY_ENABLE_HEADSUP_NOTIFICATIONS, 1) == 0) return;
+        if(!mHeadsupEnabled) return;
         if (DEBUG) Log.v(TAG, "showNotification");
         addHeadsUpEntry(headsUp);
         updateNotification(headsUp, true);
         headsUp.setInterruption();
+    }
+    
+    private class HeadsupObserver extends ContentObserver {
+        
+        public HeadsupObserver(Handler handler) {
+            super(handler);
+            observe();
+            onChange(false);
+        }
+        
+        public void observe() {
+            mContext.getContentResolver().registerContentObserver(
+                Settings.System.getUriFor(
+                    Settings.System.KEY_ENABLE_HEADSUP_NOTIFICATIONS
+                ), false, this
+            );
+        }
+        
+        @Override
+        public void onChange(boolean selfChange) {
+            mHeadsupEnabled = Settings.System.getInt(mContext.getContentResolver(),
+                KEY_ENABLE_HEADSUP_NOTIFICATIONS, 1) == 1;
+        }
+        
     }
 
     /**
      * Called when updating or posting a notification to the heads up.
      */
     public void updateNotification(NotificationData.Entry headsUp, boolean alert) {
-        if(Settings.System.getInt(mContext.getContentResolver(),
-            KEY_ENABLE_HEADSUP_NOTIFICATIONS, 1) == 0) return;
+        if(!mHeadsupEnabled) return;
         if (DEBUG) Log.v(TAG, "updateNotification");
 
         headsUp.row.setChildrenExpanded(false /* expanded */, false /* animated */);
