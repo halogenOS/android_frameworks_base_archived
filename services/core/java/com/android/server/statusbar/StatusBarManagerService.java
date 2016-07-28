@@ -64,7 +64,6 @@ public class StatusBarManagerService extends IStatusBarService.Stub {
     private StatusBarIconList mIcons = new StatusBarIconList();
     
     // To disable hw keys
-    private DevForceNavbarObserver mDevForceNavbarObserver;
     private HwKeysEnabledObserver  mHwKeysEnabledObserver;
 
     // for disabling the status bar
@@ -110,7 +109,6 @@ public class StatusBarManagerService extends IStatusBarService.Stub {
 
         LocalServices.addService(StatusBarManagerInternal.class, mInternalService);
         
-        mDevForceNavbarObserver = new DevForceNavbarObserver(mHandler);
         if(areHwKeysSupported()) {
             mHwKeysEnabledObserver = new  HwKeysEnabledObserver(mHandler);
             if(Settings.System.getInt(mContext.getContentResolver(),
@@ -230,28 +228,6 @@ public class StatusBarManagerService extends IStatusBarService.Stub {
         }
     }
     
-    private class DevForceNavbarObserver extends ContentObserver {
-        DevForceNavbarObserver(Handler handler) {
-            super(handler);
-            observe();
-            onChange(false);
-        }
-
-        public void observe() {
-            ContentResolver resolver = mContext.getContentResolver();
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.DEV_FORCE_SHOW_NAVBAR), false, this);
-        }
-
-        @Override
-        public void onChange(boolean selfChange) {
-            boolean visible = Settings.System.getIntForUser(mContext.getContentResolver(),
-                    Settings.System.DEV_FORCE_SHOW_NAVBAR, 0, UserHandle.USER_CURRENT) == 1;
-            Log.d(TAG, "Received change of navbar: " + visible + ", handling hw keys");
-            setHwKeysEnabled(visible);
-        }
-    }
-    
     private class HwKeysEnabledObserver extends ContentObserver {
         HwKeysEnabledObserver(Handler handler) {
             super(handler);
@@ -271,7 +247,6 @@ public class StatusBarManagerService extends IStatusBarService.Stub {
             boolean enabled = Settings.System.getIntForUser(mContext.getContentResolver(),
                     Settings.System.HARDWARE_BUTTONS_ENABLED, areHwKeysSupported() ? 1 : 0,
                     UserHandle.USER_CURRENT) == 1;
-            Log.d(TAG, "Hardware keys: " + enabled);
             setHwKeysEnabled(enabled);
         }
     }
