@@ -18,7 +18,6 @@
 */
 -->
 
-<!--    android:background="@drawable/status_bar_closed_default_background" -->
 <com.android.systemui.statusbar.phone.PhoneStatusBarView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:systemui="http://schemas.android.com/apk/res/com.android.systemui"
