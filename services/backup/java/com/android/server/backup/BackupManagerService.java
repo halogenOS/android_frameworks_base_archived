@@ -2261,16 +2261,16 @@ public class BackupManagerService {
                     if (DEBUG) Slog.i(TAG, "got agent " + mConnectedAgent);
                     agent = mConnectedAgent;
                 }
-            }
-        } catch (RemoteException e) {
-                // can't happen - ActivityManager is local
-        } finally {
-            // failed to bind backup agent, clear pending backup
-            if (agent == null) {
-                try {
-                    mActivityManager.clearPendingBackup();
-                } catch (RemoteException e) {
+            } catch (RemoteException e) {
                     // can't happen - ActivityManager is local
+            } finally {
+                // failed to bind backup agent, clear pending backup
+                if (agent == null) {
+                    try {
+                        mActivityManager.clearPendingBackup();
+                    } catch (RemoteException e) {
+                        // can't happen - ActivityManager is local
+                    }
                 }
             }
         }
