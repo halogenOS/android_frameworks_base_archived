@@ -26,6 +26,7 @@ import android.content.res.Resources;
 import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -214,6 +215,14 @@ public class QSPanel extends ViewGroup {
     }
 
     public void refreshAllTiles() {
+        try {
+            // Make sure all QS tiles are listening
+            setListening(true);
+        } catch(Exception e) {
+            Log.w("QSPanel", "Tiles not listening, what happened?");
+            // Let's print the log!
+            e.printStackTrace();
+        }
         for (TileRecord r : mRecords) {
             r.tile.refreshState();
         }
