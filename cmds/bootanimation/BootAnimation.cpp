@@ -94,7 +94,7 @@ class MPlayerListener : public MediaPlayerListener
         return 0;
     }
     
-    void notify(int msg, int ext1, int ext2, Parcel *obj)
+    void notify(int msg, int ext1, int ext2, const Parcel *obj)
     {
         unused(obj);
         ALOGV("message received msg=%d, ext1=%d, ext2=%d",
