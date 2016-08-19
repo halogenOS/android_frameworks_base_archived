@@ -90,8 +90,13 @@ static void* playMusic(void* arg);
 
 class MPlayerListener : public MediaPlayerListener
 {
-    void notify(int msg, int ext1, int ext2)
+    int unused(Parcel *obj) {
+        return 0;
+    }
+    
+    void notify(int msg, int ext1, int ext2, Parcel *obj)
     {
+        unused(obj);
         ALOGV("message received msg=%d, ext1=%d, ext2=%d",
                 msg, ext1, ext2);
         switch (msg) {
