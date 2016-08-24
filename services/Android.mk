@@ -8,6 +8,13 @@ LOCAL_MODULE := services
 
 LOCAL_SRC_FILES := $(call all-java-files-under,java)
 
+ifneq ($(PRODUCT_XOS_INITFILE),)
+LOCAL_XOS_RELATIVE_INITFILE := $(subst $(shell pwd),../../..,$(PRODUCT_XOS_INITFILE))
+LOCAL_SRC_FILES += $(LOCAL_XOS_RELATIVE_INITFILE)
+else
+$(shell echo "No device init found, not using it." >&2)
+endif # PRODUCT_XOS_INITFILE
+
 # EventLogTags files.
 LOCAL_SRC_FILES += \
         core/java/com/android/server/EventLogTags.logtags

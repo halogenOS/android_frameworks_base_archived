@@ -99,6 +99,7 @@ import com.android.server.wm.WindowManagerService;
 import dalvik.system.VMRuntime;
 
 import java.io.File;
+import java.lang.reflect.Method;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -204,6 +205,20 @@ public final class SystemServer {
         if (System.currentTimeMillis() < EARLIEST_SUPPORTED_TIME) {
             slogw("System clock is before 1970; setting to 1970.");
             SystemClock.setCurrentTimeMillis(EARLIEST_SUPPORTED_TIME);
+        }
+        
+        try {
+            // Pre-boot device-specific initialization
+            if (!SystemProperties.get("ro.device.model_varies").isEmpty()) {
+                Class modelInitClass = Class.forName("org.halogenos.hw.init.DeviceInit");
+                Method method = modelInitClass.getMethod("initDevice", null);
+                method.invoke(null, null);
+            }
+        } catch(Throwable e) {
+            // Don't panic, this is optional
+            e.printStackTrace();
+            slogw("Could not find or call device-specific initialization." +
+                " Skipping. (This is not fatal)");
         }
 
         // If the system has "persist.sys.language" and friends set, replace them with
