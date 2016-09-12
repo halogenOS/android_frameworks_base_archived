@@ -862,5 +862,8 @@
     <string name="screen_zoom_summary_custom">Custom (<xliff:g id="densityDpi" example="160">%d</xliff:g>)</string>
     <!-- Label for Help and feedback menu item -->
     <string name="help_feedback_label">Help &amp; feedback</string>
-
+    <!-- Description for the screen zoom level that makes interface elements smaller. [CHAR LIMIT=24] -->
+    <string name="screen_zoom_summary_smaller">Smaller</string>
+    <!-- Description for the screen zoom level that makes interface elements smallest. [CHAR LIMIT=24] -->
+    <string name="screen_zoom_summary_smallest">Smallest</string>
 </resources>
