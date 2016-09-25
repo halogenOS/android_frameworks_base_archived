@@ -56,4 +56,6 @@
     <!-- [CHAR LIMIT=100] Notification Importance slider: very low importance level description -->
     <string name="notification_importance_very_low">No full screen interruption, peeking, sound, or vibration. Hide from lock screen.</string>
 
+    <!-- Quick Settings tiles -->
+    <string name="quick_settings_screenshot_label">Screenshot</string>
 </resources>
