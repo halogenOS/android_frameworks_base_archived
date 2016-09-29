@@ -1060,6 +1060,10 @@ public class SubscriptionManager {
         if (VDBG) logd("getDefaultDataSubscriptionId, sub id = " + subId);
         return subId;
     }
+    
+    public static int getDefaultDataSubId() {
+        return getDefaultDataSubscriptionId();
+    }
 
     /** @hide */
     public void setDefaultDataSubId(int subId) {
