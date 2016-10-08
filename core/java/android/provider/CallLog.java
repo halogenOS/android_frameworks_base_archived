@@ -203,6 +203,25 @@ public class CallLog {
          * @hide
          */
         public static final int ANSWERED_EXTERNALLY_TYPE = 7;
+        /** Call log type for outgoing IMS calls. */
+        private static final int OUTGOING_IMS_TYPE = 9;
+        /** Call log type for missed IMS calls. */
+        private static final int MISSED_IMS_TYPE = 10;
+        /**
+         * Call log type for incoming WiFi calls.
+         * @hide
+         */
+        public static final int INCOMING_WIFI_TYPE = 20;
+        /**
+         * Call log type for outgoing WiFi calls.
+         * @hide
+         */
+        public static final int OUTGOING_WIFI_TYPE = 21;
+        /**
+         * Call log type for missed WiFi calls.
+         * @hide
+         */
+        public static final int MISSED_WIFI_TYPE = 22;
 
         /**
          * Bit-mask describing features of the call (e.g. video).
@@ -648,7 +667,8 @@ public class CallLog {
             values.put(NEW, Integer.valueOf(1));
             values.put(ADD_FOR_ALL_USERS, addForAllUsers ? 1 : 0);
 
-            if (callType == MISSED_TYPE) {
+            if (callType == MISSED_TYPE || callType == MISSED_IMS_TYPE
+                    || callType == MISSED_WIFI_TYPE) {
                 values.put(IS_READ, Integer.valueOf(is_read ? 1 : 0));
             }
 
@@ -808,7 +828,8 @@ public class CallLog {
                 c = resolver.query(
                     CONTENT_URI,
                     new String[] {NUMBER},
-                    TYPE + " = " + OUTGOING_TYPE,
+                    TYPE + " = " + OUTGOING_TYPE + " OR " + TYPE + " = " + OUTGOING_IMS_TYPE +
+                            " OR " + TYPE + " = " + OUTGOING_WIFI_TYPE,
                     null,
                     DEFAULT_SORT_ORDER + " LIMIT 1");
                 if (c == null || !c.moveToFirst()) {
