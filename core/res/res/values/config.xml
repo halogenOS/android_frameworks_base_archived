@@ -2667,4 +2667,9 @@
     <string name="permdesc_preventpower">Allows an app to override the power key.</string>
     
     <integer name="config_deviceHardwareKeys">83</integer>
+    
+    <integer name="config_proximityCheckTimeout">320</integer>
+    <bool name="config_proximityCheckOnWake">true</bool>
+    <bool name="config_proximityCheckOnWakeEnabledByDefault">true</bool>
+    
 </resources>
