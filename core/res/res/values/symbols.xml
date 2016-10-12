@@ -2856,6 +2856,11 @@
   <java-symbol type="integer" name="time_picker_mode" />
   <java-symbol type="integer" name="date_picker_mode" />
   <java-symbol type="integer" name="config_deviceHardwareKeys" />
+  
   <!-- Gesture Sensor -->
   <java-symbol type="bool" name="config_enableGestureService" />
+  
+  <java-symbol type="integer" name="config_proximityCheckTimeout" />
+  <java-symbol type="bool"    name="config_proximityCheckOnWake" />
+  <java-symbol type="bool"    name="config_proximityCheckOnWakeEnabledByDefault" />
 </resources>
