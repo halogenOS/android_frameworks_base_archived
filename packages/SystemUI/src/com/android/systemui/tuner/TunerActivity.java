@@ -40,7 +40,7 @@ public class TunerActivity extends SettingsDrawerActivity implements
             boolean showDemoMode = action != null && action.equals(
                     "com.android.settings.action.DEMO_MODE");
             boolean showNightMode = getIntent().getBooleanExtra(
-                    NightModeFragment.EXTRA_SHOW_NIGHT_MODE, false);
+                    NightModeFragment.EXTRA_SHOW_NIGHT_MODE, true);
             final PreferenceFragment fragment = showNightMode ? new NightModeFragment()
                     : showDemoMode ? new DemoModeFragment()
                     : new TunerFragment();
