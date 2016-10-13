@@ -1824,6 +1824,24 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 
         mWindowManagerInternal.registerAppTransitionListener(
                 mStatusBarController.getAppTransitionListener());
+
+        String deviceKeyHandlerClass = mContext.getResources().getString(
+                com.android.internal.R.string.config_deviceKeyHandlerClass);
+
+        if(!deviceKeyHandlerClass.isEmpty()) {
+            try {
+                Slog.d(TAG, "Loading device key handler...");
+                Class clazz = Class.forName(deviceKeyHandlerClass);
+                Constructor<?> constr = clazz.getConstructor(Context.class);
+                mDeviceKeyHandler =
+                    (DeviceKeyHandler) constr.newInstance(mContext);
+                Slog.d(TAG, "Device key handler loaded successfully.");
+            } catch(Exception ex) {
+                Slog.e(TAG, "Failed to load device key handler: "
+                        + ex.getMessage());
+                ex.printStackTrace();
+            }
+        }
     }
 
     /**
