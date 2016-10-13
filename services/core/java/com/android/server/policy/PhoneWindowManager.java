@@ -1797,36 +1797,21 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         mWindowManagerInternal.registerAppTransitionListener(
                 mStatusBarController.getAppTransitionListener());
 
-        String deviceKeyHandlerLib = mContext.getResources().getString(
-                com.android.internal.R.string.config_deviceKeyHandlerLib);
-
         String deviceKeyHandlerClass = mContext.getResources().getString(
                 com.android.internal.R.string.config_deviceKeyHandlerClass);
 
-        if (!deviceKeyHandlerLib.isEmpty() && !deviceKeyHandlerClass.isEmpty()) {
-            ContextWrapper cxwrap = new ContextWrapper(mContext);
-            String ccDir = "";
+        if(!deviceKeyHandlerClass.isEmpty()) {
             try {
-                ccDir = cxwrap.getCodeCacheDir().getAbsolutePath();
+                Slog.d(TAG, "Loading device key handler...");
+                Class clazz = Class.forName(deviceKeyHandlerClass);
+                Constructor<?> constr = clazz.getConstructor(Context.class);
+                mDeviceKeyHandler =
+                    (DeviceKeyHandler) constr.newInstance(mContext);
+                Slog.d(TAG, "Device key handler loaded successfully.");
             } catch(Exception ex) {
-                File ccDirF = new File("/data/data/android/code_cache/");
-                ccDirF.mkdirs();
-                ccDir = ccDirF.getAbsolutePath();
-            }
-            try {
-                DexClassLoader loader =  new DexClassLoader(deviceKeyHandlerLib,
-                    ccDir,
-                    null,
-                    ClassLoader.getSystemClassLoader());
-                Class<?> klass = loader.loadClass(deviceKeyHandlerClass);
-                Constructor<?> constructor = klass.getConstructor(Context.class);
-                mDeviceKeyHandler = (DeviceKeyHandler) constructor.newInstance(
-                        mContext);
-                if(DEBUG) Slog.d(TAG, "Device key handler loaded");
-            } catch (Exception e) {
-                Slog.w(TAG, "Could not instantiate device key handler "
-                        + deviceKeyHandlerClass + " from class "
-                        + deviceKeyHandlerLib, e);
+                Slog.e(TAG, "Failed to load device key handler: "
+                        + ex.getMessage());
+                ex.printStackTrace();
             }
         }
     }

@@ -487,8 +487,15 @@ LOCAL_INTERMEDIATE_SOURCES := \
 			$(framework_res_source_path)/com/android/internal/R.java
 
 LOCAL_NO_STANDARD_LIBRARIES := true
-LOCAL_JAVA_LIBRARIES := core-oj core-libart core-lambda-stubs conscrypt okhttp core-junit bouncycastle ext
+LOCAL_JAVA_LIBRARIES :=	core-oj core-libart core-lambda-stubs conscrypt okhttp core-junit bouncycastle ext
 LOCAL_STATIC_JAVA_LIBRARIES := framework-protos
+
+ifneq ($(TARGET_KEYHANDLER_PACKAGE),)
+TARGET_KEYHANDLER_SRC_FILES := \
+	$(foreach _,$(TARGET_KEYHANDLER_SRC_FILES),\
+		 ../../$(TARGET_KEYHANDLER_TOP_DIR)/$_)
+LOCAL_SRC_FILES += $(TARGET_KEYHANDLER_SRC_FILES)
+endif
 
 LOCAL_MODULE := framework
 
