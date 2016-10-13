@@ -1804,11 +1804,20 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 com.android.internal.R.string.config_deviceKeyHandlerClass);
 
         if (!deviceKeyHandlerLib.isEmpty() && !deviceKeyHandlerClass.isEmpty()) {
-            DexClassLoader loader =  new DexClassLoader(deviceKeyHandlerLib,
-                    new ContextWrapper(mContext).getCacheDir().getAbsolutePath(),
+            ContextWrapper cxwrap = new ContextWrapper(mContext);
+            String ccDir = "";
+            try {
+                ccDir = cxwrap.getCodeCacheDir().getAbsolutePath();
+            } catch(Exception ex) {
+                File ccDirF = new File("/data/data/android/code_cache/");
+                ccDirF.mkdirs();
+                ccDir = ccDirF.getAbsolutePath();
+            }
+            try {
+                DexClassLoader loader =  new DexClassLoader(deviceKeyHandlerLib,
+                    ccDir,
                     null,
                     ClassLoader.getSystemClassLoader());
-            try {
                 Class<?> klass = loader.loadClass(deviceKeyHandlerClass);
                 Constructor<?> constructor = klass.getConstructor(Context.class);
                 mDeviceKeyHandler = (DeviceKeyHandler) constructor.newInstance(
