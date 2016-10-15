@@ -1922,6 +1922,21 @@ public final class Settings {
             return getStringForUser(resolver, name, UserHandle.myUserId());
         }
 
+        /**
+         * Look up a name in the database
+         * @param resolver to access the database with
+         * @param name to look up in the table
+         * @param defaultValue to return if not found
+         * @return the corresponding value, or defaultValue if not present
+         */
+        public static String getString(
+                ContentResolver resolver, String name, String defaultValue) {
+            String result = getString(resolver, name);
+            if(result == null)
+                return defaultValue;
+            return result;
+        }
+
         /** @hide */
         public static String getStringForUser(ContentResolver resolver, String name,
                 int userHandle) {
