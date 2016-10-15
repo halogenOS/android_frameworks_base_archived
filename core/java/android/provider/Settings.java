@@ -58,6 +58,7 @@ import android.text.TextUtils;
 import android.util.AndroidException;
 import android.util.ArrayMap;
 import android.util.ArraySet;
+import android.util.Base64;
 import android.util.Log;
 import android.util.MemoryIntArray;
 
@@ -67,6 +68,7 @@ import com.android.internal.widget.ILockSettings;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -3600,8 +3602,157 @@ public final class Settings {
          * 
          * @hide
          */
-         public static final String PROXIMITY_ON_WAKE =
+        public static final String PROXIMITY_ON_WAKE =
                                 "proximity_on_wake";
+
+        /**
+         * Set a device-specific setting
+         *
+         * @param key Key
+         * @param value Value
+         * @hide
+         */
+        public static void putDeviceSpecificSetting(
+                ContentResolver resolver, String key, String value) {
+            // Retrieve current settings
+            String currentSettings = getString(
+                                resolver, DEVICE_SPECIFIC_SETTINGS, "");
+            // Encode new setting
+            String newKey   = new String(Base64.encode(key.getBytes(
+                                    StandardCharsets.UTF_8),
+                                    Base64.NO_PADDING|Base64.NO_WRAP),
+                                StandardCharsets.UTF_8);
+            String newValue = new String(Base64.encode(value.getBytes(
+                                    StandardCharsets.UTF_8),
+                                    Base64.NO_PADDING|Base64.NO_WRAP),
+                                StandardCharsets.UTF_8);
+            // Create an array out of the current settings
+            String[] currentSettingsArr = currentSettings.split(";");
+
+            String newSettings = "";
+
+            if(doesDeviceSpecificSettingExist(resolver, key)) {
+                for ( int i = 0; i < currentSettingsArr.length; i++ ) {
+                    String[] curSetting = currentSettingsArr[i].split("=");
+                    if(new String(Base64.decode(
+                                    curSetting[0],
+                                    Base64.NO_PADDING|Base64.NO_WRAP),
+                                StandardCharsets.UTF_8).equals(key)) {
+                        currentSettingsArr[i] = newKey + "=" + newValue;
+                        break;
+                    }
+                }
+                // Create one string to save
+                for ( int i = 0; i < currentSettingsArr.length; i++) {
+                    newSettings += currentSettingsArr[i];
+                    if(i < currentSettingsArr.length - 1)
+                        newSettings += ";";
+                }
+            } else {
+                // Create a new array for new settings
+                String[] newSettingsArr = new String[currentSettingsArr.length + 1];
+                // Copy the current settings into new settings
+                java.lang.System.arraycopy(
+                    currentSettingsArr, 0, newSettingsArr, 0,
+                        currentSettingsArr.length);
+
+                // Add the new setting
+                newSettingsArr[newSettingsArr.length - 1] =
+                    newKey + "=" + newValue;
+
+                // Create one string to save
+                for ( int i = 0; i < newSettingsArr.length; i++) {
+                    newSettings += newSettingsArr[i];
+                    if(i < newSettingsArr.length - 1)
+                        newSettings += ";";
+                }
+            }
+
+            // Save it
+            putString(resolver, DEVICE_SPECIFIC_SETTINGS, newSettings);
+        }
+
+        /**
+         * Get a device-specific setting
+         *
+         * @param key Key of setting
+         * @return String contains value
+         * @hide
+         */
+         public static String getDeviceSpecificSetting(
+                ContentResolver resolver, String key, String defaultValue) {
+            // Retrieve current settings
+            String currentSettings = getString(
+                                resolver, DEVICE_SPECIFIC_SETTINGS, "");
+            if(currentSettings.isEmpty())
+                return defaultValue;
+            // Create an array out of the current settings
+            String[] currentSettingsArr = currentSettings.split(";");
+            // Check the array and find the key.
+            // Return the associated value if matches.
+            for ( int i = 0; i < currentSettingsArr.length; i++ ) {
+                String[] curSetting = currentSettingsArr[i].split("=");
+                String ikey = new String(Base64.decode(
+                                    curSetting[0],
+                                    Base64.NO_PADDING|Base64.NO_WRAP),
+                                StandardCharsets.UTF_8);
+                if(ikey.equals(key))
+                    return new String(Base64.decode(
+                                    curSetting[1],
+                                    Base64.NO_PADDING|Base64.NO_WRAP),
+                                StandardCharsets.UTF_8);
+            }
+            // No match found. Returning default value.
+            return defaultValue;
+         }
+
+         /**
+          * Check whether a device-specific setting already exists.
+          * This is almost the same as getDeviceSpecificSetting.
+          * But we can't check if the value returned from it is empty,
+          * because the value could be empty by default.
+          * We also can't just pass a specific default value and
+          * check whether it returns the same value as the default value
+          * because the value of the setting itself could be identical.
+          * So we need to check whether the key has already been saved.
+          *
+          * @param resolver ContentResolver
+          * @param key Key
+          * @return boolean: true if found, false if not
+          * @hide
+          */
+         public static boolean doesDeviceSpecificSettingExist(
+                    ContentResolver resolver, String key) {
+            // Retrieve current settings
+            String currentSettings = getString(
+                                resolver, DEVICE_SPECIFIC_SETTINGS, "");
+            if(currentSettings.isEmpty())
+                return false;
+            // Create an array out of the current settings
+            String[] currentSettingsArr = currentSettings.split(";");
+            // Check the array and find the key.
+            // Return true if matches.
+            for ( int i = 0; i < currentSettingsArr.length; i++ ) {
+                String[] curSetting = currentSettingsArr[i].split("=");
+                String ikey = new String(Base64.decode(
+                                    curSetting[0],
+                                    Base64.NO_PADDING|Base64.NO_WRAP),
+                                StandardCharsets.UTF_8);
+                if(ikey.equals(key))
+                    return true;
+            }
+            // No match found. Returning false.
+            return false;
+         }
+
+
+        /**
+         * Settings string for device-specific stuff
+         *
+         * @hide
+         */
+         public static final String DEVICE_SPECIFIC_SETTINGS =
+                                "device_specific_settings";
 
         /**
          * IMPORTANT: If you add a new public settings you also have to add it to
@@ -3720,6 +3871,7 @@ public final class Settings {
             PUBLIC_SETTINGS.add(VIBRATE_WHEN_RINGING);
             PUBLIC_SETTINGS.add(TOUCHSCREEN_GESTURE_HAPTIC_FEEDBACK);
             PUBLIC_SETTINGS.add(PROXIMITY_ON_WAKE);
+            PUBLIC_SETTINGS.add(DEVICE_SPECIFIC_SETTINGS);
         }
 
         /**
