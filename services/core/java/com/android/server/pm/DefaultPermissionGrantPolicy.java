@@ -669,12 +669,12 @@ final class DefaultPermissionGrantPolicy {
                 grantRuntimePermissionsLPw(chromiumPackage, CONTACTS_PERMISSIONS, userId);
             }
             
-            // SystemUI Lockscreen Visualizer
+            /* SystemUI Lockscreen Visualizer
             PackageParser.Package systemuiPackage = getSystemPackageLPr(
                     "com.android.systemui");
             if(systemuiPackage != null)
                 grantRuntimePermissionsLPw(
-                    systemuiPackage, VISUALIZER_PERMISSIONS, userId);
+                    systemuiPackage, VISUALIZER_PERMISSIONS, userId); */
             
             // XOS Browser
             PackageParser.Package xosBrowserPackage = getSystemPackageLPr(
