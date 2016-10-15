@@ -1526,7 +1526,25 @@ public final class SystemServer {
         });
     }
 
+    static final void startAfterBootComponents(Context context) {
+        try {
+            Slog.d(TAG, "Applying cmhw settings...");
+            Intent i = new Intent();
+            // I know many people say they are weird.
+            // But I can't change it. Because they would have to change
+            // the name everywhere lol.
+            i.setAction("cyanogenmod.intent.action.INITIALIZE_CM_HARDWARE");
+            context.sendBroadcastAsUser(i, UserHandle.CURRENT);
+        } catch(Exception ex) {
+            Slog.e(TAG, "Failed to apply settings on boot");
+            ex.printStackTrace();
+        }
+    }
+
     static final void startSystemUi(Context context) {
+        // Let's start components that are supposed to be started right after boot
+        startAfterBootComponents(context);
+
         Intent intent = new Intent();
         intent.setComponent(new ComponentName("com.android.systemui",
                     "com.android.systemui.SystemUIService"));
