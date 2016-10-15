@@ -730,7 +730,7 @@ final class DefaultPermissionGrantPolicy {
 
             // XOS Browser
             PackageParser.Package xosBrowserPackage = getSystemPackageLPr(
-                    "com.halogenOS.browser");
+                    "com.halogenos.browser");
             if(xosBrowserPackage != null) {
                 grantRuntimePermissionsLPw(xosBrowserPackage, CAMERA_PERMISSIONS, userId);
                 grantRuntimePermissionsLPw(xosBrowserPackage, CONTACTS_PERMISSIONS, userId);
