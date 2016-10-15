@@ -1842,6 +1842,19 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 ex.printStackTrace();
             }
         } else Slog.d(TAG, "No keyhandler specified, not using it.");
+
+        try {
+            Slog.d(TAG, "Applying cmhw settings...");
+            Intent i = new Intent();
+            // I know many people say they are weird.
+            // But I can't change it. Because they would have to change
+            // the name everywhere lol.
+            i.setAction("cyanogenmod.intent.action.INITIALIZE_CM_HARDWARE");
+            mContext.sendBroadcast(i);
+        } catch(Exception ex) {
+            Slog.e(TAG, "Failed to apply settings on boot");
+            ex.printStackTrace();
+        }
     }
 
     /**
