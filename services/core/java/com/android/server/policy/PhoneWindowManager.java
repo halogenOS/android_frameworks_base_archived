@@ -1841,7 +1841,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                         + ex.getMessage());
                 ex.printStackTrace();
             }
-        }
+        } else Slog.d(TAG, "No keyhandler specified, not using it.");
     }
 
     /**
