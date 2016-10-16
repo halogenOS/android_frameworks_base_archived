@@ -323,6 +323,7 @@ status_t BootAnimation::readyToRun() {
 
     else if (access(getAnimationFileName(IMG_OEM), R_OK) == 0) {
         mZipFileName = getAnimationFileName(IMG_OEM);
+    }
     else if (access(THEME_BOOTANIMATION_FILE, R_OK) == 0) {
         mZipFileName = THEME_BOOTANIMATION_FILE;
     }
