@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
+ * Copyright (C) 2016 halogenOS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,12 +63,12 @@ public abstract class Shape implements Cloneable {
      * @param height the height of the shape (in pixels)
      */
     public final void resize(float width, float height) {
-        if (width < 0) {
+        if (width < 0)
             width = 0;
-        }
-        if (height < 0) {
+
+        if (height < 0)
             height =0;
-        }
+
         if (mWidth != width || mHeight != height) {
             mWidth = width;
             mHeight = height;

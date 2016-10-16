@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2006 The Android Open Source Project
+ * Copyright (C) 2016 halogenOS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -157,7 +158,7 @@ public class AudioService extends IAudioService.Stub {
     protected static final boolean DEBUG_DEVICES = Log.isLoggable(TAG + ".DEVICES", Log.DEBUG);
 
     /** How long to delay before persisting a change in volume/ringer mode. */
-    private static final int PERSIST_DELAY = 500;
+    private static final int PERSIST_DELAY = 520;
 
     /** How long to delay after a volume down event before unmuting a stream */
     private static final int UNMUTE_STREAM_DELAY = 350;
@@ -282,13 +283,13 @@ public class AudioService extends IAudioService.Stub {
 
    /** Maximum volume index values for audio streams */
     private static int[] MAX_STREAM_VOLUME = new int[] {
-        5,  // STREAM_VOICE_CALL
-        7,  // STREAM_SYSTEM
+        7,  // STREAM_VOICE_CALL
+        9,  // STREAM_SYSTEM
         7,  // STREAM_RING
-        15, // STREAM_MUSIC
+        21, // STREAM_MUSIC
         7,  // STREAM_ALARM
-        7,  // STREAM_NOTIFICATION
-        15, // STREAM_BLUETOOTH_SCO
+        9,  // STREAM_NOTIFICATION
+        21, // STREAM_BLUETOOTH_SCO
         7,  // STREAM_SYSTEM_ENFORCED
         15, // STREAM_DTMF
         15  // STREAM_TTS
@@ -377,12 +378,10 @@ public class AudioService extends IAudioService.Stub {
     private final AudioSystem.ErrorCallback mAudioSystemCallback = new AudioSystem.ErrorCallback() {
         public void onError(int error) {
             switch (error) {
-            case AudioSystem.AUDIO_STATUS_SERVER_DIED:
-                sendMsg(mAudioHandler, MSG_AUDIO_SERVER_DIED,
-                        SENDMSG_NOOP, 0, 0, null, 0);
-                break;
-            default:
-                break;
+                case AudioSystem.AUDIO_STATUS_SERVER_DIED:
+                    sendMsg(mAudioHandler, MSG_AUDIO_SERVER_DIED,
+                            SENDMSG_NOOP, 0, 0, null, 0);
+                    break;
             }
         }
     };
@@ -1051,9 +1050,8 @@ public class AudioService extends IAudioService.Stub {
         // any stream with a min level > 0 is not muteable by definition
         for (int i = 0; i < mStreamStates.length; i++) {
             final VolumeStreamState vss = mStreamStates[i];
-            if (vss.mIndexMin > 0) {
+            if (vss.mIndexMin > 0)
                 mMuteAffectedStreams &= ~(1 << vss.mStreamType);
-            }
         }
     }
 
@@ -1062,7 +1060,8 @@ public class AudioService extends IAudioService.Stub {
         VolumeStreamState[] streams = mStreamStates = new VolumeStreamState[numStreamTypes];
 
         for (int i = 0; i < numStreamTypes; i++) {
-            streams[i] = new VolumeStreamState(System.VOLUME_SETTINGS[mStreamVolumeAlias[i]], i);
+            streams[i] =
+                new VolumeStreamState(System.VOLUME_SETTINGS[mStreamVolumeAlias[i]], i);
         }
 
         checkAllFixedVolumeDevices();
@@ -1086,17 +1085,17 @@ public class AudioService extends IAudioService.Stub {
         int dtmfStreamAlias;
 
         switch (mPlatformType) {
-        case AudioSystem.PLATFORM_VOICE:
-            mStreamVolumeAlias = STREAM_VOLUME_ALIAS_VOICE;
-            dtmfStreamAlias = AudioSystem.STREAM_RING;
-            break;
-        case AudioSystem.PLATFORM_TELEVISION:
-            mStreamVolumeAlias = STREAM_VOLUME_ALIAS_TELEVISION;
-            dtmfStreamAlias = AudioSystem.STREAM_MUSIC;
-            break;
-        default:
-            mStreamVolumeAlias = STREAM_VOLUME_ALIAS_DEFAULT;
-            dtmfStreamAlias = AudioSystem.STREAM_MUSIC;
+            case AudioSystem.PLATFORM_VOICE:
+                mStreamVolumeAlias = STREAM_VOLUME_ALIAS_VOICE;
+                dtmfStreamAlias = AudioSystem.STREAM_RING;
+                break;
+            case AudioSystem.PLATFORM_TELEVISION:
+                mStreamVolumeAlias = STREAM_VOLUME_ALIAS_TELEVISION;
+                dtmfStreamAlias = AudioSystem.STREAM_MUSIC;
+                break;
+            default:
+                mStreamVolumeAlias = STREAM_VOLUME_ALIAS_DEFAULT;
+                dtmfStreamAlias = AudioSystem.STREAM_MUSIC;
         }
 
         if (isPlatformTelevision()) {

@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
+ * Copyright (C) 2016 halogenOS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -78,14 +79,16 @@ import java.util.ArrayList;
  */
 public class ZygoteInit {
     private static final String TAG = "Zygote";
+    
+    private static final boolean DEBUG = false;
 
     private static final String PROPERTY_DISABLE_OPENGL_PRELOADING = "ro.zygote.disable_gl_preload";
     private static final String PROPERTY_RUNNING_IN_CONTAINER = "ro.boot.container";
 
     private static final String ANDROID_SOCKET_PREFIX = "ANDROID_SOCKET_";
 
-    private static final int LOG_BOOT_PROGRESS_PRELOAD_START = 3020;
-    private static final int LOG_BOOT_PROGRESS_PRELOAD_END = 3030;
+    private static final int LOG_BOOT_PROGRESS_PRELOAD_START = 3020,
+                             LOG_BOOT_PROGRESS_PRELOAD_END   = 3030;
 
     /** when preloading, GC after allocating this many bytes */
     private static final int PRELOAD_GC_THRESHOLD = 50000;
@@ -182,14 +185,15 @@ public class ZygoteInit {
         return sServerSocket.getFileDescriptor();
     }
 
-    private static final int UNPRIVILEGED_UID = 9999;
-    private static final int UNPRIVILEGED_GID = 9999;
+    private static final int 
+            UNPRIVILEGED_UID = 9999,
+            UNPRIVILEGED_GID = UNPRIVILEGED_UID,
 
-    private static final int ROOT_UID = 0;
-    private static final int ROOT_GID = 0;
+            ROOT_UID = 0,
+            ROOT_GID = 0;
 
     static void preload() {
-        Log.d(TAG, "begin preload");
+        Log.d(TAG, "Begin preload");
         Trace.traceBegin(Trace.TRACE_TAG_DALVIK, "BeginIcuCachePinning");
         beginIcuCachePinning();
         Trace.traceEnd(Trace.TRACE_TAG_DALVIK);
@@ -370,7 +374,7 @@ public class ZygoteInit {
             }
 
             Log.i(TAG, "...preloaded " + count + " classes in "
-                    + (SystemClock.uptimeMillis()-startTime) + "ms.");
+                    + (SystemClock.uptimeMillis()-startTime) + " ms.");
         } catch (IOException e) {
             Log.e(TAG, "Error reading " + PRELOADED_CLASSES + ".", e);
         } finally {
@@ -446,11 +450,10 @@ public class ZygoteInit {
 
     private static int preloadColorStateLists(TypedArray ar) {
         int N = ar.length();
-        for (int i=0; i<N; i++) {
+        for (int i = 0; i < N; i++) {
             int id = ar.getResourceId(i, 0);
-            if (false) {
+            if (DEBUG)
                 Log.v(TAG, "Preloading resource #" + Integer.toHexString(id));
-            }
             if (id != 0) {
                 if (mResources.getColorStateList(id, null) == null) {
                     throw new IllegalArgumentException(
@@ -466,11 +469,10 @@ public class ZygoteInit {
 
     private static int preloadDrawables(TypedArray ar) {
         int N = ar.length();
-        for (int i=0; i<N; i++) {
+        for (int i = 0; i < N; i++) {
             int id = ar.getResourceId(i, 0);
-            if (false) {
+            if (DEBUG)
                 Log.v(TAG, "Preloading resource #" + Integer.toHexString(id));
-            }
             if (id != 0) {
                 if (mResources.getDrawable(id, null) == null) {
                     throw new IllegalArgumentException(
@@ -805,8 +807,13 @@ public class ZygoteInit {
             }
 
             try {
-                Thread.sleep(1000);
+                // Which guy did write this?!
+                // Let's just lower the value a little bit
+                // and keep this unbelievable, very funny code here
+                Thread.sleep(600);
+                // I still don't believe it.
             } catch (InterruptedException ie) {
+                
             }
         }
     }
@@ -861,6 +868,7 @@ public class ZygoteInit {
      * Class not instantiable.
      */
     private ZygoteInit() {
+
     }
 
     /**
@@ -897,4 +905,5 @@ public class ZygoteInit {
             }
         }
     }
+
 }

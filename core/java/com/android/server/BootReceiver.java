@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
+ * Copyright (C) 2016 halogenOS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,8 +70,8 @@ public class BootReceiver extends BroadcastReceiver {
     // ran in the system process.  We need to remove its packages here
     // in order to clean up after a pre-froyo-to-froyo update.
     private static final String OLD_UPDATER_PACKAGE =
-        "com.google.android.systemupdater";
-    private static final String OLD_UPDATER_CLASS =
+        "com.google.android.systemupdater",
+                                OLD_UPDATER_CLASS =
         "com.google.android.systemupdater.SystemUpdateReceiver";
 
     // Keep a reference to the observer so the finalizer doesn't disable it.

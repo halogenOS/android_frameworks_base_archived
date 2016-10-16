@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
+ * Copyright (C) 2016 halogenOS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,6 +64,7 @@ public class BackupRestoreConfirmation extends Activity {
     static final int MSG_TIMEOUT = 100;
 
     Handler mHandler;
+    Context mCtx;
     IBackupManager mBackupManager;
     IMountService mMountService;
     FullObserver mObserver;
@@ -87,44 +89,33 @@ public class BackupRestoreConfirmation extends Activity {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
-                case MSG_START_BACKUP: {
+                case MSG_START_BACKUP:
                     Toast.makeText(mContext, R.string.toast_backup_started, Toast.LENGTH_LONG).show();
-                }
-                break;
+                    break;
 
-                case MSG_BACKUP_PACKAGE: {
+                case MSG_RESTORE_PACKAGE:
+                case MSG_BACKUP_PACKAGE:
                     String name = (String) msg.obj;
                     mStatusView.setText(name);
-                }
-                break;
+                    break;
 
-                case MSG_END_BACKUP: {
+                case MSG_END_BACKUP:
                     Toast.makeText(mContext, R.string.toast_backup_ended, Toast.LENGTH_LONG).show();
                     finish();
-                }
-                break;
+                    break;
 
-                case MSG_START_RESTORE: {
+                case MSG_START_RESTORE:
                     Toast.makeText(mContext, R.string.toast_restore_started, Toast.LENGTH_LONG).show();
-                }
-                break;
+                    break;
 
-                case MSG_RESTORE_PACKAGE: {
-                    String name = (String) msg.obj;
-                    mStatusView.setText(name);
-                }
-                break;
-
-                case MSG_END_RESTORE: {
-                    Toast.makeText(mContext, R.string.toast_restore_ended, Toast.LENGTH_SHORT).show();
+                case MSG_END_RESTORE:
+                    Toast.makeText(mContext, R.string.toast_restore_ended, Toast.LENGTH_LONG).show();
                     finish();
-                }
-                break;
+                    break;
 
-                case MSG_TIMEOUT: {
+                case MSG_TIMEOUT:
                     Toast.makeText(mContext, R.string.toast_timeout, Toast.LENGTH_LONG).show();
-                }
-                break;
+                    break;
             }
         }
     }
@@ -132,12 +123,13 @@ public class BackupRestoreConfirmation extends Activity {
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
+        
+        mCtx = getApplicationContext();
 
         final Intent intent = getIntent();
         final String action = intent.getAction();
 
-        final int layoutId;
-        final int titleId;
+        final int layoutId, titleId;
         if (action.equals(FullBackup.FULL_BACKUP_INTENT_ACTION)) {
             layoutId = R.layout.confirm_backup;
             titleId = R.string.backup_confirm_title;
@@ -229,10 +221,14 @@ public class BackupRestoreConfirmation extends Activity {
         mAllowButton.setEnabled(false);
         mEncPassword.addTextChangedListener(new TextWatcher() {
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) { }
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // No need
+            }
 
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // No need
+            }
 
             @Override
             public void afterTextChanged(Editable s) {
@@ -264,7 +260,9 @@ public class BackupRestoreConfirmation extends Activity {
                         String.valueOf(encPassword),
                         mObserver);
             } catch (RemoteException e) {
-                // TODO: bail gracefully if we can't contact the backup manager
+                Toast.makeText(
+                    mCtx, R.string.toast_backup_manager_unreachable,
+                    Toast.LENGTH_LONG).show();
             }
         }
     }

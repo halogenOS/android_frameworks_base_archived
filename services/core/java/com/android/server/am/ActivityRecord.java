@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2006 The Android Open Source Project
+ * Copyright (C) 2016 halogenOS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -448,9 +449,8 @@ final class ActivityRecord {
     }
 
     void scheduleConfigurationChanged(Configuration config, boolean reportToActivity) {
-        if (app == null || app.thread == null) {
-            return;
-        }
+        if (app == null || app.thread == null) return;
+
         try {
             // Make sure fontScale is always equal to global. For fullscreen apps, config is
             // the shared EMPTY config, which has default fontScale of 1.0. We don't want it
@@ -469,9 +469,9 @@ final class ActivityRecord {
     }
 
     void scheduleMultiWindowModeChanged() {
-        if (task == null || task.stack == null || app == null || app.thread == null) {
+        if (task == null || task.stack == null || app == null || app.thread == null)
             return;
-        }
+
         try {
             // An activity is considered to be in multi-window mode if its task isn't fullscreen.
             app.thread.scheduleMultiWindowModeChanged(appToken, !task.mFullscreen);
@@ -481,9 +481,9 @@ final class ActivityRecord {
     }
 
     void schedulePictureInPictureModeChanged() {
-        if (task == null || task.stack == null || app == null || app.thread == null) {
+        if (task == null || task.stack == null || app == null || app.thread == null)
             return;
-        }
+
         try {
             app.thread.schedulePictureInPictureModeChanged(
                     appToken, task.stack.mStackId == PINNED_STACK_ID);
@@ -545,9 +545,8 @@ final class ActivityRecord {
             ProcessRecord anrApp;
             synchronized (mService) {
                 r = tokenToActivityRecordLocked(this);
-                if (r == null) {
+                if (r == null)
                     return false;
-                }
                 anrActivity = r.getWaitingHistoryRecordLocked();
                 anrApp = r != null ? r.app : null;
             }
@@ -580,11 +579,11 @@ final class ActivityRecord {
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder(128);
-            sb.append("Token{");
-            sb.append(Integer.toHexString(System.identityHashCode(this)));
-            sb.append(' ');
-            sb.append(weakActivity.get());
-            sb.append('}');
+            sb.append("Token{")
+              .append(Integer.toHexString(System.identityHashCode(this)))
+              .append(' ')
+              .append(weakActivity.get())
+              .append('}');
             return sb.toString();
         }
     }
@@ -1120,7 +1119,7 @@ final class ActivityRecord {
     }
 
     void startLaunchTickingLocked() {
-        if (ActivityManagerService.IS_USER_BUILD) {
+        if (ActivityManagerService.IS_USER_OR_USERDEBUG_BUILD) {
             return;
         }
         if (launchTickTime == 0) {

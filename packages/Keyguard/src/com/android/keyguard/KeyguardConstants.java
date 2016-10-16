@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 The Android Open Source Project
+ * Copyright (C) 2016 halogenOS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +25,10 @@ public class KeyguardConstants {
     /**
      * Turns on debugging information for the whole Keyguard. This is very verbose and should only
      * be used temporarily for debugging.
+     * ------------------
+     * Comment by xdevs23: Well, why don't you set it to false then??
      */
-    public static final boolean DEBUG = true;
-    public static final boolean DEBUG_SIM_STATES = true;
-    public static final boolean DEBUG_FP_WAKELOCK = true;
+    public static final boolean DEBUG = false;
+    public static final boolean DEBUG_SIM_STATES = false;
+    public static final boolean DEBUG_FP_WAKELOCK = false;
 }

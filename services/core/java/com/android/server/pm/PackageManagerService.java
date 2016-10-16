@@ -414,7 +414,7 @@ public class PackageManagerService extends IPackageManager.Stub {
 
     /**
      * Timeout (in milliseconds) after which the watchdog should declare that
-     * our handler thread is wedged.  The usual default for such things is one
+     * our handler thread is wedged. The usual default for such things is one
      * minute but we sometimes do very lengthy I/O operations on this thread,
      * such as installing multi-gigabyte applications, so ours needs to be longer.
      */
@@ -422,12 +422,12 @@ public class PackageManagerService extends IPackageManager.Stub {
 
     /**
      * Wall-clock timeout (in milliseconds) after which we *require* that an fstrim
-     * be run on this device.  We use the value in the Settings.Global.MANDATORY_FSTRIM_INTERVAL
-     * settings entry if available, otherwise we use the hardcoded default.  If it's been
+     * be run on this device. We use the value in the Settings.Global.MANDATORY_FSTRIM_INTERVAL
+     * settings entry if available, otherwise we use the hardcoded default. If it's been
      * more than this long since the last fstrim, we force one during the boot sequence.
      *
-     * This backstops other fstrim scheduling:  if the device is alive at midnight+idle,
-     * one gets run at the next available charging+idle time.  This final mandatory
+     * This backstops other fstrim scheduling: if the device is alive at midnight+idle,
+     * one gets run at the next available charging+idle time. This final mandatory
      * no-fstrim check kicks in only of the other scheduling criteria is never met.
      */
     private static final long DEFAULT_MANDATORY_FSTRIM_INTERVAL = 3 * DateUtils.DAY_IN_MILLIS;

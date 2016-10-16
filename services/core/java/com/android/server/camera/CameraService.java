@@ -1,5 +1,6 @@
 /*
  * Copyright 2015 The Android Open Source Project
+ * Copyright (C) 2016 halogenOS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,7 +70,7 @@ public class CameraService extends SystemService
     // Handler message codes
     private static final int MSG_SWITCH_USER = 1;
 
-    private static final int RETRY_DELAY_TIME = 20; //ms
+    private static final int RETRY_DELAY_TIME = 22; //ms
 
     private final Context mContext;
     private final ServiceThread mHandlerThread;

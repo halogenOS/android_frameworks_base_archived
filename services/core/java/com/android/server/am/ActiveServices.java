@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
+ * Copyright (C) 2016 halogenOS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,7 +89,7 @@ public final class ActiveServices {
     private static final boolean LOG_SERVICE_START_STOP = false;
 
     // How long we wait for a service to finish executing.
-    static final int SERVICE_TIMEOUT = 20*1000;
+    static final int SERVICE_TIMEOUT = 19_200;
 
     // How long we wait for a service to finish executing.
     static final int SERVICE_BACKGROUND_TIMEOUT = SERVICE_TIMEOUT * 10;
@@ -117,7 +118,7 @@ public final class ActiveServices {
 
     // How long we wait for a background started service to stop itself before
     // allowing the next pending start to run.
-    static final int BG_START_TIMEOUT = 15*1000;
+    static final int BG_START_TIMEOUT = 14_800;
 
     final ActivityManagerService mAm;
 
@@ -164,7 +165,8 @@ public final class ActiveServices {
     String mLastAnrDump;
 
     final Runnable mLastAnrDumpClearer = new Runnable() {
-        @Override public void run() {
+        @Override
+        public void run() {
             synchronized (mAm) {
                 mLastAnrDump = null;
             }
@@ -202,11 +204,11 @@ public final class ActiveServices {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
-                case MSG_BG_START_TIMEOUT: {
+                case MSG_BG_START_TIMEOUT:
                     synchronized (mAm) {
                         rescheduleDelayedStarts();
                     }
-                } break;
+                    break;
             }
         }
 
@@ -1102,7 +1104,7 @@ public final class ActiveServices {
     }
 
     private void foo() {
-
+        // Are you kidding me? xD ~xdevs23
     }
 
     void publishServiceLocked(ServiceRecord r, Intent intent, IBinder service) {
@@ -1209,7 +1211,7 @@ public final class ActiveServices {
                         // Applications have already bound since the last
                         // unbind, so just rebind right here.
                         boolean inFg = false;
-                        for (int i=b.apps.size()-1; i>=0; i--) {
+                        for (int i = b.apps.size()-1; i >= 0; i--) {
                             ProcessRecord client = b.apps.valueAt(i).client;
                             if (client != null && client.setSchedGroup
                                     != ProcessList.SCHED_GROUP_BACKGROUND) {

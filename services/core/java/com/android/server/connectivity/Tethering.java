@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
+ * Copyright (C) 2016 halogenOS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -178,8 +179,8 @@ public class Tethering extends BaseNetworkObserver implements IControlsTethering
     };
 
     private String[] mDefaultDnsServers;
-    private static final String DNS_DEFAULT_SERVER1 = "8.8.8.8";
-    private static final String DNS_DEFAULT_SERVER2 = "8.8.4.4";
+    private static final String DNS_DEFAULT_SERVER1 = "8.8.8.8",
+                                DNS_DEFAULT_SERVER2 = "8.8.4.4";
 
     private final StateMachine mTetherMasterSM;
     private final UpstreamNetworkMonitor mUpstreamNetworkMonitor;
@@ -250,9 +251,9 @@ public class Tethering extends BaseNetworkObserver implements IControlsTethering
         updateConfiguration();
 
         // TODO - remove and rely on real notifications of the current iface
-        mDefaultDnsServers = new String[2];
-        mDefaultDnsServers[0] = DNS_DEFAULT_SERVER1;
-        mDefaultDnsServers[1] = DNS_DEFAULT_SERVER2;
+        mDefaultDnsServers = new String[] {
+            DNS_DEFAULT_SERVER1, DNS_DEFAULT_SERVER2
+        };
     }
 
     // We can't do this once in the Tethering() constructor and cache the value, because the

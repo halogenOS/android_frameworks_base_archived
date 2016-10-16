@@ -35,11 +35,10 @@ public class SchedulingPolicyService extends ISchedulingPolicyService.Stub {
     private static final int PRIORITY_MAX = 3;
 
     public SchedulingPolicyService() {
+
     }
 
     public int requestPriority(int pid, int tid, int prio) {
-        //Log.i(TAG, "requestPriority(pid=" + pid + ", tid=" + tid + ", prio=" + prio + ")");
-
         // Verify that the caller uid is permitted, priority is in range,
         // and that the callback thread specified by app belongs to the app that
         // called mediaserver or audioserver.
@@ -66,11 +65,11 @@ public class SchedulingPolicyService extends ISchedulingPolicyService.Stub {
     private boolean isPermittedCallingUid() {
         final int callingUid = Binder.getCallingUid();
         switch (callingUid) {
-        case Process.AUDIOSERVER_UID: // fastcapture, fastmixer
-        case Process.CAMERASERVER_UID: // camera high frame rate recording
-            return true;
-        default:
-            return false;
+            case Process.AUDIOSERVER_UID: // fastcapture, fastmixer
+            case Process.CAMERASERVER_UID: // camera high frame rate recording
+                return true;
+            default:
+                return false;
         }
     }
 }

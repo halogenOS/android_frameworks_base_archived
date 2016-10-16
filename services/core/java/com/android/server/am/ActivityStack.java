@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
+ * Copyright (C) 2016 halogenOS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -169,15 +170,15 @@ final class ActivityStack {
     private static final boolean VALIDATE_TOKENS = false;
 
     // Ticks during which we check progress while waiting for an app to launch.
-    static final int LAUNCH_TICK = 500;
+    static final int LAUNCH_TICK = 460;
 
     // How long we wait until giving up on the last activity to pause.  This
     // is short because it directly impacts the responsiveness of starting the
     // next activity.
-    static final int PAUSE_TIMEOUT = 500;
+    static final int PAUSE_TIMEOUT = 480;
 
     // How long we wait for the activity to tell us it has stopped before
-    // giving up.  This is a good amount of time because we really need this
+    // giving up. This is a good amount of time because we really need this
     // from the application in order to get its saved state.
     static final int STOP_TIMEOUT = 10 * 1000;
 
@@ -185,7 +186,7 @@ final class ActivityStack {
     // finished destroying itself.
     static final int DESTROY_TIMEOUT = 10 * 1000;
 
-    // How long until we reset a task when the user returns to it.  Currently
+    // How long until we reset a task when the user returns to it. Currently
     // disabled.
     static final long ACTIVITY_INACTIVE_RESET_TIME = 0;
 
