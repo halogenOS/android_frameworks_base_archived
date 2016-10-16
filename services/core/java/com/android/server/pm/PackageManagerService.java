@@ -397,16 +397,17 @@ public class PackageManagerService extends IPackageManager.Stub {
     private static final int SCAN_UPDATE_TIME = 1<<6;
     private static final int SCAN_DEFER_DEX = 1<<7;
     private static final int SCAN_BOOTING = 1<<8;
-    private static final int SCAN_DELETE_DATA_ON_FAILURES = 1<<9;
-    private static final int SCAN_REPLACING = 1<<10;
-    private static final int SCAN_REQUIRE_KNOWN = 1<<11;
-    private static final int SCAN_MOVE = 1<<12;
-    private static final int SCAN_INITIAL = 1<<13;
-    private static final int SCAN_CHECK_ONLY = 1<<14;
-    private static final int SCAN_DONT_KILL_APP = 1<<15;
-    private static final int SCAN_IGNORE_FROZEN = 1<<16;
+    private static final int SCAN_TRUSTED_OVERLAY = 1<<9;
+    private static final int SCAN_DELETE_DATA_ON_FAILURES = 1<<10;
+    private static final int SCAN_REPLACING = 1<<11;
+    private static final int SCAN_REQUIRE_KNOWN = 1<<12;
+    private static final int SCAN_MOVE = 1<<13;
+    private static final int SCAN_INITIAL = 1<<14;
+    private static final int SCAN_CHECK_ONLY = 1<<15;
+    private static final int SCAN_DONT_KILL_APP = 1<<16;
+    private static final int SCAN_IGNORE_FROZEN = 1<<17;
 
-    private static final int REMOVE_CHATTY = 1<<17;
+    private static final int REMOVE_CHATTY = 1<<18;
 
     private static final int[] EMPTY_INT_ARRAY = new int[0];
 
