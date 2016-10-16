@@ -116,6 +116,8 @@ public class CarrierText extends TextView {
                 attrs, R.styleable.CarrierText, 0, 0);
         try {
             useAllCaps = a.getBoolean(R.styleable.CarrierText_allCaps, false);
+        } catch(Exception e) {
+            // No need to be handled
         } finally {
             a.recycle();
         }

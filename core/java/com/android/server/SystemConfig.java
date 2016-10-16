@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 The Android Open Source Project
+ * Copyright (C) 2016 halogenOS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -502,8 +503,8 @@ public class SystemConfig {
             addFeature(PackageManager.FEATURE_SECURELY_REMOVES_USERS, 0);
         }
 
-        for (String featureName : mUnavailableFeatures) {
-            removeFeature(featureName);
+        for (int i = 0; i < mUnavailableFeatures; i++) {
+            removeFeature(mUnavailableFeatures[i]);
         }
     }
 
