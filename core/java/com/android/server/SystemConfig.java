@@ -503,8 +503,8 @@ public class SystemConfig {
             addFeature(PackageManager.FEATURE_SECURELY_REMOVES_USERS, 0);
         }
 
-        for (int i = 0; i < mUnavailableFeatures; i++) {
-            removeFeature(mUnavailableFeatures[i]);
+        for (int i = 0; i < mUnavailableFeatures.size(); i++) {
+            removeFeature(mUnavailableFeatures[i].toArray());
         }
     }
 
