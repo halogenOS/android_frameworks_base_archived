@@ -437,8 +437,8 @@ public class NativeLibraryHelper {
     private static native int hasRenderscriptBitcode(long apkHandle);
 
     public static boolean hasRenderscriptBitcode(Handle handle) throws IOException {
-        for (long i = 0; i < handle.apkHandles; i++) {
-            final int res = hasRenderscriptBitcode(handle.apkHandles[i]);
+        for (long i = 0; i < handle.apkHandles.size(); i++) {
+            final long res = hasRenderscriptBitcode(handle.apkHandles[i]);
             if (res < 0) {
                 throw new IOException("Error scanning APK, code: " + res);
             } else if (res == BITCODE_PRESENT) {
