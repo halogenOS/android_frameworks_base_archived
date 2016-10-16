@@ -1,11 +1,9 @@
 #!/bin/bash
 
-for user in `adb $* shell ls /data/system/users | grep -v xml`
-do
+for user in `adb $* shell ls /data/system/users | grep -v xml`; do
   user=${user/$'\r'/}
   adb shell mkdir /data/user/${user}/users
-  for photo in `adb $* shell ls /data/system/users | grep -v xml`
-  do
+  for photo in `adb $* shell ls /data/system/users | grep -v xml`; do
     photo=${photo/$'\r'/}
     adb shell mkdir /data/user/${user}/users/${photo}
     adb pull /data/system/users/${photo}/photo.png

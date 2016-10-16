@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 The Android Open Source Project
+ * Copyright (C) 2016 halogenOS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,10 +51,10 @@ import java.util.Stack;
  */
 public class PasswordTextView extends View {
 
-    private static final float DOT_OVERSHOOT_FACTOR = 1.5f;
-    private static final long DOT_APPEAR_DURATION_OVERSHOOT = 320;
-    private static final long APPEAR_DURATION = 160;
-    private static final long DISAPPEAR_DURATION = 160;
+    private static final float DOT_OVERSHOOT_FACTOR = 1.6f;
+    private static final long DOT_APPEAR_DURATION_OVERSHOOT = 340;
+    private static final long APPEAR_DURATION = 140;
+    private static final long DISAPPEAR_DURATION = 140;
     private static final long RESET_DELAY_PER_ELEMENT = 40;
     private static final long RESET_MAX_DELAY = 200;
 
@@ -70,7 +71,7 @@ public class PasswordTextView extends View {
     /**
      * The duration the text should be visible, starting with the appear animation
      */
-    private static final long TEXT_VISIBILITY_DURATION = 1300;
+    private static final long TEXT_VISIBILITY_DURATION = 1240;
 
     /**
      * The position in time from [0,1] where the overshoot should be finished and the settle back

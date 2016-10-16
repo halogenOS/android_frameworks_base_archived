@@ -1,6 +1,7 @@
 /* //device/libs/android_runtime/android_util_Log.cpp
 **
 ** Copyright 2006, The Android Open Source Project
+** Copyright (C) 2016 halogenOS
 **
 ** Licensed under the Apache License, Version 2.0 (the "License");
 ** you may not use this file except in compliance with the License.
@@ -134,12 +135,12 @@ int register_android_util_Log(JNIEnv* env)
 {
     jclass clazz = FindClassOrDie(env, "android/util/Log");
 
-    levels.verbose = env->GetStaticIntField(clazz, GetStaticFieldIDOrDie(env, clazz, "VERBOSE", "I"));
-    levels.debug = env->GetStaticIntField(clazz, GetStaticFieldIDOrDie(env, clazz, "DEBUG", "I"));
-    levels.info = env->GetStaticIntField(clazz, GetStaticFieldIDOrDie(env, clazz, "INFO", "I"));
-    levels.warn = env->GetStaticIntField(clazz, GetStaticFieldIDOrDie(env, clazz, "WARN", "I"));
-    levels.error = env->GetStaticIntField(clazz, GetStaticFieldIDOrDie(env, clazz, "ERROR", "I"));
-    levels.assert = env->GetStaticIntField(clazz, GetStaticFieldIDOrDie(env, clazz, "ASSERT", "I"));
+    levels.verbose  = env->GetStaticIntField(clazz, GetStaticFieldIDOrDie(env, clazz, "VERBOSE", "I"));
+    levels.debug    = env->GetStaticIntField(clazz, GetStaticFieldIDOrDie(env, clazz,   "DEBUG", "I"));
+    levels.info     = env->GetStaticIntField(clazz, GetStaticFieldIDOrDie(env, clazz,    "INFO", "I"));
+    levels.warn     = env->GetStaticIntField(clazz, GetStaticFieldIDOrDie(env, clazz,    "WARN", "I"));
+    levels.error    = env->GetStaticIntField(clazz, GetStaticFieldIDOrDie(env, clazz,   "ERROR", "I"));
+    levels.assert   = env->GetStaticIntField(clazz, GetStaticFieldIDOrDie(env, clazz,  "ASSERT", "I"));
 
     return RegisterMethodsOrDie(env, "android/util/Log", gMethods, NELEM(gMethods));
 }

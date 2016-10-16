@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
+ * Copyright (C) 2016 halogenOS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -436,8 +437,8 @@ public class NativeLibraryHelper {
     private static native int hasRenderscriptBitcode(long apkHandle);
 
     public static boolean hasRenderscriptBitcode(Handle handle) throws IOException {
-        for (long apkHandle : handle.apkHandles) {
-            final int res = hasRenderscriptBitcode(apkHandle);
+        for (long i = 0; i < handle.apkHandles; i++) {
+            final int res = hasRenderscriptBitcode(handle.apkHandles[i]);
             if (res < 0) {
                 throw new IOException("Error scanning APK, code: " + res);
             } else if (res == BITCODE_PRESENT) {

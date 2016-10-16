@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 The Android Open Source Project
+ * Copyright (C) 2016 halogenOS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -139,9 +140,9 @@ public final class Zygote {
         int pid = nativeForkSystemServer(
                 uid, gid, gids, debugFlags, rlimits, permittedCapabilities, effectiveCapabilities);
         // Enable tracing as soon as we enter the system_server.
-        if (pid == 0) {
+        if (pid == 0)
             Trace.setTracingEnabled(true);
-        }
+
         VM_HOOKS.postForkCommon();
         return pid;
     }

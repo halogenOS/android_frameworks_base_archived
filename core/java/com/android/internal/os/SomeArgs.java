@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
+ * Copyright (C) 2016 halogenOS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,20 +41,8 @@ public final class SomeArgs {
     static final int WAIT_FINISHED = 2;
     int mWaitState = WAIT_NONE;
 
-    public Object arg1;
-    public Object arg2;
-    public Object arg3;
-    public Object arg4;
-    public Object arg5;
-    public Object arg6;
-    public Object arg7;
-    public Object arg8;
-    public int argi1;
-    public int argi2;
-    public int argi3;
-    public int argi4;
-    public int argi5;
-    public int argi6;
+    public Object arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8;
+    public int argi1, argi2, argi3, argi4, argi5, argi6;
 
     private SomeArgs() {
         /* do nothing - reduce visibility */
@@ -76,21 +65,20 @@ public final class SomeArgs {
 
     public void complete() {
         synchronized (this) {
-            if (mWaitState != WAIT_WAITING) {
+            if (mWaitState != WAIT_WAITING)
                 throw new IllegalStateException("Not waiting");
-            }
             mWaitState = WAIT_FINISHED;
             notifyAll();
         }
     }
 
     public void recycle() {
-        if (mInPool) {
+        if (mInPool)
             throw new IllegalStateException("Already recycled.");
-        }
-        if (mWaitState != WAIT_NONE) {
+
+        if (mWaitState != WAIT_NONE)
             return;
-        }
+
         synchronized (sPoolLock) {
             clear();
             if (sPoolSize < MAX_POOL_SIZE) {
@@ -103,13 +91,7 @@ public final class SomeArgs {
     }
 
     private void clear() {
-        arg1 = null;
-        arg2 = null;
-        arg3 = null;
-        arg4 = null;
-        arg5 = null;
-        arg6 = null;
-        arg7 = null;
+        arg1 = arg2 = arg3 = arg4 = arg5 = arg6 = arg7 = null;
         argi1 = 0;
         argi2 = 0;
         argi3 = 0;
