@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2006 The Android Open Source Project
+ * Copyright (C) 2016 halogenOS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -264,6 +265,9 @@ public final class SystemServer {
 
             // Here we go!
             Slog.i(TAG, "Entered the Android system server!");
+            Slog.i("halogenOS",
+                "Welcome to halogenOS! We believe that you'll love it. " +
+                "Ready to rock!");
             EventLog.writeEvent(EventLogTags.BOOT_PROGRESS_SYSTEM_RUN, SystemClock.uptimeMillis());
 
             // In case the runtime switched since last boot (such as when
