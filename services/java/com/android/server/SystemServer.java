@@ -104,26 +104,27 @@ import com.android.server.vr.VrManagerService;
 import com.android.server.webkit.WebViewUpdateService;
 import com.android.server.wm.WindowManagerService;
 
-import dalvik.system.VMRuntime;
 import dalvik.system.PathClassLoader;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
+import dalvik.system.VMRuntime;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public final class SystemServer {
+
     private static final String TAG = "SystemServer";
 
-    private static final String ENCRYPTING_STATE = "trigger_restart_min_framework";
-    private static final String ENCRYPTED_STATE = "1";
+    private static final String ENCRYPTING_STATE = "trigger_restart_min_framework",
+                                ENCRYPTED_STATE  = "1";
 
     private static final long SNAPSHOT_INTERVAL = 60 * 60 * 1000; // 1hr
 
-    // The earliest supported time.  We pick one day into 1970, to
+    // The earliest supported time. We pick one day into 1970, to
     // give any timezone code room without going into negative time.
     private static final long EARLIEST_SUPPORTED_TIME = 86400 * 1000;
 
@@ -131,44 +132,50 @@ public final class SystemServer {
      * Implementation class names. TODO: Move them to a codegen class or load
      * them from the build system somehow.
      */
-    private static final String BACKUP_MANAGER_SERVICE_CLASS =
-            "com.android.server.backup.BackupManagerService$Lifecycle";
-    private static final String APPWIDGET_SERVICE_CLASS =
-            "com.android.server.appwidget.AppWidgetService";
-    private static final String VOICE_RECOGNITION_MANAGER_SERVICE_CLASS =
-            "com.android.server.voiceinteraction.VoiceInteractionManagerService";
-    private static final String PRINT_MANAGER_SERVICE_CLASS =
-            "com.android.server.print.PrintManagerService";
-    private static final String USB_SERVICE_CLASS =
-            "com.android.server.usb.UsbService$Lifecycle";
-    private static final String MIDI_SERVICE_CLASS =
-            "com.android.server.midi.MidiService$Lifecycle";
-    private static final String WIFI_SERVICE_CLASS =
-            "com.android.server.wifi.WifiService";
-    private static final String WIFI_NAN_SERVICE_CLASS =
-            "com.android.server.wifi.nan.WifiNanService";
-    private static final String WIFI_P2P_SERVICE_CLASS =
-            "com.android.server.wifi.p2p.WifiP2pService";
-    private static final String ETHERNET_SERVICE_CLASS =
-            "com.android.server.ethernet.EthernetService";
-    private static final String JOB_SCHEDULER_SERVICE_CLASS =
-            "com.android.server.job.JobSchedulerService";
-    private static final String LOCK_SETTINGS_SERVICE_CLASS =
-            "com.android.server.LockSettingsService$Lifecycle";
-    private static final String MOUNT_SERVICE_CLASS =
-            "com.android.server.MountService$Lifecycle";
-    private static final String SEARCH_MANAGER_SERVICE_CLASS =
-            "com.android.server.search.SearchManagerService$Lifecycle";
-    private static final String THERMAL_OBSERVER_CLASS =
-            "com.google.android.clockwork.ThermalObserver";
-    private static final String WEAR_BLUETOOTH_SERVICE_CLASS =
-            "com.google.android.clockwork.bluetooth.WearBluetoothService";
-    private static final String ACCOUNT_SERVICE_CLASS =
-            "com.android.server.accounts.AccountManagerService$Lifecycle";
-    private static final String CONTENT_SERVICE_CLASS =
-            "com.android.server.content.ContentService$Lifecycle";
-    private static final String WALLPAPER_SERVICE_CLASS =
-            "com.android.server.wallpaper.WallpaperManagerService$Lifecycle";
+    private static final String 
+        BACKUP_MANAGER_SERVICE_CLASS =
+            "com.android.server.backup.BackupManagerService$Lifecycle",
+        APPWIDGET_SERVICE_CLASS =
+            "com.android.server.appwidget.AppWidgetService",
+        VOICE_RECOGNITION_MANAGER_SERVICE_CLASS =
+            "com.android.server.voiceinteraction.VoiceInteractionManagerService",
+        PRINT_MANAGER_SERVICE_CLASS =
+            "com.android.server.print.PrintManagerService",
+        USB_SERVICE_CLASS =
+            "com.android.server.usb.UsbService$Lifecycle",
+        MIDI_SERVICE_CLASS =
+            "com.android.server.midi.MidiService$Lifecycle",
+        WIFI_SERVICE_CLASS =
+            "com.android.server.wifi.WifiService",
+        WIFI_NAN_SERVICE_CLASS =
+            "com.android.server.wifi.nan.WifiNanService",
+        WIFI_P2P_SERVICE_CLASS =
+            "com.android.server.wifi.p2p.WifiP2pService",
+        ETHERNET_SERVICE_CLASS =
+            "com.android.server.ethernet.EthernetService",
+        JOB_SCHEDULER_SERVICE_CLASS =
+            "com.android.server.job.JobSchedulerService",
+        LOCK_SETTINGS_SERVICE_CLASS =
+            "com.android.server.LockSettingsService$Lifecycle",
+        MOUNT_SERVICE_CLASS =
+            "com.android.server.MountService$Lifecycle",
+        SEARCH_MANAGER_SERVICE_CLASS =
+            "com.android.server.search.SearchManagerService$Lifecycle",
+        THERMAL_OBSERVER_CLASS =
+            "com.google.android.clockwork.ThermalObserver",
+        WEAR_BLUETOOTH_SERVICE_CLASS =
+            "com.google.android.clockwork.bluetooth.WearBluetoothService",
+        ACCOUNT_SERVICE_CLASS =
+            "com.android.server.accounts.AccountManagerService$Lifecycle",
+        CONTENT_SERVICE_CLASS =
+            "com.android.server.content.ContentService$Lifecycle",
+        WALLPAPER_SERVICE_CLASS =
+            "com.android.server.wallpaper.WallpaperManagerService$Lifecycle",
+        WIFI_RTT_SERVICE_CLASS =
+            "com.android.server.wifi.RttService",
+        WIFI_SCANNING_SERVICE_CLASS =
+            "com.android.server.wifi.scanner.WifiScanningService"
+            ;
 
     private static final String PERSISTENT_DATA_BLOCK_PROP = "ro.frp.pst";
 
@@ -203,9 +210,7 @@ public final class SystemServer {
     private ContentResolver mContentResolver;
     private EntropyMixer mEntropyMixer;
 
-    private boolean mOnlyCore;
-    private boolean mFirstBoot;
-    private boolean mIsAlarmBoot;
+    private boolean mOnlyCore, mFirstBoot, mIsAlarmBoot;
 
     /**
      * Start the sensor service.
@@ -555,6 +560,14 @@ public final class SystemServer {
         HardwarePropertiesManagerService hardwarePropertiesService = null;
         Object wigigP2pService = null;
         Object wigigService = null;
+        StatusBarManagerService statusBar = null;
+        INotificationManager notification = null;
+        LocationManagerService location = null;
+        CountryDetectorService countryDetector = null;
+        ILockSettings lockSettings = null;
+        AssetAtlasService atlas = null;
+        MediaRouterService mediaRouter = null;
+        GestureService gestureService = null;
 
         boolean disableStorage = SystemProperties.getBoolean("config.disable_storage", false);
         boolean disableBluetooth = SystemProperties.getBoolean("config.disable_bluetooth", false);
@@ -685,15 +698,6 @@ public final class SystemServer {
             Slog.e("System", "************ Failure starting core service", e);
         }
 
-        StatusBarManagerService statusBar = null;
-        INotificationManager notification = null;
-        LocationManagerService location = null;
-        CountryDetectorService countryDetector = null;
-        ILockSettings lockSettings = null;
-        AssetAtlasService atlas = null;
-        MediaRouterService mediaRouter = null;
-        GestureService gestureService = null;
-
         // Bring up services needed for UI.
         if (mFactoryTestMode != FactoryTest.FACTORY_TEST_LOW_LEVEL) {
             mSystemServiceManager.startService(InputMethodManagerService.Lifecycle.class);
@@ -759,6 +763,7 @@ public final class SystemServer {
                             com.android.internal.R.string.android_upgrading_starting_apps),
                     false);
         } catch (RemoteException e) {
+            Slog.w(TAG, "Not showing boot message: " + e.getMessage());
         }
 
         if (mFactoryTestMode != FactoryTest.FACTORY_TEST_LOW_LEVEL) {
@@ -852,19 +857,16 @@ public final class SystemServer {
                 }
                 Trace.traceEnd(Trace.TRACE_TAG_SYSTEM_SERVER);
 
-                if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_WIFI_NAN)) {
+                if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_WIFI_NAN))
                     mSystemServiceManager.startService(WIFI_NAN_SERVICE_CLASS);
-                } else {
-                    Slog.i(TAG, "No Wi-Fi NAN Service (NAN support Not Present)");
-                }
+                else Slog.i(TAG, "No Wi-Fi NAN Service (NAN support Not Present)");
+                
                 mSystemServiceManager.startService(WIFI_P2P_SERVICE_CLASS);
                 mSystemServiceManager.startService(WIFI_SERVICE_CLASS);
-                mSystemServiceManager.startService(
-                            "com.android.server.wifi.scanner.WifiScanningService");
+                mSystemServiceManager.startService(WIFI_SCANNING_SERVICE_CLASS);
 
-                if (!disableRtt) {
-                    mSystemServiceManager.startService("com.android.server.wifi.RttService");
-                }
+                if (!disableRtt)
+                    mSystemServiceManager.startService(WIFI_RTT_SERVICE_CLASS);
 
                 if (enableWigig) {
                     try {
@@ -930,9 +932,8 @@ public final class SystemServer {
                 Trace.traceEnd(Trace.TRACE_TAG_SYSTEM_SERVER);
             }
 
-            if (!disableNonCoreServices) {
+            if (!disableNonCoreServices)
                 mSystemServiceManager.startService(RecoverySystemService.class);
-            }
 
             /*
              * MountService has a few dependencies: Notification Manager and
@@ -944,6 +945,7 @@ public final class SystemServer {
                 try {
                     mountService.waitForAsecScan();
                 } catch (RemoteException ignored) {
+
                 }
                 Trace.traceEnd(Trace.TRACE_TAG_SYSTEM_SERVER);
             }
@@ -1001,7 +1003,7 @@ public final class SystemServer {
             if (!disableNonCoreServices) {
                 mSystemServiceManager.startService(DockObserver.class);
 
-		if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_WATCH)) {
+		        if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_WATCH)) {
                     //#Fixme:mSystemServiceManager.startService(THERMAL_OBSERVER_CLASS);
                 }
             }
@@ -1176,21 +1178,17 @@ public final class SystemServer {
 
             mSystemServiceManager.startService(MediaSessionService.class);
 
-            if (mPackageManager.hasSystemFeature(PackageManager.FEATURE_HDMI_CEC)) {
+            if (mPackageManager.hasSystemFeature(PackageManager.FEATURE_HDMI_CEC))
                 mSystemServiceManager.startService(HdmiControlService.class);
-            }
 
-            if (mPackageManager.hasSystemFeature(PackageManager.FEATURE_LIVE_TV)) {
+            if (mPackageManager.hasSystemFeature(PackageManager.FEATURE_LIVE_TV))
                 mSystemServiceManager.startService(TvInputManagerService.class);
-            }
 
-            if (mPackageManager.hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE)) {
+            if (mPackageManager.hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE))
                 mSystemServiceManager.startService(MediaResourceMonitorService.class);
-            }
 
-            if (mPackageManager.hasSystemFeature(PackageManager.FEATURE_LEANBACK)) {
+            if (mPackageManager.hasSystemFeature(PackageManager.FEATURE_LEANBACK))
                 mSystemServiceManager.startService(TvRemoteService.class);
-            }
 
             if (!disableNonCoreServices) {
                 traceBeginAndSlog("StartMediaRouterService");
@@ -1202,13 +1200,11 @@ public final class SystemServer {
                 }
                 Trace.traceEnd(Trace.TRACE_TAG_SYSTEM_SERVER);
 
-                if (!disableTrustManager) {
+                if (!disableTrustManager)
                     mSystemServiceManager.startService(TrustManagerService.class);
-                }
 
-                if (mPackageManager.hasSystemFeature(PackageManager.FEATURE_FINGERPRINT)) {
+                if (mPackageManager.hasSystemFeature(PackageManager.FEATURE_FINGERPRINT))
                     mSystemServiceManager.startService(FingerprintService.class);
-                }
 
                 traceBeginAndSlog("StartBackgroundDexOptService");
                 try {
@@ -1224,9 +1220,8 @@ public final class SystemServer {
             mSystemServiceManager.startService(LauncherAppsService.class);
         }
 
-        if (!disableNonCoreServices && !disableMediaProjection) {
+        if (!disableNonCoreServices && !disableMediaProjection)
             mSystemServiceManager.startService(MediaProjectionManagerService.class);
-        }
 
         if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_WATCH)) {
             //#Fixme:mSystemServiceManager.startService(WEAR_BLUETOOTH_SERVICE_CLASS);
@@ -1300,9 +1295,8 @@ public final class SystemServer {
         }
         Trace.traceEnd(Trace.TRACE_TAG_SYSTEM_SERVER);
 
-        if (safeMode) {
+        if (safeMode)
             mActivityManagerService.showSafeModeOverlay();
-        }
 
         // Update the configuration for this context by hand, because we're going
         // to start using it before the config change done in wm.systemReady() will
@@ -1315,9 +1309,8 @@ public final class SystemServer {
 
         // The system context's theme may be configuration-dependent.
         final Theme systemTheme = context.getTheme();
-        if (systemTheme.getChangingConfigurations() != 0) {
+        if (systemTheme.getChangingConfigurations() != 0)
             systemTheme.rebase();
-        }
 
         Trace.traceBegin(Trace.TRACE_TAG_SYSTEM_SERVER, "MakePowerManagerServiceReady");
         try {
@@ -1397,6 +1390,22 @@ public final class SystemServer {
                     mWebViewUpdateService.prepareWebViewInSystemServer();
                     Trace.traceEnd(Trace.TRACE_TAG_SYSTEM_SERVER);
                 }
+
+                Trace.traceBegin(Trace.TRACE_TAG_SYSTEM_SERVER, "StartAfterBootComponents");
+                try {
+                    /* Components that need to be started after boot completion
+                     * but before SystemUI starts. Good for stuff that should
+                     * be done before the user gets to touch anything, so that
+                     * user experience is better and there are no delays.
+                     * Make sure to catch exceptions for non-critical things
+                     * so that the probability of a boot failure is as low
+                     * as possible.
+                     */
+                    startAfterBootComponents(context);
+                } catch(Throwable e) {
+                    reportWtf("starting afterboot components", e);
+                }
+                Trace.traceEnd(Trace.TRACE_TAG_SYSTEM_SERVER);
 
                 Trace.traceBegin(Trace.TRACE_TAG_SYSTEM_SERVER, "StartSystemUI");
                 try {
@@ -1526,14 +1535,10 @@ public final class SystemServer {
     }
 
     static final void startSystemUi(Context context) {
-        // Let's start components that are supposed to be started right after boot
-        startAfterBootComponents(context);
-        
         Intent intent = new Intent();
         intent.setComponent(new ComponentName("com.android.systemui",
                     "com.android.systemui.SystemUIService"));
         intent.addFlags(Intent.FLAG_DEBUG_TRIAGED_MISSING);
-        //Slog.d(TAG, "Starting service: " + intent);
         context.startServiceAsUser(intent, UserHandle.SYSTEM);
     }
 
@@ -1541,4 +1546,5 @@ public final class SystemServer {
         Trace.traceBegin(Trace.TRACE_TAG_SYSTEM_SERVER, name);
         Slog.i(TAG, name);
     }
+
 }

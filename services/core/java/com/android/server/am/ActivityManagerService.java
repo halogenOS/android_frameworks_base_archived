@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2006-2008 The Android Open Source Project
+ * Copyright (C) 2016 halogenOS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -423,7 +424,9 @@ public final class ActivityManagerService extends ActivityManagerNative
 
     static final String SYSTEM_DEBUGGABLE = "ro.debuggable";
 
-    static final boolean IS_USER_BUILD = "user".equals(Build.TYPE);
+    static final boolean IS_USER_BUILD = "user".equals(Build.TYPE),
+                         IS_USER_OR_USERDEBUG_BUILD = 
+                            "userdebug".contains(Build.TYPE);
 
     // Amount of time after a call to stopAppSwitches() during which we will
     // prevent further untrusted switches from happening.
@@ -431,10 +434,10 @@ public final class ActivityManagerService extends ActivityManagerNative
 
     // How long we wait for a launched process to attach to the activity manager
     // before we decide it's never going to come up for real.
-    static final int PROC_START_TIMEOUT = 10*1000;
+    static final int PROC_START_TIMEOUT = 9800;
     // How long we wait for an attached process to publish its content providers
     // before we decide it must be hung.
-    static final int CONTENT_PROVIDER_PUBLISH_TIMEOUT = 10*1000;
+    static final int CONTENT_PROVIDER_PUBLISH_TIMEOUT = 9800;
 
     // How long we will retain processes hosting content providers in the "last activity"
     // state before allowing them to drop down to the regular cached LRU list.  This is
@@ -448,10 +451,10 @@ public final class ActivityManagerService extends ActivityManagerNative
     static final int PROC_START_TIMEOUT_WITH_WRAPPER = 1200*1000;
 
     // How long to wait after going idle before forcing apps to GC.
-    static final int GC_TIMEOUT = 5*1000;
+    static final int GC_TIMEOUT = 5000;
 
     // The minimum amount of time between successive GC requests for a process.
-    static final int GC_MIN_INTERVAL = 60*1000;
+    static final int GC_MIN_INTERVAL = 60_000;
 
     // The minimum amount of time between successive PSS requests for a process.
     static final int FULL_PSS_MIN_INTERVAL = 10*60*1000;

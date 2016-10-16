@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
+ * Copyright (C) 2016 halogenOS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -108,15 +109,12 @@ public class StatusBarIcon implements Parcelable {
      * Parcelable.Creator that instantiates StatusBarIcon objects
      */
     public static final Parcelable.Creator<StatusBarIcon> CREATOR
-            = new Parcelable.Creator<StatusBarIcon>()
-    {
-        public StatusBarIcon createFromParcel(Parcel parcel)
-        {
+            = new Parcelable.Creator<StatusBarIcon>() {
+        public StatusBarIcon createFromParcel(Parcel parcel) {
             return new StatusBarIcon(parcel);
         }
 
-        public StatusBarIcon[] newArray(int size)
-        {
+        public StatusBarIcon[] newArray(int size) {
             return new StatusBarIcon[size];
         }
     };
