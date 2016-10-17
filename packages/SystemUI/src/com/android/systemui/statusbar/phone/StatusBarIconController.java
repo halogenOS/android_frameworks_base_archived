@@ -38,6 +38,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.android.internal.statusbar.StatusBarIcon;
+import com.android.systemui.BatteryLevelTextView;
 import com.android.systemui.BatteryMeterView;
 import com.android.systemui.FontSizeUtils;
 import com.android.systemui.Interpolators;
@@ -102,6 +103,8 @@ public class StatusBarIconController extends StatusBarIconList implements Tunabl
     private long mTransitionDeferringDuration;
 
     private final ArraySet<String> mIconBlacklist = new ArraySet<>();
+
+    private BatteryLevelTextView mBatteryLevelView;
 
     private final Runnable mTransitionDeferringDoneRunnable = new Runnable() {
         @Override
