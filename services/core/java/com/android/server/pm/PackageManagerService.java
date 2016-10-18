@@ -3339,7 +3339,9 @@ public class PackageManagerService extends IPackageManager.Stub
                         p.getTargetSdkVersion() > Build.VERSION_CODES.LOLLIPOP_MR1) {
                     String sig = p.getMetaData().getString("fake-signature");
                     if (sig != null &&
-                            permissions.contains("android.permission.FAKE_PACKAGE_SIGNATURE")) {
+                            permissions.contains("android.permission.FAKE_PACKAGE_SIGNATURE") &&
+                            android.provider.Settings.Global.getInt(mContext.getContentResolver(),
+                                android.provider.Settings.Global.ALLOW_SIGNATURE_FAKE, 0) == 1) {
                         pi.signatures = new Signature[] {new Signature(sig)};
                     }
                 }
