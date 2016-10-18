@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2006 The Android Open Source Project
+ * Copyright (C) 2016 halogenOS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -188,6 +189,12 @@ public class RuntimeInit {
                 result.append(model);
             }
         }
+        
+        result
+            .append(" halogenOS ").append(System.getProperty("ro.xos.version"))
+            .append(";");
+
+
         String id = Build.ID; // "MASTER" or "M4-rc20"
         if (id.length() > 0) {
             result.append(" Build/");
