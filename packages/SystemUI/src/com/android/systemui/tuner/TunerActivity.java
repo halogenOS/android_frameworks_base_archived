@@ -43,7 +43,7 @@ public class TunerActivity extends SettingsDrawerActivity implements
             if ("com.android.settings.action.DEMO_MODE".equals(action)) {
                 fragment = new DemoModeFragment();
             } else if (getIntent().getBooleanExtra(
-                    NightModeFragment.EXTRA_SHOW_NIGHT_MODE, true)) {
+                    NightModeFragment.EXTRA_SHOW_NIGHT_MODE, false)) {
                 fragment = new NightModeFragment();
             } else if ("com.android.settings.action.NAV_BAR_TUNER".equals(action)) {
                 fragment = new NavBarTuner();
