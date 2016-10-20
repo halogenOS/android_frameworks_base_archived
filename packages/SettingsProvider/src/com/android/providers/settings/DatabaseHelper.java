@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
+ * Copyright (C) 2016 halogenOS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -2716,9 +2717,11 @@ class DatabaseHelper extends SQLiteOpenHelper {
             String val = "";
             String mode = "";
             for (int phoneId = 0; phoneId < phoneCount; phoneId++) {
-                mode = TelephonyManager.getTelephonyProperty(phoneId,
-                         "ro.telephony.default_network",
-                         Integer.toString(RILConstants.NETWORK_MODE_GSM_ONLY));
+                mode = SystemProperties.get("persist.telephony.default_network", "");
+                if ( mode == null || mode.isEmpty() )
+                    mode = TelephonyManager.getTelephonyProperty(phoneId,
+                             "ro.telephony.default_network",
+                             Integer.toString(RILConstants.NETWORK_MODE_GSM_ONLY));
                 if (phoneId == 0) {
                     val = mode;
                 } else {

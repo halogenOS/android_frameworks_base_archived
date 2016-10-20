@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
+ * Copyright (C) 2016 halogenOS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1139,7 +1140,10 @@ public class TelephonyManager {
         // When the system property CURRENT_ACTIVE_PHONE, has not been set,
         // use the system property for default network type.
         // This is a fail safe, and can only happen at first boot.
-        String mode = getTelephonyProperty(phoneId, "ro.telephony.default_network", null);
+        String mode;
+        mode = SystemProperties.get("persist.telephony.default_network", "");
+        if ( mode == null || mode.isEmpty() )
+            mode = getTelephonyProperty(phoneId, "ro.telephony.default_network", null);
         if (mode != null) {
             return TelephonyManager.getPhoneType(Integer.parseInt(mode));
         }
