@@ -31,7 +31,7 @@ LOCAL_STATIC_JAVA_LIBRARIES := \
     SystemUI-proto-tags
 
 LOCAL_JAVA_LIBRARIES := telephony-common telephony-ext
-LOCAL_FULL_LIBS_MANIFEST_FILES := $(LOCAL_PATH)/AndroidManifest_tuner.xml
+
 LOCAL_PACKAGE_NAME := SystemUI
 LOCAL_CERTIFICATE := platform
 LOCAL_PRIVILEGED_MODULE := true
