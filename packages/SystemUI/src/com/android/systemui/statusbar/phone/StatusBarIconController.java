@@ -37,6 +37,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
 import com.android.internal.statusbar.StatusBarIcon;
 import com.android.systemui.BatteryLevelTextView;
 import com.android.systemui.BatteryMeterView;
@@ -79,6 +80,7 @@ public class StatusBarIconController extends StatusBarIconList implements Tunabl
     private BatteryMeterView mBatteryMeterView;
     private BatteryMeterView mBatteryMeterViewKeyguard;
     private TextView mClock;
+    private TextView mCarrierLabel;
 
     private int mIconSize;
     private int mIconHPadding;
@@ -139,6 +141,7 @@ public class StatusBarIconController extends StatusBarIconList implements Tunabl
         scaleBatteryMeterViews(context);
 
         mClock = (TextView) statusBar.findViewById(R.id.clock);
+        mCarrierLabel = (TextView) statusBar.findViewById(R.id.statusbar_carrier_text);
         mDarkModeIconColorSingleTone = context.getColor(R.color.dark_mode_icon_color_single_tone);
         mLightModeIconColorSingleTone = context.getColor(R.color.light_mode_icon_color_single_tone);
         mHandler = new Handler();
@@ -535,6 +538,7 @@ public class StatusBarIconController extends StatusBarIconList implements Tunabl
         mBatteryMeterView.setDarkIntensity(
                 isInArea(mTintArea, mBatteryMeterView) ? mDarkIntensity : 0);
         mClock.setTextColor(getTint(mTintArea, mClock, mIconTint));
+        mCarrierLabel.setTextColor(getTint(mTintArea, mCarrierLabel, mIconTint));
     }
 
     public void appTransitionPending() {
@@ -588,6 +592,7 @@ public class StatusBarIconController extends StatusBarIconList implements Tunabl
         mNotificationIconAreaController.onDensityOrFontScaleChanged(mContext);
         updateClock();
         updateBatteryLevelText();
+        updateCarrier();
         for (int i = 0; i < mStatusIcons.getChildCount(); i++) {
             View child = mStatusIcons.getChildAt(i);
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
@@ -602,6 +607,10 @@ public class StatusBarIconController extends StatusBarIconList implements Tunabl
             child.setLayoutParams(lp);
         }
         scaleBatteryMeterViews(mContext);
+    }
+
+    private void updateCarrier() {
+        FontSizeUtils.updateFontSize(mCarrierLabel, R.dimen.status_bar_carrier_height);
     }
 
     private void updateClock() {
