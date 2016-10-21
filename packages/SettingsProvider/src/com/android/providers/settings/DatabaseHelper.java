@@ -2717,7 +2717,7 @@ class DatabaseHelper extends SQLiteOpenHelper {
             String val = "";
             String mode = "";
             for (int phoneId = 0; phoneId < phoneCount; phoneId++) {
-                mode = SystemProperties.get("persist.telephony.default_network", "");
+                mode = SystemProperties.get("persist.tp.defaultnetwork", "");
                 if ( mode == null || mode.isEmpty() )
                     mode = TelephonyManager.getTelephonyProperty(phoneId,
                              "ro.telephony.default_network",

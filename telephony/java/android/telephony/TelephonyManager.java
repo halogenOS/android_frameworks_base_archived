@@ -1141,7 +1141,7 @@ public class TelephonyManager {
         // use the system property for default network type.
         // This is a fail safe, and can only happen at first boot.
         String mode;
-        mode = SystemProperties.get("persist.telephony.default_network", "");
+        mode = SystemProperties.get("persist.tp.defaultnetwork", "");
         if ( mode == null || mode.isEmpty() )
             mode = getTelephonyProperty(phoneId, "ro.telephony.default_network", null);
         if (mode != null) {
