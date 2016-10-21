@@ -880,6 +880,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             resolver.registerContentObserver(Settings.Global.getUriFor(
                     Settings.Global.POLICY_CONTROL), false, this,
                     UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.LONG_PRESS_HOME_BUTTON_BEHAVIOR),
+                false, this);
             updateSettings();
         }
 
@@ -1852,12 +1855,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     private void readConfigurationDependentBehaviors() {
         final Resources res = mContext.getResources();
 
-        mLongPressOnHomeBehavior = res.getInteger(
-                com.android.internal.R.integer.config_longPressOnHomeBehavior);
-        if (mLongPressOnHomeBehavior < LONG_PRESS_HOME_NOTHING ||
-                mLongPressOnHomeBehavior > LAST_LONG_PRESS_HOME_BEHAVIOR) {
-            mLongPressOnHomeBehavior = LONG_PRESS_HOME_NOTHING;
-        }
+        updateLongPressOnHomeBehavior();
 
         mDoubleTapOnHomeBehavior = res.getInteger(
                 com.android.internal.R.integer.config_doubleTapOnHomeBehavior);
@@ -1982,6 +1980,27 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         }
     }
 
+    protected void updateLongPressOnHomeBehavior() {
+        updateLongPressOnHomeBehavior(mContext.getContentResolver());
+    }
+
+    protected void updateLongPressOnHomeBehavior(ContentResolver resolver) {
+        int defaultLongPressOnHomeBehavior = mContext.getResources().getInteger(
+                    com.android.internal.R.integer.config_longPressOnHomeBehavior);
+        mLongPressOnHomeBehavior = Settings.System.getInt(resolver,
+            Settings.System.LONG_PRESS_HOME_BUTTON_BEHAVIOR, -1);
+        if(mLongPressOnHomeBehavior == -1) {
+            mLongPressOnHomeBehavior = defaultLongPressOnHomeBehavior;
+            Settings.System.putInt(resolver,
+                Settings.System.LONG_PRESS_HOME_BUTTON_BEHAVIOR,
+                    defaultLongPressOnHomeBehavior);
+        }
+        if (mLongPressOnHomeBehavior < LONG_PRESS_HOME_NOTHING ||
+                mLongPressOnHomeBehavior > LAST_LONG_PRESS_HOME_BEHAVIOR) {
+            mLongPressOnHomeBehavior = LONG_PRESS_HOME_NOTHING;
+        }
+    }
+
     public void updateSettings() {
         ContentResolver resolver = mContext.getContentResolver();
         boolean updateRotation = false;
@@ -2044,6 +2063,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             if (mImmersiveModeConfirmation != null) {
                 mImmersiveModeConfirmation.loadSetting(mCurrentUserId);
             }
+
+            updateLongPressOnHomeBehavior(resolver);
         }
         synchronized (mWindowManagerFuncs.getWindowManagerLock()) {
             PolicyControl.reloadFromSetting(mContext);
