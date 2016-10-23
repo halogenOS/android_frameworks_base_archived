@@ -2776,4 +2776,7 @@
     <bool name="config_proximityCheckOnWake">true</bool>
     <bool name="config_proximityCheckOnWakeEnabledByDefault">true</bool>
     
+    <bool name="config_deviceHasVariableButtonBrightness">false</bool>
+    <integer name="config_buttonBrightnessSettingDefault">100</integer>
+    
 </resources>
