@@ -49,4 +49,7 @@
     <bool name="config_deviceHasVariableButtonBrightness">false</bool>
 
     <string-array name="config_vendorPlatformSignatures" translatable="false" />
+
+    <!-- Whether notify fingerprint client of successful cancelled authentication -->
+    <bool name="config_notifyClientOnFingerprintCancelSuccess">false</bool>
 </resources>
