@@ -3733,6 +3733,14 @@ public final class Settings {
          */
         public static final String LONG_PRESS_HOME_BUTTON_BEHAVIOR =
                                 "long_press_home_button_behavior";
+        
+        /**
+         * Navbar toggle
+         * 
+         * @hide
+         */
+        public static final String SHOW_NAVBAR =
+                                "user_wants_show_navbar";
 
         /**
          * IMPORTANT: If you add a new public settings you also have to add it to
@@ -3795,7 +3803,8 @@ public final class Settings {
             RINGTONE,
             LOCK_TO_APP_ENABLED,
             NOTIFICATION_SOUND,
-            ACCELEROMETER_ROTATION
+            ACCELEROMETER_ROTATION,
+            SHOW_NAVBAR
         };
 
         /**
@@ -3853,6 +3862,7 @@ public final class Settings {
             PUBLIC_SETTINGS.add(PROXIMITY_ON_WAKE);
             PUBLIC_SETTINGS.add(DEVICE_SPECIFIC_SETTINGS);
             PUBLIC_SETTINGS.add(LONG_PRESS_HOME_BUTTON_BEHAVIOR);
+            PUBLIC_SETTINGS.add(SHOW_NAVBAR);
         }
 
         /**
