@@ -43,6 +43,7 @@ import android.app.StatusBarManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentCallbacks2;
 import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -574,6 +575,8 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     private int mLastCameraLaunchSource;
     private PowerManager.WakeLock mGestureWakeLock;
     private Vibrator mVibrator;
+    
+    private SettingsObserver mSbSettingsObserver;
 
     // Fingerprint (as computed by getLoggingFingerprint() of the last logged state.
     private int mLastLoggedStateFingerprint;
@@ -694,6 +697,26 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         }
     };
 
+    class SettingsObserver extends ContentObserver {
+        SettingsObserver(Handler handler) {
+            super(handler);
+        }
+
+        void observe() {
+            // Observe all users' changes
+            ContentResolver resolver = mContext.getContentResolver();
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.SHOW_NAVBAR), false, this,
+                    UserHandle.USER_ALL);
+        }
+
+        @Override
+        public void onChange(boolean selfChange) {
+            onNavbarChange(Settings.System.getIntForUser(mContext.getContentResolver(),
+                Settings.System.SHOW_NAVBAR, -1, UserHandle.USER_CURRENT) == 1);
+        }
+    }
+
     @Override
     public void start() {
         mDisplay = ((WindowManager)mContext.getSystemService(Context.WINDOW_SERVICE))
@@ -741,6 +764,12 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                     Settings.Global.getUriFor(SETTING_HEADS_UP_TICKER), true,
                     mHeadsUpObserver);
         }
+        
+        Handler handler = new Handler();
+        mSbSettingsObserver = new SettingsObserver(handler);
+        mSbSettingsObserver.observe();
+        mSbSettingsObserver.onChange(true);
+        
         mUnlockMethodCache = UnlockMethodCache.getInstance(mContext);
         mUnlockMethodCache.addListener(this);
         startKeyguard();
@@ -816,15 +845,11 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                     R.id.header_debug_info);
             mNotificationPanelDebugText.setVisibility(View.VISIBLE);
         }
-
+        
         try {
-            boolean showNav = mWindowManagerService.hasNavigationBar();
-            if (DEBUG) Log.v(TAG, "hasNavigationBar=" + showNav);
-            if (showNav) {
-                createNavigationBarView(context);
-            }
-        } catch (RemoteException ex) {
-            // no window manager? good luck with that
+            onNavbarChange(mWindowManagerService.hasNavigationBar());
+        } catch(RemoteException e) {
+            // Have fun with no Window Manager xD
         }
 
         mAssistManager = SystemUIFactory.getInstance().createAssistManager(this, context);
@@ -1221,6 +1246,43 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         if (signalCluster != null) {
             signalCluster.setSecurityController(mSecurityController);
             signalCluster.setNetworkController(mNetworkController);
+        }
+    }
+    
+    private synchronized void onNavbarChangeInternal(boolean enabled) throws Exception {
+        if(enabled) {
+            if(mNavigationBarView == null || mNavigationBarView.getWindowToken() == null) {
+                mNavigationBarView = null;
+                createNavigationBarView(mContext);
+                prepareNavigationBarView();
+                addNavigationBar();
+            }
+        } else {
+            if(mNavigationBarView != null && mNavigationBarView.getWindowToken() != null)
+                mWindowManager.removeView(mNavigationBarView);
+            mNavigationBarView = null;
+        }
+    }
+    
+    private synchronized void onNavbarChange(final boolean enabled) {
+        try {
+            onNavbarChangeInternal(enabled);
+        } catch(Exception ex) {
+            // It is possible that the user has spammed the toggle
+            // so hard that SystemUI would crash at this point
+            // But we can just catch the exception, as it doesn't matter.
+            // It will continue working fine, it's the user's fault if
+            // something is broken at this point :D
+            // But let's try to clean it up anyways.
+            Log.d(TAG, "Please don't spam the toggle!");
+            try {
+                if(mNavigationBarView != null && mNavigationBarView.getWindowToken() == null) {
+                    mNavigationBarView = null;
+                    onNavbarChangeInternal(enabled);
+                }
+            } catch(Exception iex) {
+                // Chuck it.
+            }
         }
     }
 

@@ -183,6 +183,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     static final boolean DEBUG_STARTING_WINDOW = false;
     static final boolean DEBUG_WAKEUP = false;
     static final boolean SHOW_STARTING_ANIMATIONS = true;
+    static final boolean DEBUG_CUSTOM_SETTINGS = false;
 
     // Whether to allow dock apps with METADATA_DOCK_HOME to temporarily take over the Home key.
     // No longer recommended for desk docks;
@@ -717,6 +718,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     private boolean mScreenshotChordVolumeUpKeyTriggered;
     private boolean mScreenshotChordPowerKeyTriggered;
     private long mScreenshotChordPowerKeyTime;
+    
+    private boolean canRefreshNavbar = false;
 
     /* The number of steps between min and max brightness */
     private static final int BRIGHTNESS_STEPS = 10;
@@ -883,12 +886,16 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.LONG_PRESS_HOME_BUTTON_BEHAVIOR),
                 false, this);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.SHOW_NAVBAR), false, this,
+                    UserHandle.USER_ALL);
             updateSettings();
         }
 
         @Override public void onChange(boolean selfChange) {
             updateSettings();
             updateRotation(false);
+            updateCustomSettings();
         }
     }
 
@@ -1917,17 +1924,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         // Allow the navigation bar to move on non-square small devices (phones).
         mNavigationBarCanMove = width != height && shortSizeDp < 600;
 
-        mHasNavigationBar = res.getBoolean(com.android.internal.R.bool.config_showNavigationBar);
-
-        // Allow a system property to override this. Used by the emulator.
-        // See also hasNavigationBar().
-        String navBarOverride = SystemProperties.get("qemu.hw.mainkeys");
-        if ("1".equals(navBarOverride)) {
-            mHasNavigationBar = false;
-        } else if ("0".equals(navBarOverride)) {
-            mHasNavigationBar = true;
-        }
-
         // For demo purposes, allow the rotation of the HDMI display to be controlled.
         // By default, HDMI locks rotation to landscape.
         if ("portrait".equals(SystemProperties.get("persist.demo.hdmirotation"))) {
@@ -1955,6 +1951,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 // $ adb shell setprop config.override_forced_orient true
                 // $ adb shell wm size reset
                 !"true".equals(SystemProperties.get("config.override_forced_orient"));
+        
+        updateCustomSettings();
     }
 
     /**
@@ -1999,6 +1997,13 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 mLongPressOnHomeBehavior > LAST_LONG_PRESS_HOME_BEHAVIOR) {
             mLongPressOnHomeBehavior = LONG_PRESS_HOME_NOTHING;
         }
+    }
+    
+    /** @hide */
+    protected void updateCustomSettings() {
+        if(DEBUG_CUSTOM_SETTINGS) Log.d(TAG, "Updating custom settings...");
+        prepareNavbarRefresh();
+        hasNavigationBar(); // Refresh navbar setting
     }
 
     public void updateSettings() {
@@ -7870,11 +7875,50 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     private boolean areTranslucentBarsAllowed() {
         return mTranslucentDecorEnabled;
     }
+    
+    /**
+     * Allows refreshing navbar. Usually traditional behavior applies to keep
+     * compatibility and prevent SecurityException.
+     * 
+     * @hide 
+     */
+    private void prepareNavbarRefresh() {
+        canRefreshNavbar = true;
+    }
 
-    // Use this instead of checking config_showNavigationBar so that it can be consistently
-    // overridden by qemu.hw.mainkeys in the emulator.
     @Override
     public boolean hasNavigationBar() {
+        if(canRefreshNavbar) {
+            try {
+                boolean shouldHaveNavigationBar =
+                    mContext.getResources().getBoolean(
+                            com.android.internal.R.bool.config_showNavigationBar);
+                int nav = Settings.System.getIntForUser(mContext.getContentResolver(),
+                            Settings.System.SHOW_NAVBAR, -1, UserHandle.USER_CURRENT);
+                if(!shouldHaveNavigationBar) {
+                    if(nav == 1)
+                        mHasNavigationBar = true;
+                    else if (nav == -1) {
+                        String navBarOverride = SystemProperties.get("qemu.hw.mainkeys");
+                        mHasNavigationBar = "0".equals(navBarOverride);
+                        Settings.System.putIntForUser(mContext.getContentResolver(),
+                            Settings.System.SHOW_NAVBAR,
+                                (navBarOverride != null && !navBarOverride.isEmpty() ?
+                                    Integer.parseInt(navBarOverride) : -1),
+                                UserHandle.USER_CURRENT);
+                    } else mHasNavigationBar = false;
+                } else if(nav != -2) {
+                    Settings.System.putIntForUser(mContext.getContentResolver(),
+                        Settings.System.SHOW_NAVBAR, -2, UserHandle.USER_CURRENT);
+                    mHasNavigationBar = true;
+                }
+                if(mHasNavigationBar)
+                    mTranslucentDecorEnabled = true;
+                canRefreshNavbar = false;
+            } catch(Exception e) {
+                // Just in case...
+            }
+        }
         return mHasNavigationBar;
     }
 
