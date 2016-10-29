@@ -52,7 +52,6 @@ import android.provider.Settings;
 import android.system.ErrnoException;
 import android.system.Os;
 
-import com.android.internal.util.ThemeUtils;
 import com.android.internal.telephony.ITelephony;
 import com.android.server.pm.PackageManagerService;
 
@@ -141,7 +140,7 @@ public final class ShutdownThread extends Thread {
         mReboot = false;
         mRebootSafeMode = false;
         mReason = reason;
-        shutdownInner(getUiContext(context), confirm);
+        shutdownInner(context, confirm);
     }
 
     static void shutdownInner(final Context context, boolean confirm) {
@@ -184,12 +183,11 @@ public final class ShutdownThread extends Thread {
 
         if (confirm) {
             final CloseDialogReceiver closer = new CloseDialogReceiver(context);
-            final Context mUiContext = getUiContext(context);
-
             if (sConfirmDialog != null) {
                 sConfirmDialog.dismiss();
                 sConfirmDialog = null;
             }
+
             if (mReboot && !mRebootSafeMode) {
                 // Determine if primary user is logged in
                 boolean isPrimary = UserHandle.getCallingUserId() == UserHandle.USER_OWNER;
@@ -300,7 +298,7 @@ public final class ShutdownThread extends Thread {
         mRebootSafeMode = false;
         mRebootHasProgressBar = false;
         mReason = reason;
-        shutdownInner(getUiContext(context), confirm);
+        shutdownInner(context, confirm);
     }
 
     /**
@@ -847,12 +845,5 @@ public final class ShutdownThread extends Thread {
         if (!done[0]) {
             Log.w(TAG, "Timed out waiting for uncrypt.");
         }
-    }
-
-    private static Context getUiContext(Context context) {
-        Context mUiContext = null;
-        mUiContext = ThemeUtils.createUiContext(context);
-        mUiContext.setTheme(android.R.style.Theme_DeviceDefault_Light_DarkActionBar);
-        return mUiContext != null ? mUiContext : context;
     }
 }
