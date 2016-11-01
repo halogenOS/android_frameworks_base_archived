@@ -740,6 +740,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         Handler handler = new Handler();
         mSbSettingsObserver = new SettingsObserver(handler);
         mSbSettingsObserver.observe();
+        mSbSettingsObserver.onChange(true);
         
         mUnlockMethodCache = UnlockMethodCache.getInstance(mContext);
         mUnlockMethodCache.addListener(this);
