@@ -56,6 +56,7 @@ import com.android.internal.os.RegionalizationEnvironment;
 import com.android.internal.os.SamplingProfilerIntegration;
 import com.android.internal.os.ZygoteInit;
 import com.android.internal.widget.ILockSettings;
+import com.android.server.HardwareControlService;
 import com.android.server.accessibility.AccessibilityManagerService;
 import com.android.server.am.ActivityManagerService;
 import com.android.server.audio.AudioService;
@@ -174,7 +175,9 @@ public final class SystemServer {
         WIFI_RTT_SERVICE_CLASS =
             "com.android.server.wifi.RttService",
         WIFI_SCANNING_SERVICE_CLASS =
-            "com.android.server.wifi.scanner.WifiScanningService"
+            "com.android.server.wifi.scanner.WifiScanningService",
+        HARDWARE_CONTROL_SERVICE_CLASS =
+            "com.android.server.HardwareControlService"
             ;
 
     private static final String PERSISTENT_DATA_BLOCK_PROP = "ro.frp.pst";
@@ -1401,6 +1404,7 @@ public final class SystemServer {
                      * so that the probability of a boot failure is as low
                      * as possible.
                      */
+                    startAfterBootComponents();
                     startAfterBootComponents(context);
                 } catch(Throwable e) {
                     reportWtf("starting afterboot components", e);
@@ -1517,6 +1521,26 @@ public final class SystemServer {
                 Trace.traceEnd(Trace.TRACE_TAG_SYSTEM_SERVER);
             }
         });
+    }
+    
+    /**
+     * This is the non-static variant of startAfterBootComponents(Context)
+     **/
+    void startAfterBootComponents() {
+        try {
+            // Why would you need this?
+            boolean disableHardwareControlService =
+                SystemProperties.getBoolean("config.disable_hardwarecontrol", false);
+            if(!disableHardwareControlService) {
+                Slog.d(TAG, "Starting Hardware Control Service...");
+                HardwareControlService hws =
+                    mSystemServiceManager.startService(HardwareControlService.class);
+                Slog.d(TAG, "Hardware Control Service started successfully.");
+            }
+        } catch(Exception ex) {
+            Slog.e(TAG, "Failed to start Hardware Control Service!");
+            ex.printStackTrace();
+        }
     }
     
     static final void startAfterBootComponents(Context context) {
