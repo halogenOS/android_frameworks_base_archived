@@ -17,6 +17,13 @@ LOCAL_SRC_FILES += \
 LOCAL_AIDL_INCLUDES += \
     system/netd/server/binder
 
+# Other hw components
+LOCAL_XOS_HWCOMPS := $(strip $(foreach _,$(shell find device/*/$(TARGET_DEVICE)/xoshw/ -name '*.java' -type f 2>/dev/null),../../../../$_))
+
+ifneq ($(LOCAL_XOS_HWCOMPS),)
+	LOCAL_SRC_FILES += $(LOCAL_XOS_HWCOMPS)
+endif
+
 LOCAL_JAVA_LIBRARIES := services.net telephony-common
 LOCAL_STATIC_JAVA_LIBRARIES := tzdata_update
 LOCAL_PROTOC_OPTIMIZE_TYPE := nano
