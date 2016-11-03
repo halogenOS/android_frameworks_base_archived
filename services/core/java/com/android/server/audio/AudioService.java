@@ -673,9 +673,6 @@ public class AudioService extends IAudioService.Stub {
                 null,
                 0);
 
-        mSafeMediaVolumeState = new Integer(Settings.Global.getInt(mContentResolver,
-                                                        Settings.Global.AUDIO_SAFE_VOLUME_STATE,
-                                                        SAFE_MEDIA_VOLUME_NOT_CONFIGURED));
         // The default safe volume index read here will be replaced by the actual value when
         // the mcc is read by onConfigureSafeVolume()
         mSafeMediaVolumeIndex = mContext.getResources().getInteger(
@@ -3499,21 +3496,8 @@ public class AudioService extends IAudioService.Stub {
                 int persistedState;
                 if (safeMediaVolumeEnabled && !safeMediaVolumeBypass) {
                     persistedState = SAFE_MEDIA_VOLUME_ACTIVE;
-                    // The state can already be "inactive" here if the user has forced it before
-                    // the 30 seconds timeout for forced configuration. In this case we don't reset
-                    // it to "active".
-                    if (mSafeMediaVolumeState != SAFE_MEDIA_VOLUME_INACTIVE) {
-                        if (mMusicActiveMs == 0) {
-                            mSafeMediaVolumeState = SAFE_MEDIA_VOLUME_ACTIVE;
-                            enforceSafeMediaVolume(caller);
-                        } else {
-                            // We have existing playback time recorded, already confirmed.
-                            mSafeMediaVolumeState = SAFE_MEDIA_VOLUME_INACTIVE;
-                        }
-                    }
                 } else {
                     persistedState = SAFE_MEDIA_VOLUME_DISABLED;
-                    mSafeMediaVolumeState = SAFE_MEDIA_VOLUME_DISABLED;
                 }
                 mMcc = mcc;
                 sendMsg(mAudioHandler,
@@ -5862,7 +5846,7 @@ public class AudioService extends IAudioService.Stub {
     private static final int SAFE_MEDIA_VOLUME_DISABLED = 1;
     private static final int SAFE_MEDIA_VOLUME_INACTIVE = 2;  // confirmed
     private static final int SAFE_MEDIA_VOLUME_ACTIVE = 3;  // unconfirmed
-    private Integer mSafeMediaVolumeState;
+    private final Integer mSafeMediaVolumeState = SAFE_MEDIA_VOLUME_DISABLED;
 
     private int mMcc = 0;
     // mSafeMediaVolumeIndex is the cached value of config_safe_media_volume_index property
@@ -5874,56 +5858,16 @@ public class AudioService extends IAudioService.Stub {
     // When this time reaches UNSAFE_VOLUME_MUSIC_ACTIVE_MS_MAX, the safe media volume is re-enabled
     // automatically. mMusicActiveMs is rounded to a multiple of MUSIC_ACTIVE_POLL_PERIOD_MS.
     private int mMusicActiveMs;
-    private static final int UNSAFE_VOLUME_MUSIC_ACTIVE_MS_MAX = (20 * 3600 * 1000); // 20 hours
+    private static final int UNSAFE_VOLUME_MUSIC_ACTIVE_MS_MAX = Integer.MAX_VALUE; // Basically infinite
     private static final int MUSIC_ACTIVE_POLL_PERIOD_MS = 60000;  // 1 minute polling interval
     private static final int SAFE_VOLUME_CONFIGURE_TIMEOUT_MS = 30000;  // 30s after boot completed
-
+    
     private void setSafeMediaVolumeEnabled(boolean on, String caller) {
-        synchronized (mSafeMediaVolumeState) {
-            if ((mSafeMediaVolumeState != SAFE_MEDIA_VOLUME_NOT_CONFIGURED) &&
-                    (mSafeMediaVolumeState != SAFE_MEDIA_VOLUME_DISABLED)) {
-                if (on && (mSafeMediaVolumeState == SAFE_MEDIA_VOLUME_INACTIVE)) {
-                    mSafeMediaVolumeState = SAFE_MEDIA_VOLUME_ACTIVE;
-                    enforceSafeMediaVolume(caller);
-                } else if (!on && (mSafeMediaVolumeState == SAFE_MEDIA_VOLUME_ACTIVE)) {
-                    mSafeMediaVolumeState = SAFE_MEDIA_VOLUME_INACTIVE;
-                    mMusicActiveMs = 1;  // nonzero = confirmed
-                    saveMusicActiveMs();
-                    sendMsg(mAudioHandler,
-                            MSG_CHECK_MUSIC_ACTIVE,
-                            SENDMSG_REPLACE,
-                            0,
-                            0,
-                            caller,
-                            MUSIC_ACTIVE_POLL_PERIOD_MS);
-                }
-            }
-        }
+        // Nothing to do here!
     }
-
+    
     private void enforceSafeMediaVolume(String caller) {
-        VolumeStreamState streamState = mStreamStates[AudioSystem.STREAM_MUSIC];
-        int devices = mSafeMediaVolumeDevices;
-        int i = 0;
-
-        while (devices != 0) {
-            int device = 1 << i++;
-            if ((device & devices) == 0) {
-                continue;
-            }
-            int index = streamState.getIndex(device);
-            if (index > mSafeMediaVolumeIndex) {
-                streamState.setIndex(mSafeMediaVolumeIndex, device, caller);
-                sendMsg(mAudioHandler,
-                        MSG_SET_DEVICE_VOLUME,
-                        SENDMSG_QUEUE,
-                        device,
-                        0,
-                        streamState,
-                        0);
-            }
-            devices &= ~device;
-        }
+        // Chuck it!
     }
 
     private boolean checkSafeMediaVolume(int streamType, int index, int device) {
