@@ -84,6 +84,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.halogenos.hardware.buttons.IButtonBacklightControl;
+
 import static android.os.PowerManagerInternal.POWER_HINT_INTERACTION;
 import static android.os.PowerManagerInternal.WAKEFULNESS_ASLEEP;
 import static android.os.PowerManagerInternal.WAKEFULNESS_AWAKE;
@@ -502,6 +504,8 @@ public final class PowerManagerService extends SystemService
 
     // True if brightness should be affected by twilight.
     private boolean mBrightnessUseTwilight;
+    
+    private IButtonBacklightControl mButtonBacklightControl;
 
     private native void nativeInit();
 
@@ -797,6 +801,10 @@ public final class PowerManagerService extends SystemService
         }
 
         mDirty |= DIRTY_SETTINGS;
+    }
+    
+    public void setButtonBacklightControl(IButtonBacklightControl control) {
+        mButtonBacklightControl = control;
     }
 
     private void postAfterBootCompleted(Runnable r) {
@@ -1214,6 +1222,13 @@ public final class PowerManagerService extends SystemService
             switch (mWakefulness) {
                 case WAKEFULNESS_ASLEEP:
                     Slog.i(TAG, "Waking up from sleep (uid " + reasonUid +")...");
+                    try {
+                        if(mButtonBacklightControl.currentTimeout == -1)
+                            mButtonBacklightControl.handleBrightnessChange(
+                                mButtonBacklightControl.currentBrightnessSetting);
+                    } catch(Exception e) {
+                        // Huh?
+                    }
                     break;
                 case WAKEFULNESS_DREAMING:
                     Slog.i(TAG, "Waking up from dream (uid " + reasonUid +")...");
@@ -1713,12 +1728,34 @@ public final class PowerManagerService extends SystemService
                 final int screenOffTimeout = getScreenOffTimeoutLocked(sleepTimeout);
                 final int screenDimDuration = getScreenDimDurationLocked(screenOffTimeout);
                 final boolean userInactiveOverride = mUserInactiveOverrideFromWindowManager;
+                final int buttonBacklightTimeout = 
+                    (mButtonBacklightControl != null
+                        ? mButtonBacklightControl.currentTimeout()
+                        : -2);
 
                 mUserActivitySummary = 0;
                 if (mLastUserActivityTime >= mLastWakeTime) {
                     nextTimeout = mLastUserActivityTime
                             + screenOffTimeout - screenDimDuration;
                     if (now < nextTimeout) {
+                        if(buttonBacklightTimeout > 0 &&
+                            mButtonBacklightControl.currentBrightnessSetting() != 0) {
+                            try {
+                                if (now > mLastUserActivityTime + buttonBacklightTimeout * 1000)
+                                    mButtonBacklightControl.handleBrightnessChange(0);
+                                else {
+                                    mButtonBacklightControl
+                                        .handleBrightnessChange(mButtonBacklightControl
+                                            .currentBrightnessSetting());
+                                    nextTimeout = now + buttonBacklightTimeout * 1000;
+                                }
+                            } catch(Exception e) {
+                                // Huh? This should not happen.
+                                // Is very very unlikely to happen.
+                                // These try-catch blocks are there to avoid
+                                // any possible system crash related to this.
+                            }
+                        }
                         mUserActivitySummary = USER_ACTIVITY_SCREEN_BRIGHT;
                     } else {
                         nextTimeout = mLastUserActivityTime + screenOffTimeout;
@@ -1774,6 +1811,13 @@ public final class PowerManagerService extends SystemService
                     mHandler.sendMessageAtTime(msg, nextTimeout);
                 }
             } else {
+                if(mUserActivitySummary != 0) {
+                    try {
+                        mButtonBacklightControl.setBrightness(0);
+                    } catch(Exception e) {
+                        // Huh?
+                    }
+                }
                 mUserActivitySummary = 0;
             }
 

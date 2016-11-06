@@ -3770,6 +3770,30 @@ public final class Settings {
         public static final String SHOW_NAVBAR =
                                 "user_wants_show_navbar";
         
+        
+        /**
+         * Button backlight brightness
+         * 
+         * @hide
+         */
+        public static final String BUTTON_BACKLIGHT_BRIGHTNESS =
+                                "button_backlight_brightness";
+        
+        /**
+         * Button backlight timeout
+         * 
+         * @hide
+         */
+        public static final String BUTTON_BACKLIGHT_TIMEOUT =
+                                "button_backlight_timeout";
+        
+        /**
+         * Button backlight control type
+         * 
+         * @hide
+         */
+        public static final String BUTTON_BACKLIGHT_CONTROL_TYPE =
+                                "button_backlight_control_type";
         /**
          * Hardware buttons toggle
          * 
@@ -3900,6 +3924,8 @@ public final class Settings {
             PUBLIC_SETTINGS.add(LONG_PRESS_HOME_BUTTON_BEHAVIOR);
             PUBLIC_SETTINGS.add(SHOW_NAVBAR);
             PUBLIC_SETTINGS.add(HARDWARE_BUTTONS_ENABLED);
+            PUBLIC_SETTINGS.add(BUTTON_BACKLIGHT_BRIGHTNESS);
+            PUBLIC_SETTINGS.add(BUTTON_BACKLIGHT_TIMEOUT);
         }
 
         /**
@@ -3946,6 +3972,7 @@ public final class Settings {
             PRIVATE_SETTINGS.add(POINTER_SPEED);
             PRIVATE_SETTINGS.add(LOCK_TO_APP_ENABLED);
             PRIVATE_SETTINGS.add(EGG_MODE);
+            PRIVATE_SETTINGS.add(BUTTON_BACKLIGHT_CONTROL_TYPE);
         }
 
         /**

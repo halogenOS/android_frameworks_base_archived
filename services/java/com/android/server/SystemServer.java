@@ -1548,6 +1548,8 @@ public final class SystemServer {
                 Slog.d(TAG, "Starting Hardware Control Service...");
                 HardwareControlService hws =
                     mSystemServiceManager.startService(HardwareControlService.class);
+                mPowerManagerService.setButtonBacklightControl(
+                    hws.getButtonBacklightControl());
                 Slog.d(TAG, "Hardware Control Service started successfully.");
             }
         } catch(Exception ex) {
