@@ -26,6 +26,7 @@ import android.util.Log;
 
 import java.lang.reflect.Constructor;
 
+import org.halogenos.hardware.buttons.IButtonBacklightControl;
 import org.halogenos.hardware.buttons.KeyDisablerUtils;
 
 /**
@@ -42,6 +43,7 @@ class HardwareControlService extends SystemService {
     
     /* Hardware Control Components */
     
+    private IButtonBacklightControl mButtonBacklightControl;
     
     /* --------------------------- */
 
@@ -105,10 +107,40 @@ class HardwareControlService extends SystemService {
                 Settings.System.putIntForUser(resolver,
                     Settings.System.HARDWARE_BUTTONS_ENABLED,
                     1, UserHandle.USER_CURRENT);
+            // Button backlight
+            mButtonBacklightControl.ready();
+            int currentBlSetting = Settings.System.getIntForUser(resolver,
+                Settings.System.BUTTON_BACKLIGHT_BRIGHTNESS, -10,
+                    UserHandle.USER_CURRENT);
+            if(currentBlSetting == -10) {
+                if(mButtonBacklightControl.CONTROL_TYPE !=
+                    mButtonBacklightControl.CONTROL_TYPE_NONE) {
+                    mButtonBacklightControl.setBrightness(1000); // 1000 = MAX
+                    Settings.System.putIntForUser(resolver,
+                        Settings.System.BUTTON_BACKLIGHT_BRIGHTNESS, 1000,
+                        UserHandle.USER_CURRENT);
+                    Settings.System.putIntForUser(resolver,
+                        Settings.System.BUTTON_BACKLIGHT_TIMEOUT,
+                        3, UserHandle.USER_CURRENT);
+                }
+            }
+
+            if (IButtonBacklightControl.currentControlType(resolver) !=
+                mButtonBacklightControl.CONTROL_TYPE) {
+                Settings.System.putIntForUser(resolver,
+                    Settings.System.BUTTON_BACKLIGHT_CONTROL_TYPE,
+                    mButtonBacklightControl.CONTROL_TYPE, UserHandle.USER_CURRENT);
+            }
         }
         
         public void observe() {
             ContentResolver resolver = mContext.getContentResolver();
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.BUTTON_BACKLIGHT_BRIGHTNESS), false, this,
+                    UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.BUTTON_BACKLIGHT_TIMEOUT), false, this,
+                    UserHandle.USER_ALL);
             if(isKeyDisablerSupported)
                 resolver.registerContentObserver(Settings.System.getUriFor(
                         Settings.System.HARDWARE_BUTTONS_ENABLED), false, this,
@@ -118,6 +150,21 @@ class HardwareControlService extends SystemService {
         @Override
         public void onChange(boolean selfChange) {
             ContentResolver resolver = mContext.getContentResolver();
+            int br = 
+                Settings.System.getIntForUser(
+                    resolver,
+                    Settings.System.BUTTON_BACKLIGHT_BRIGHTNESS,
+                    0, UserHandle.USER_CURRENT
+                );
+            int tm =
+                Settings.System.getIntForUser(
+                    resolver,
+                    Settings.System.BUTTON_BACKLIGHT_TIMEOUT,
+                    0, UserHandle.USER_CURRENT
+                );
+            mButtonBacklightControl.handleBrightnessChange(br);
+            mButtonBacklightControl.currentBrightnessSetting = br;
+            mButtonBacklightControl.currentTimeout = tm;
             if(isKeyDisablerSupported)
                 KeyDisablerUtils.setHwKeysEnabled(
                     Settings.System.getIntForUser(resolver,
@@ -164,11 +211,24 @@ class HardwareControlService extends SystemService {
      **/
     private boolean loadHardwareComponents() {
         try {
-             
+            mButtonBacklightControl = (IButtonBacklightControl)
+                loadHardwareComponent(IButtonBacklightControl.COMPONENT_NAME);
+            if(mButtonBacklightControl == null)
+                mButtonBacklightControl = new IButtonBacklightControl();
         } catch(Exception e) {
             return false;
         }
         return true;
+    }
+    
+    /**
+     * Get the button backlight control object
+     * 
+     * This is used by the System Server to assign the reference to the
+     * current instance to a variable in PowerManagerService
+     **/
+    IButtonBacklightControl getButtonBacklightControl() {
+        return mButtonBacklightControl;
     }
 
 }
