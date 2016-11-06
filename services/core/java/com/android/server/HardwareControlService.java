@@ -26,6 +26,8 @@ import android.util.Log;
 
 import java.lang.reflect.Constructor;
 
+import org.halogenos.hardware.buttons.KeyDisablerUtils;
+
 /**
  * Hardware Control Service is supposed to be used to handle hardware-specific
  * settings and other important things related to hardware. Things like
@@ -80,6 +82,8 @@ class HardwareControlService extends SystemService {
     }
     
     private class SettingsObserver extends ContentObserver {
+        private boolean isKeyDisablerSupported;
+        
         public SettingsObserver(Handler handler) {
             super(handler);
         }
@@ -89,15 +93,35 @@ class HardwareControlService extends SystemService {
          **/
         public void prepare() {
             ContentResolver resolver = mContext.getContentResolver();
+            // KeyDisabler
+            isKeyDisablerSupported = KeyDisablerUtils.areHwKeysSupported();
+            int currentKdSetting = Settings.System.getIntForUser(resolver,
+                Settings.System.HARDWARE_BUTTONS_ENABLED, -2, UserHandle.USER_CURRENT);
+            if(currentKdSetting == -2 && !isKeyDisablerSupported)
+                Settings.System.putIntForUser(resolver,
+                    Settings.System.HARDWARE_BUTTONS_ENABLED,
+                    -1, UserHandle.USER_CURRENT);
+            else if(currentKdSetting == -2 && isKeyDisablerSupported)
+                Settings.System.putIntForUser(resolver,
+                    Settings.System.HARDWARE_BUTTONS_ENABLED,
+                    1, UserHandle.USER_CURRENT);
         }
         
         public void observe() {
             ContentResolver resolver = mContext.getContentResolver();
+            if(isKeyDisablerSupported)
+                resolver.registerContentObserver(Settings.System.getUriFor(
+                        Settings.System.HARDWARE_BUTTONS_ENABLED), false, this,
+                        UserHandle.USER_ALL);
         }
         
         @Override
         public void onChange(boolean selfChange) {
             ContentResolver resolver = mContext.getContentResolver();
+            if(isKeyDisablerSupported)
+                KeyDisablerUtils.setHwKeysEnabled(
+                    Settings.System.getIntForUser(resolver,
+                        Settings.System.HARDWARE_BUTTONS_ENABLED, 0, UserHandle.USER_CURRENT) == 1);
         }
     }
     

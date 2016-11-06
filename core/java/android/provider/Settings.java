@@ -3769,6 +3769,14 @@ public final class Settings {
          */
         public static final String SHOW_NAVBAR =
                                 "user_wants_show_navbar";
+        
+        /**
+         * Hardware buttons toggle
+         * 
+         * @hide
+         */
+        public static final String HARDWARE_BUTTONS_ENABLED =
+                                "hardware_buttons_enabled";
 
         /**
          * IMPORTANT: If you add a new public settings you also have to add it to
@@ -3891,6 +3899,7 @@ public final class Settings {
             PUBLIC_SETTINGS.add(DEVICE_SPECIFIC_SETTINGS);
             PUBLIC_SETTINGS.add(LONG_PRESS_HOME_BUTTON_BEHAVIOR);
             PUBLIC_SETTINGS.add(SHOW_NAVBAR);
+            PUBLIC_SETTINGS.add(HARDWARE_BUTTONS_ENABLED);
         }
 
         /**
