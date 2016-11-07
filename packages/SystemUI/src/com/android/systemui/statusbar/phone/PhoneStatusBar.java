@@ -1249,6 +1249,55 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         }
     }
     
+    private synchronized void doNavbarSanityCheckInternal() throws Exception {
+        if
+        /* Translation:
+         * ------------
+         *
+         * If navbar is enabled, but navbar view is null
+         * OR navbar is disabled, but navbar view not null
+         * OR navbar view is not null, but is not attached to window
+         * OR... (Hehe, you can't check if a nulled navbar view has a window token :P
+         *        Only typical chut... (like me when I was 14) would be able to 
+         *        cause such a dumb NullPointerException
+         *          (I know nil pointers are bad (maybe), but why should
+         *          you complain about nal now? NUL is useful in some cases, if not
+         *          more than only some)
+         *       )
+         * => THEN try to handle the navbar properly again because something is terribly wrong
+         *  --> This is just to avoid crashes or any other bugs with navbar.
+         *  ---> User could have spammed toggle
+         *  ---> halogenOS system might have a bad day
+         *  ---> User's phone doesn't like the user
+         *  ---> Or there is just something wrong
+         * BTW: Don't think this implementation is bad just because it could cause
+         *      issues if the user is mad. Other implementations are not better than
+         *      this AFAIK and as far as I have experienced.
+         * BTW BTW: If you ever wonder which mad boy wrote this code:
+         *          @xdevs23
+         * Have fun
+         * 
+         * Yours sincerely
+         * The mad boy who wrote this code
+         */
+        (
+            ( mNavigationBarEnabled && mNavigationBarView == null) ||
+            (!mNavigationBarEnabled && mNavigationBarView != null) ||
+            ( mNavigationBarView != null && mNavigationBarView.getWindowToken() == null)
+        ) onNavbarChangeInternal(mNavigationBarEnabled);
+        if(!mNavigationBarEnabled && mNavigationBarView != null)
+            mNavigationBarView = null;
+    }
+    
+    private synchronized boolean doNavbarSanityCheck() {
+        try {
+            doNavbarSanityCheckInternal();
+            return true;
+        } catch(Exception t) {
+            return false;
+        }
+    }
+    
     private synchronized void onNavbarChangeInternal(boolean enabled) throws Exception {
         if(enabled) {
             if(mNavigationBarView == null || mNavigationBarView.getWindowToken() == null) {
@@ -1262,6 +1311,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                 mWindowManager.removeView(mNavigationBarView);
             mNavigationBarView = null;
         }
+        mNavigationBarEnabled = enabled;
     }
     
     private synchronized void onNavbarChange(final boolean enabled) {
@@ -1281,7 +1331,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                     onNavbarChangeInternal(enabled);
                 }
             } catch(Exception iex) {
-                // Chuck it.
+                doNavbarSanityCheck();
             }
         }
     }
@@ -2894,6 +2944,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             return;
         }
 
+        doNavbarSanityCheck();
         mExpandedVisible = true;
 
         // Expand the window to encompass the full screen in anticipation of the drag.
@@ -3031,6 +3082,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
         mNotificationPanel.closeQs();
 
+        doNavbarSanityCheck();
         mExpandedVisible = false;
 
         visibilityChanged(false);
