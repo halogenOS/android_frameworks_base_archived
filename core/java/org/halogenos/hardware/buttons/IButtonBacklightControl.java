@@ -63,7 +63,8 @@ public class IButtonBacklightControl {
     /// Device-specific maximum brightness value
     public int MAXIMUM_BRIGHTNESS = -1;
     
-    public int currentBrightnessSetting = 1000, currentTimeout = 3;
+    public int currentBrightnessSetting = 1000, currentTimeout = 3,
+               currentBrightness = 0;
 
     /** @hide **/
     public IButtonBacklightControl() {
@@ -76,11 +77,13 @@ public class IButtonBacklightControl {
      * @hide
      **/
     private void setBrightnessDirect(int brightness) {
+        if(currentBrightness == brightness) return;
         if(DEBUG) Log.d(TAG, "Setting brightness: " + brightness);
         FileUtils.writeLine(
             BRIGHTNESS_CONTROL,
             String.valueOf(brightness)
         );
+        currentBrightness = brightness;
     }
 
     /**
@@ -147,6 +150,7 @@ public class IButtonBacklightControl {
             if (MAXIMUM_BRIGHTNESS == -1)
                 MAXIMUM_BRIGHTNESS =
                     Integer.parseInt(FileUtils.readOneLine(MAX_BRIGHTNESS_CONTORL));
+            currentBrightness = getBrightness();
         } catch(Exception e) {
             MAXIMUM_BRIGHTNESS = 100;
         }
