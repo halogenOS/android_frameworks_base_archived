@@ -1720,4 +1720,7 @@
     <string name="sim1">SIM 1</string>
     <string name="sim2">SIM 2</string>
 
+    <!-- NavBar Tuner -->
+    <string name="menu_ime_always_show">Menu / Keyboard Switcher (always show)</string>
+    <string name="search">Search</string>
 </resources>
