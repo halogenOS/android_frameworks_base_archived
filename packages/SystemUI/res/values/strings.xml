@@ -1684,4 +1684,8 @@
     <!-- Label that replaces other notification controls when the notification is from the system
          and cannot be silenced (see @string/show_silently) or blocked (see @string/block) -->
     <string name="cant_silence_or_block">Notifications can\'t be silenced or blocked</string>
+
+    <!-- NavBar Tuner -->
+    <string name="menu_ime_always_show">Menu / Keyboard Switcher (always show)</string>
+    <string name="search">Search</string>
 </resources>
