@@ -290,6 +290,11 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
         mScreenOn = screenOn;
         checkStateChanged();
     }
+    
+    public void refreshColor() {
+        if(mCurrentBitmap != null)
+            Palette.generateAsync(mCurrentBitmap, this);
+    }
 
     public void setBitmap(Bitmap bitmap) {
         if(!mAlive) return;

@@ -88,6 +88,7 @@ public class VisualizerViewWrapper {
         }
         if(!isNull()) {
             if(mPlaying) visualizerView.setPlaying(true);
+            visualizerView.refreshColor();
             visualizerView.setVisible(visible);
         }
     }
