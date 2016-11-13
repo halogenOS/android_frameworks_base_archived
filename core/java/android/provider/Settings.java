@@ -4861,6 +4861,18 @@ public final class Settings {
         public static final Validator THEME_DARK_STYLE_VALIDATOR = BOOLEAN_VALIDATOR;
 
         /**
+         * Lockscreen Visualizer
+         *
+         * @hide
+         */
+       public static final String SHOW_LOCKSCREEN_VISUALIZER =
+                               "show_lockscreen_visualizer";
+       public static final int SHOW_LOCKSCREEN_VISUALIZER_DEFAULT = 1;
+
+       /** @hide */
+       public static final Validator SHOW_LOCKSCREEN_VISUALIZER_VALIDATOR = BOOLEAN_VALIDATOR;
+
+        /**
          * Settings to backup. This is here so that it's in the same place as the settings
          * keys and easy to update.
          *
@@ -4921,6 +4933,7 @@ public final class Settings {
             HAPTIC_FEEDBACK_INTENSITY,
             DISPLAY_COLOR_MODE,
             NOTIFICATION_LIGHT_PULSE,
+            SHOW_LOCKSCREEN_VISUALIZER,
         };
 
         /**
@@ -4988,6 +5001,7 @@ public final class Settings {
             PUBLIC_SETTINGS.add(HAPTIC_FEEDBACK_ENABLED);
             PUBLIC_SETTINGS.add(SHOW_WEB_SUGGESTIONS);
             PUBLIC_SETTINGS.add(VIBRATE_WHEN_RINGING);
+            PUBLIC_SETTINGS.add(SHOW_LOCKSCREEN_VISUALIZER);
         }
 
         /**
@@ -5259,6 +5273,7 @@ public final class Settings {
             VALIDATORS.put(SWIPE_TO_SCREENSHOT, SWIPE_TO_SCREENSHOT_VALIDATOR);
             VALIDATORS.put(THEME_AUTOMATIC_TIME_IS_NIGHT, THEME_AUTOMATIC_TIME_IS_NIGHT_VALIDATOR);
             VALIDATORS.put(THEME_DARK_STYLE, THEME_DARK_STYLE_VALIDATOR);
+            VALIDATORS.put(SHOW_LOCKSCREEN_VISUALIZER, SHOW_LOCKSCREEN_VISUALIZER_VALIDATOR);
         }
 
         /**

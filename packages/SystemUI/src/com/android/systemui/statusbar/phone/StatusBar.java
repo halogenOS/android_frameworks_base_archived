@@ -997,6 +997,9 @@ public class StatusBar extends SystemUI implements DemoMode, TunerService.Tunabl
                         mNotificationPanel.getLockIcon());
         mNotificationPanel.setKeyguardIndicationController(mKeyguardIndicationController);
 
+        getKeyguardBottomAreaView().setKeyguardIndicationController(mKeyguardIndicationController);
+        getKeyguardBottomAreaView().onLockscreenVisualizerChange();
+
         mAmbientIndicationContainer = mStatusBarWindow.findViewById(
                 R.id.ambient_indication_container);
         if (mAmbientIndicationContainer != null) {
@@ -1858,6 +1861,20 @@ public class StatusBar extends SystemUI implements DemoMode, TunerService.Tunabl
             mScrimController.setHasBackdrop(hasArtwork);
         }
 
+        final boolean keyguardVisible = (mState != StatusBarState.SHADE);
+        if(getKeyguardBottomAreaView().mVisualizerView != null &&
+                !mKeyguardFadingAway && keyguardVisible) {
+            getKeyguardBottomAreaView().mVisualizerView.setPlaying(
+                mMediaManager != null && mMediaManager.isMediaPlaybackActive());
+        }
+
+        if (getKeyguardBottomAreaView().mVisualizerView != null &&
+                keyguardVisible && hasArtwork &&
+                (artworkDrawable instanceof BitmapDrawable)) {
+            getKeyguardBottomAreaView().mVisualizerView
+                .setBitmap(((BitmapDrawable)artworkDrawable).getBitmap());
+        }
+
         if ((hasArtwork || DEBUG_MEDIA_FAKE_ARTWORK)
                 && (mState != StatusBarState.SHADE || allowWhenShade)
                 && mFingerprintUnlockController.getMode()
@@ -1959,6 +1976,12 @@ public class StatusBar extends SystemUI implements DemoMode, TunerService.Tunabl
                 }
             }
         }
+
+        if (getKeyguardBottomAreaView().mVisualizerView != null) {
+            getKeyguardBottomAreaView().mVisualizerView
+                .setPlaying(mMediaManager.isMediaPlaybackActive());
+        }
+
         Trace.endSection();
     }
 
@@ -4275,7 +4298,7 @@ public class StatusBar extends SystemUI implements DemoMode, TunerService.Tunabl
             mStatusBarWindowManager.setKeyguardDark(useDarkText);
         }
     }
-    
+
     private void updateDarkThemeStyle(){
         boolean useBlackByDefault = mContext.getResources().getBoolean(
                     com.android.internal.R.bool.config_hasOledDisplay);
@@ -5457,6 +5480,9 @@ public class StatusBar extends SystemUI implements DemoMode, TunerService.Tunabl
             resolver.registerContentObserver(Settings.Secure.getUriFor(
                     Settings.Secure.THEME_MODE),
                     false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.SHOW_LOCKSCREEN_VISUALIZER),
+                    false, this, UserHandle.USER_ALL);
         }
 
         @Override
@@ -5484,6 +5510,8 @@ public class StatusBar extends SystemUI implements DemoMode, TunerService.Tunabl
             updateNavigationBar(false, false);
             updateCutoutOverlay();
             updateDarkThemeStyle();
+            if (mNotificationPanel != null && getKeyguardBottomAreaView() != null)
+              getKeyguardBottomAreaView().onLockscreenVisualizerChange();
         }
     }
 

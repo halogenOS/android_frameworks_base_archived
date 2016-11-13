@@ -48,6 +48,7 @@ public class NotificationMediaManager implements Dumpable {
     private MediaController mMediaController;
     private String mMediaNotificationKey;
     private MediaMetadata mMediaMetadata;
+    private boolean mIsMediaPlaying = false;
 
     private final MediaController.Callback mMediaListener = new MediaController.Callback() {
         @Override
@@ -57,7 +58,7 @@ public class NotificationMediaManager implements Dumpable {
                 Log.v(TAG, "DEBUG_MEDIA: onPlaybackStateChanged: " + state);
             }
             if (state != null) {
-                if (!isPlaybackActive(state.getState())) {
+                if (!(mIsMediaPlaying = isPlaybackActive(state.getState()))) {
                     clearCurrentMediaNotification();
                     mPresenter.updateMediaMetaData(true, true);
                 }
@@ -87,6 +88,10 @@ public class NotificationMediaManager implements Dumpable {
             NotificationEntryManager entryManager) {
         mPresenter = presenter;
         mEntryManager = entryManager;
+    }
+
+    public boolean isMediaPlaybackActive() {
+      return mIsMediaPlaying;
     }
 
     public void onNotificationRemoved(String key) {
