@@ -31,13 +31,12 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 
-import com.android.systemui.cm.UserContentObserver;
-import cyanogenmod.providers.CMSettings;
-
 public class VisualizerView extends View implements Palette.PaletteAsyncListener {
 
     private static final String TAG = VisualizerView.class.getSimpleName();
     private static final boolean DEBUG = false;
+
+    public boolean isVisualizerEnabled = true;
 
     private Paint mPaint;
     private Visualizer mVisualizer;
@@ -47,18 +46,21 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
     private float[] mFFTPoints;
 
     private int mStatusBarState;
-    private boolean mVisualizerEnabled = false;
-    private boolean mVisible = false;
-    private boolean mPlaying = false;
-    private boolean mPowerSaveMode = false;
-    private boolean mDisplaying = false; // the state we're animating to
-    private boolean mDozing = false;
-    private boolean mOccluded = false;
+    protected boolean mVisualizerEnabled = true;
+    protected boolean mVisible = false;
+    protected boolean mPlaying = false;
+    protected boolean mPowerSaveMode = false;
+    protected boolean mDisplaying = false; // the state we're animating to
+    protected boolean mDozing = false;
+    protected boolean mOccluded = false;
+    protected boolean mScreenOn = false;
+    protected boolean mAlive = true;
 
     private int mColor;
+    private int[] colorToFill;
     private Bitmap mCurrentBitmap;
-
-    private SettingsObserver mObserver;
+    
+    private Boolean calculatorLock = false;
 
     private Visualizer.OnDataCaptureListener mVisualizerListener =
             new Visualizer.OnDataCaptureListener() {
@@ -68,20 +70,28 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
 
         @Override
         public void onWaveFormDataCapture(Visualizer visualizer, byte[] bytes, int samplingRate) {
+            
         }
 
         @Override
         public void onFftDataCapture(Visualizer visualizer, byte[] fft, int samplingRate) {
-            for (int i = 0; i < 32; i++) {
-                mValueAnimators[i].cancel();
-                rfk = fft[i * 2 + 2];
-                ifk = fft[i * 2 + 3];
-                magnitude = rfk * rfk + ifk * ifk;
-                dbValue = magnitude > 0 ? (int) (10 * Math.log10(magnitude)) : 0;
-
-                mValueAnimators[i].setFloatValues(mFFTPoints[i * 4 + 1],
-                        mFFTPoints[3] - (dbValue * 16f));
-                mValueAnimators[i].start();
+            if(!mAlive || mFFTPoints == null) return;
+            if(calculatorLock) return;
+            synchronized(calculatorLock) {
+                calculatorLock = true;
+                for (int i = 0; i < 32; i++) {
+                    mValueAnimators[i].cancel();
+                    rfk = fft[i * 2 + 2];
+                    ifk = fft[i * 2 + 3];
+                    magnitude = rfk * rfk + ifk * ifk;
+                    dbValue = magnitude > 0 ? (int) (10 * Math.log10(magnitude)) : 0;
+    
+                    mValueAnimators[i].setFloatValues(mFFTPoints[i * 4 + 1],
+                            mFFTPoints[3] - (dbValue * 16f));
+                    mValueAnimators[i].setDuration(92);
+                    mValueAnimators[i].start();
+                }
+                calculatorLock = false;
             }
         }
     };
@@ -90,7 +100,9 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
         @Override
         public void run() {
             if (DEBUG) {
-                Log.w(TAG, "+++ mLinkVisualizer run()");
+                Log.d(TAG, "screenOn: " + mScreenOn + 
+                    " displaying: " + mDisplaying + " visible: " + mVisible);
+                Log.d(TAG, "+++ mLinkVisualizer run()");
             }
 
             try {
@@ -101,13 +113,13 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
             }
 
             mVisualizer.setEnabled(false);
-            mVisualizer.setCaptureSize(66);
-            mVisualizer.setDataCaptureListener(mVisualizerListener,Visualizer.getMaxCaptureRate(),
+            mVisualizer.setCaptureSize(68);
+            mVisualizer.setDataCaptureListener(mVisualizerListener, Visualizer.getMaxCaptureRate(),
                     false, true);
             mVisualizer.setEnabled(true);
 
             if (DEBUG) {
-                Log.w(TAG, "--- mLinkVisualizer run()");
+                Log.d(TAG, "--- mLinkVisualizer run()");
             }
         }
     };
@@ -138,8 +150,11 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
 
     public VisualizerView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-
-        mColor = Color.TRANSPARENT;
+    }
+    
+    public void ready() {
+        if(!mAlive) return;
+        mColor = Color.WHITE;
 
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
@@ -150,10 +165,11 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
         for (int i = 0; i < 32; i++) {
             final int j = i * 4 + 1;
             mValueAnimators[i] = new ValueAnimator();
-            mValueAnimators[i].setDuration(128);
+            mValueAnimators[i].setDuration(92);
             mValueAnimators[i].addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public void onAnimationUpdate(ValueAnimator animation) {
+                    if(mFFTPoints == null) return;
                     mFFTPoints[j] = (float) animation.getAnimatedValue();
                     postInvalidate();
                 }
@@ -169,36 +185,24 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
         this(context, null, 0);
     }
 
-    private void updateViewVisibility() {
-        final int curVis = getVisibility();
-        final int newVis = mStatusBarState != StatusBarState.SHADE
-                && mVisualizerEnabled ? View.VISIBLE : View.GONE;
-        if (curVis != newVis) {
-            setVisibility(newVis);
-            checkStateChanged();
-        }
-    }
-
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        mObserver = new SettingsObserver(new Handler());
-        mObserver.observe();
-        mObserver.update();
     }
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        mObserver.unobserve();
-        mObserver = null;
         mCurrentBitmap = null;
     }
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-
+        
+        if(!mAlive) return;
+        if(mPaint == null) return;
+        
         float barUnit = w / 32f;
         float barWidth = barUnit * 8f / 9f;
         barUnit = barWidth + (barUnit - barWidth) * 32f / 31f;
@@ -219,23 +223,26 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-
+        if(!mAlive) return;
+        
         if (mVisualizer != null) {
             canvas.drawLines(mFFTPoints, mPaint);
         }
     }
 
     public void setVisible(boolean visible) {
+        if(!mAlive) return;
         if (mVisible != visible) {
             if (DEBUG) {
                 Log.i(TAG, "setVisible() called with visible = [" + visible + "]");
             }
-            mVisible = visible;
-            checkStateChanged();
+            mVisible = visible && mScreenOn && mPlaying;
+            if(mScreenOn) checkStateChanged();
         }
     }
 
     public void setDozing(boolean dozing) {
+        if(!mAlive) return;
         if (mDozing != dozing) {
             if (DEBUG) {
                 Log.i(TAG, "setDozing() called with dozing = [" + dozing + "]");
@@ -246,16 +253,18 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
     }
 
     public void setPlaying(boolean playing) {
+        if(!mAlive) return;
         if (mPlaying != playing) {
             if (DEBUG) {
                 Log.i(TAG, "setPlaying() called with playing = [" + playing + "]");
             }
-            mPlaying = playing;
+            mPlaying = playing && mScreenOn;
             checkStateChanged();
         }
     }
 
     public void setPowerSaveMode(boolean powerSaveMode) {
+        if(!mAlive) return;
         if (mPowerSaveMode != powerSaveMode) {
             if (DEBUG) {
                 Log.i(TAG, "setPowerSaveMode() called with powerSaveMode = [" + powerSaveMode + "]");
@@ -266,6 +275,7 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
     }
 
     public void setOccluded(boolean occluded) {
+        if(!mAlive) return;
         if (mOccluded != occluded) {
             if (DEBUG) {
                 Log.i(TAG, "setOccluded() called with occluded = [" + occluded + "]");
@@ -274,15 +284,15 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
             checkStateChanged();
         }
     }
-
-    public void setStatusBarState(int statusBarState) {
-        if (mStatusBarState != statusBarState) {
-            mStatusBarState = statusBarState;
-            updateViewVisibility();
-        }
+    
+    public void setScreenOn(boolean screenOn) {
+        if(screenOn) mDisplaying = false;
+        mScreenOn = screenOn;
+        checkStateChanged();
     }
 
     public void setBitmap(Bitmap bitmap) {
+        if(!mAlive) return;
         if (mCurrentBitmap == bitmap) {
             return;
         }
@@ -290,12 +300,13 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
         if (bitmap != null) {
             Palette.generateAsync(bitmap, this);
         } else {
-            setColor(Color.TRANSPARENT);
+            setColor(Color.WHITE);
         }
     }
 
     @Override
     public void onGenerated(Palette palette) {
+        if(!mAlive) return;
         int color = Color.TRANSPARENT;
 
         color = palette.getVibrantColor(color);
@@ -309,12 +320,13 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
         setColor(color);
     }
 
-    private void setColor(int color) {
+    protected void setColor(int color) {
+        if(!mAlive) return;
         if (color == Color.TRANSPARENT) {
             color = Color.WHITE;
         }
 
-        color = Color.argb(140, Color.red(color), Color.green(color), Color.blue(color));
+        color = Color.argb(138, Color.red(color), Color.green(color), Color.blue(color));
 
         if (mColor != color) {
             mColor = color;
@@ -326,8 +338,8 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
 
                 mVisualizerColorAnimator = ObjectAnimator.ofArgb(mPaint, "color",
                         mPaint.getColor(), mColor);
-                mVisualizerColorAnimator.setStartDelay(600);
-                mVisualizerColorAnimator.setDuration(1200);
+                mVisualizerColorAnimator.setStartDelay(420);
+                mVisualizerColorAnimator.setDuration(1080);
                 mVisualizerColorAnimator.start();
             } else {
                 mPaint.setColor(mColor);
@@ -335,25 +347,48 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
         }
     }
 
-    private void checkStateChanged() {
-        if (getVisibility() == View.VISIBLE && mVisible && mPlaying && !mDozing && !mPowerSaveMode
+    protected void checkStateChanged() {
+        if(!mAlive) return;
+        if(!isVisualizerEnabled) {
+            if(DEBUG) Log.d(TAG, "Visualizer not enabled!");
+            mVisualizerEnabled = false;
+            mVisible = false;
+            mPlaying = false;
+            mPowerSaveMode = false;
+            mDisplaying = false;
+            mDozing = false;
+            mOccluded = false;
+            return;
+        }
+        if(DEBUG)
+            Log.d(TAG,
+                "mVisible: " + mVisible + " mPlaying: " + mPlaying + " " +
+                "mDozing:  " + mDozing  + " mPowerSaveMode: " + mPowerSaveMode + " " +
+                "mVisualizerEnabled: "  + mVisualizerEnabled + " " +
+                "mOccluded: " + mOccluded + " mScreenOn: " + mScreenOn + " mDisplaying: " + mDisplaying + " " +
+                "visible:  " + (getVisibility() == View.VISIBLE)
+            );
+        if (getVisibility() == View.VISIBLE && mScreenOn && mVisible && mPlaying && !mDozing && !mPowerSaveMode
                 && mVisualizerEnabled && !mOccluded) {
+            if(DEBUG) Log.d(TAG, "We are good!");
             if (!mDisplaying) {
+                if(DEBUG) Log.d(TAG, "Setting visualizer on fire!");
                 mDisplaying = true;
                 AsyncTask.execute(mLinkVisualizer);
                 animate()
                         .alpha(1f)
                         .withEndAction(null)
-                        .setDuration(800);
+                        .setDuration(720);
             }
         } else {
             if (mDisplaying) {
+                if(DEBUG) Log.d(TAG, "Getting rid of visualizer");
                 mDisplaying = false;
                 if (mVisible) {
                     animate()
                             .alpha(0f)
                             .withEndAction(mAsyncUnlinkVisualizer)
-                            .setDuration(600);
+                            .setDuration(540);
                 } else {
                     animate().
                             alpha(0f)
@@ -363,33 +398,30 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
             }
         }
     }
-
-    private class SettingsObserver extends UserContentObserver {
-
-        public SettingsObserver(Handler handler) {
-            super(handler);
+    
+    public void destroy() {
+        if(DEBUG) Log.d(TAG, "DESTROY");
+        mAlive = false;
+        mVisualizerEnabled = false;
+        mVisible = false;
+        mPlaying = false;
+        mPowerSaveMode = false;
+        mDisplaying = false;
+        mDozing = false;
+        mOccluded = false;
+        mPaint = null;
+        if(mVisualizer != null) {
+            mVisualizer.setEnabled(false);
+            mVisualizer.release();
+            mVisualizer = null;
         }
-
-        @Override
-        protected void update() {
-            mVisualizerEnabled = CMSettings.Secure.getInt(getContext().getContentResolver(),
-                    CMSettings.Secure.LOCKSCREEN_VISUALIZER_ENABLED, 1) != 0;
-            checkStateChanged();
-            updateViewVisibility();
-        }
-
-        @Override
-        protected void observe() {
-            super.observe();
-            getContext().getContentResolver().registerContentObserver(
-                    CMSettings.Secure.getUriFor(CMSettings.Secure.LOCKSCREEN_VISUALIZER_ENABLED),
-                    false, this, UserHandle.USER_CURRENT);
-        }
-
-        @Override
-        protected void unobserve() {
-            super.unobserve();
-            getContext().getContentResolver().unregisterContentObserver(this);
-        }
+        mVisualizerColorAnimator = null;
+        mValueAnimators = null;
+        mFFTPoints = null;
+        mStatusBarState = 0;
+        mColor = 0;
+        mCurrentBitmap = null;
+        mVisualizerListener = null;
     }
+
 }

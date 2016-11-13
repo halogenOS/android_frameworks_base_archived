@@ -536,6 +536,8 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                 if (!isPlaybackActive(state.getState())) {
                     clearCurrentMediaNotification();
                     updateMediaMetaData(true, true);
+                    mKeyguardBottomArea.mVisualizerView
+                        .setPlaying(state.getState() == PlaybackState.STATE_PLAYING);
                 }
             }
         }
@@ -2416,6 +2418,21 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                 && mStatusBarKeyguardViewManager.isOccluded();
 
         final boolean hasArtwork = artworkDrawable != null;
+        
+        final boolean keyguardVisible = (mState != StatusBarState.SHADE);
+        if(hasArtwork && !mKeyguardFadingAway && keyguardVisible)
+            mKeyguardBottomArea.mVisualizerView.setPlaying(
+                mMediaController != null
+                    && mMediaController.getPlaybackState() != null
+                    && mMediaController.getPlaybackState().getState()
+                            == PlaybackState.STATE_PLAYING);
+        
+        if (keyguardVisible && hasArtwork &&
+            (artworkDrawable instanceof BitmapDrawable))
+            mKeyguardBottomArea.mVisualizerView
+                .setBitmap(((BitmapDrawable)artworkDrawable).getBitmap());
+        
+        mKeyguardBottomArea.mVisualizerView.prepare();
 
         if ((hasArtwork || DEBUG_MEDIA_FAKE_ARTWORK)
                 && (mState != StatusBarState.SHADE || allowWhenShade)
