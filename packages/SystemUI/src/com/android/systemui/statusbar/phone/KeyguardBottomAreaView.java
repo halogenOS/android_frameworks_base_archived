@@ -61,6 +61,7 @@ import com.android.systemui.assist.AssistManager;
 import com.android.systemui.statusbar.CommandQueue;
 import com.android.systemui.statusbar.KeyguardAffordanceView;
 import com.android.systemui.statusbar.KeyguardIndicationController;
+import com.android.systemui.statusbar.VisualizerViewWrapper;
 import com.android.systemui.statusbar.policy.AccessibilityController;
 import com.android.systemui.statusbar.policy.FlashlightController;
 import com.android.systemui.statusbar.policy.PreviewInflater;
@@ -93,6 +94,8 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
     private static final Intent PHONE_INTENT = new Intent(Intent.ACTION_DIAL);
     private static final int DOZE_ANIMATION_STAGGER_DELAY = 48;
     private static final int DOZE_ANIMATION_ELEMENT_DURATION = 250;
+    
+    public VisualizerViewWrapper mVisualizerView;
 
     private EmergencyButton mEmergencyButton;
     private KeyguardAffordanceView mCameraImageView;
@@ -147,6 +150,11 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
     public KeyguardBottomAreaView(Context context, AttributeSet attrs, int defStyleAttr,
             int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
+        lsvInit(context);
+    }
+    
+    private void lsvInit(Context context) {
+        mVisualizerView = new VisualizerViewWrapper(context, this);
     }
 
     private AccessibilityDelegate mAccessibilityDelegate = new AccessibilityDelegate() {
@@ -212,6 +220,7 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
         mCameraImageView.setOnClickListener(this);
         mLeftAffordanceView.setOnClickListener(this);
         initAccessibility();
+        mVisualizerView.ready();
     }
 
     private void initAccessibility() {
@@ -667,16 +676,23 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
         @Override
         public void onScreenTurnedOn() {
             mLockIcon.setScreenOn(true);
+            mVisualizerView.prepare();
+            mVisualizerView.setScreenOn(true);
+            mVisualizerView.setVisible(true);
         }
 
         @Override
         public void onScreenTurnedOff() {
             mLockIcon.setScreenOn(false);
+            mVisualizerView.setScreenOn(false);
+            mVisualizerView.setVisible(false);
+            mVisualizerView.vanish();
         }
 
         @Override
         public void onKeyguardVisibilityChanged(boolean showing) {
             mLockIcon.update();
+            if(!showing) mVisualizerView.vanish();
         }
 
         @Override
