@@ -48,6 +48,7 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.os.UserHandle;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.service.media.CameraPrewarmService;
 import android.telecom.TelecomManager;
 import android.text.TextUtils;
@@ -77,6 +78,8 @@ import com.android.systemui.plugins.IntentButtonProvider.IntentButton;
 import com.android.systemui.plugins.IntentButtonProvider.IntentButton.IconState;
 import com.android.systemui.statusbar.KeyguardAffordanceView;
 import com.android.systemui.statusbar.KeyguardIndicationController;
+import com.android.systemui.statusbar.NotificationMediaManager;
+import com.android.systemui.statusbar.VisualizerViewWrapper;
 import com.android.systemui.statusbar.policy.AccessibilityController;
 import com.android.systemui.statusbar.policy.ExtensionController;
 import com.android.systemui.statusbar.policy.ExtensionController.Extension;
@@ -116,6 +119,10 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
     private static final Intent PHONE_INTENT = new Intent(Intent.ACTION_DIAL);
     private static final int DOZE_ANIMATION_STAGGER_DELAY = 48;
     private static final int DOZE_ANIMATION_ELEMENT_DURATION = 250;
+
+    public VisualizerViewWrapper mVisualizerView;
+    public boolean mVisualizerEnabled =
+            Settings.System.SHOW_LOCKSCREEN_VISUALIZER_DEFAULT == 1;
 
     private KeyguardAffordanceView mRightAffordanceView;
     private KeyguardAffordanceView mLeftAffordanceView;
@@ -169,6 +176,9 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
     private int mBurnInXOffset;
     private int mBurnInYOffset;
     private ActivityIntentHelper mActivityIntentHelper;
+
+    private final NotificationMediaManager mMediaManager =
+        Dependency.get(NotificationMediaManager.class);
 
     public KeyguardBottomAreaView(Context context) {
         this(context, null);
@@ -281,6 +291,16 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
         getContext().registerReceiverAsUser(mDevicePolicyReceiver,
                 UserHandle.ALL, filter, null, null);
         KeyguardUpdateMonitor.getInstance(mContext).registerCallback(mUpdateMonitorCallback);
+        mMediaManager.setOnArtworkChangeListener(new NotificationMediaManager.ArtworkChangedListener() {
+            public void onArtworkChanged(boolean playbackActive) {
+                mVisualizerView.setPlaying(playbackActive);
+            }
+        });
+        mMediaManager.setVisualizerViewBridge(new NotificationMediaManager.VisualizerViewBridge() {
+            public VisualizerViewWrapper getVisualizerView() {
+                return mVisualizerView;
+            }
+        });
     }
 
     @Override
@@ -690,11 +710,44 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
         }
     };
 
+    public final void onLockscreenVisualizerChange() {
+        mVisualizerEnabled = Settings.System.getIntForUser(mContext.getContentResolver(),
+                Settings.System.SHOW_LOCKSCREEN_VISUALIZER,
+                Settings.System.SHOW_LOCKSCREEN_VISUALIZER_DEFAULT,
+                UserHandle.USER_CURRENT) == 1;
+        if(mVisualizerEnabled && mVisualizerView == null) {
+            mVisualizerView = new VisualizerViewWrapper(getContext(), this);
+        } else if(!mVisualizerEnabled && mVisualizerView != null) {
+            synchronized(mVisualizerView) {
+                mVisualizerView.vanish();
+                mVisualizerView = null;
+            }
+        }
+    }
+
     private final KeyguardUpdateMonitorCallback mUpdateMonitorCallback =
             new KeyguardUpdateMonitorCallback() {
                 @Override
                 public void onUserSwitchComplete(int userId) {
                     updateCameraVisibility();
+                }
+
+                @Override
+                public void onScreenTurnedOn() {
+                    if(mVisualizerView != null)
+                        mVisualizerView.onScreenOn();
+                }
+
+                @Override
+                public void onScreenTurnedOff() {
+                    if(mVisualizerView != null)
+                        mVisualizerView.onScreenOff();
+                }
+
+                @Override
+                public void onKeyguardVisibilityChanged(boolean showing) {
+                    if(mVisualizerView != null)
+                        mVisualizerView.setKeyguardShowing(showing);
                 }
 
                 @Override

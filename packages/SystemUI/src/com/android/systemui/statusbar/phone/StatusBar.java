@@ -911,6 +911,8 @@ public class StatusBar extends SystemUI implements DemoMode,
                         mStatusBarWindow.findViewById(R.id.lock_icon));
         mNotificationPanel.setKeyguardIndicationController(mKeyguardIndicationController);
 
+        getKeyguardBottomAreaView().onLockscreenVisualizerChange();
+
         mAmbientIndicationContainer = mStatusBarWindow.findViewById(
                 R.id.ambient_indication_container);
 
@@ -3762,6 +3764,9 @@ public class StatusBar extends SystemUI implements DemoMode,
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.DOUBLE_TAP_SLEEP_LOCKSCREEN),
                     false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.SHOW_LOCKSCREEN_VISUALIZER),
+                    false, this, UserHandle.USER_ALL);
         }
 
         @Override
@@ -3771,6 +3776,8 @@ public class StatusBar extends SystemUI implements DemoMode,
 
         public void update() {
             setStatusDoubleTapToSleep();
+            if (mNotificationPanel != null && getKeyguardBottomAreaView() != null)
+                getKeyguardBottomAreaView().onLockscreenVisualizerChange();
         }
     }
 

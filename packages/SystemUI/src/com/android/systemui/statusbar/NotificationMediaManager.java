@@ -57,6 +57,7 @@ import com.android.systemui.Dumpable;
 import com.android.systemui.Interpolators;
 import com.android.systemui.colorextraction.SysuiColorExtractor;
 import com.android.systemui.plugins.statusbar.StatusBarStateController;
+import com.android.systemui.statusbar.VisualizerViewWrapper;
 import com.android.systemui.statusbar.notification.NotificationEntryListener;
 import com.android.systemui.statusbar.notification.NotificationEntryManager;
 import com.android.systemui.statusbar.notification.collection.NotificationEntry;
@@ -133,10 +134,14 @@ public class NotificationMediaManager implements Dumpable {
     private MediaController mMediaController;
     private String mMediaNotificationKey;
     private MediaMetadata mMediaMetadata;
+    private boolean mIsMediaPlaying = false;
 
     private BackDropView mBackdrop;
     private ImageView mBackdropFront;
     private ImageView mBackdropBack;
+
+    private ArtworkChangedListener mOnArtworkChangedListener;
+    private VisualizerViewBridge mVisualizerViewBridge;
 
     private boolean mShowCompactMediaSeekbar;
     private final DeviceConfig.OnPropertiesChangedListener mPropertiesChangedListener =
@@ -163,7 +168,7 @@ public class NotificationMediaManager implements Dumpable {
                 Log.v(TAG, "DEBUG_MEDIA: onPlaybackStateChanged: " + state);
             }
             if (state != null) {
-                if (!isPlaybackActive(state.getState())) {
+                if (!(mIsMediaPlaying = isPlaybackActive(state.getState()))) {
                     clearCurrentMediaNotification();
                 }
                 dispatchUpdateMediaMetaData(true /* changed */, true /* allowAnimation */);
@@ -226,6 +231,10 @@ public class NotificationMediaManager implements Dumpable {
 
     public void setUpWithPresenter(NotificationPresenter presenter) {
         mPresenter = presenter;
+    }
+
+    public boolean isMediaPlaybackActive() {
+      return mIsMediaPlaying;
     }
 
     public void onNotificationRemoved(String key) {
@@ -636,6 +645,18 @@ public class NotificationMediaManager implements Dumpable {
                 }
             }
         }
+
+        final boolean keyguardVisible = (mStatusBarStateController.getState() != StatusBarState.SHADE);
+        if(mVisualizerViewBridge != null &&
+                !mKeyguardMonitor.isKeyguardFadingAway() && keyguardVisible) {
+            mVisualizerViewBridge.getVisualizerView().setPlaying(isMediaPlaybackActive());
+        }
+
+        if (hasArtwork && mVisualizerViewBridge != null &&
+                (artworkDrawable instanceof BitmapDrawable)) {
+            mVisualizerViewBridge.getVisualizerView()
+                .setBitmap(((BitmapDrawable)artworkDrawable).getBitmap());
+        }
     }
 
     public void setup(BackDropView backdrop, ImageView backdropFront, ImageView backdropBack,
@@ -707,6 +728,10 @@ public class NotificationMediaManager implements Dumpable {
                 manager.removeTask(this);
                 manager.finishUpdateMediaMetaData(mMetaDataChanged, mAllowEnterAnimation, result);
             }
+
+            if (manager.mOnArtworkChangedListener != null) {
+                manager.mOnArtworkChangedListener.onArtworkChanged(manager.isMediaPlaybackActive());
+            }
         }
 
         @Override
@@ -721,6 +746,14 @@ public class NotificationMediaManager implements Dumpable {
         }
     }
 
+    public void setOnArtworkChangeListener(ArtworkChangedListener listener) {
+        mOnArtworkChangedListener = listener;
+    }
+
+    public void setVisualizerViewBridge(VisualizerViewBridge bridge) {
+        mVisualizerViewBridge = bridge;
+    }
+
     public interface MediaListener {
         /**
          * Called whenever there's new metadata or playback state.
@@ -729,5 +762,13 @@ public class NotificationMediaManager implements Dumpable {
          * @see PlaybackState.State
          */
         void onMetadataOrStateChanged(MediaMetadata metadata, @PlaybackState.State int state);
+    }
+
+    public interface ArtworkChangedListener {
+        void onArtworkChanged(boolean playbackActive);
+    }
+
+    public interface VisualizerViewBridge {
+        VisualizerViewWrapper getVisualizerView();
     }
 }

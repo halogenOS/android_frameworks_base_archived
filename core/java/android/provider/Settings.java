@@ -4540,6 +4540,18 @@ public final class Settings {
                 BOOLEAN_VALIDATOR;
 
         /**
+         * Lockscreen Visualizer
+         *
+         * @hide
+         */
+        public static final String SHOW_LOCKSCREEN_VISUALIZER =
+                               "show_lockscreen_visualizer";
+        public static final int SHOW_LOCKSCREEN_VISUALIZER_DEFAULT = 1;
+
+        /** @hide */
+        public static final Validator SHOW_LOCKSCREEN_VISUALIZER_VALIDATOR = BOOLEAN_VALIDATOR;
+
+        /**
          * IMPORTANT: If you add a new public settings you also have to add it to
          * PUBLIC_SETTINGS below. If the new setting is hidden you have to add
          * it to PRIVATE_SETTINGS below. Also add a validator that can validate
@@ -4616,6 +4628,7 @@ public final class Settings {
             ADVANCED_REBOOT,
         DOUBLE_TAP_SLEEP_GESTURE,
         DOUBLE_TAP_SLEEP_LOCKSCREEN,
+		SHOW_LOCKSCREEN_VISUALIZER,
         };
 
         /**
@@ -4685,6 +4698,7 @@ public final class Settings {
             PUBLIC_SETTINGS.add(HAPTIC_FEEDBACK_ENABLED);
             PUBLIC_SETTINGS.add(SHOW_WEB_SUGGESTIONS);
             PUBLIC_SETTINGS.add(VIBRATE_WHEN_RINGING);
+			PUBLIC_SETTINGS.add(SHOW_LOCKSCREEN_VISUALIZER);
         }
 
         /**
@@ -4843,6 +4857,7 @@ public final class Settings {
             VALIDATORS.put(BUTTON_BACKLIGHT_TIMEOUT, BUTTON_BACKLIGHT_TIMEOUT_VALIDATOR);
             VALIDATORS.put(BUTTON_BRIGHTNESS, BUTTON_BRIGHTNESS_VALIDATOR);
             VALIDATORS.put(PROXIMITY_ON_WAKE, PROXIMITY_ON_WAKE_VALIDATOR);
+            VALIDATORS.put(SHOW_LOCKSCREEN_VISUALIZER, SHOW_LOCKSCREEN_VISUALIZER_VALIDATOR);
         }
 
         /**
