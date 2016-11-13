@@ -576,6 +576,10 @@ public class StatusBar extends SystemUI implements DemoMode,
                 if (!isPlaybackActive(state.getState())) {
                     clearCurrentMediaNotification();
                     updateMediaMetaData(true, true);
+                    if (mKeyguardBottomArea.mVisualizerView != null) {
+                        mKeyguardBottomArea.mVisualizerView
+                            .setPlaying(state.getState() == PlaybackState.STATE_PLAYING);
+                    }
                 }
             }
         }
@@ -805,6 +809,13 @@ public class StatusBar extends SystemUI implements DemoMode,
                 Settings.Secure.getUriFor(Settings.Secure.LOCK_SCREEN_ALLOW_PRIVATE_NOTIFICATIONS),
                 true,
                 mLockscreenSettingsObserver,
+                UserHandle.USER_ALL);
+
+        mContext.getContentResolver().registerContentObserver(
+                Settings.System.getUriFor(
+                    Settings.System.SHOW_LOCKSCREEN_VISUALIZER),
+                false,
+                mSettingsObserver,
                 UserHandle.USER_ALL);
 
         mBarService = IStatusBarService.Stub.asInterface(
@@ -1072,6 +1083,7 @@ public class StatusBar extends SystemUI implements DemoMode,
                 (ViewGroup) mStatusBarWindow.findViewById(R.id.keyguard_indication_area),
                 mKeyguardBottomArea.getLockIcon());
         mKeyguardBottomArea.setKeyguardIndicationController(mKeyguardIndicationController);
+        mKeyguardBottomArea.onLockscreenVisualizerChange();
 
         // set the initial view visibility
         setAreThereNotifications();
@@ -2384,6 +2396,23 @@ public class StatusBar extends SystemUI implements DemoMode,
                 && mStatusBarKeyguardViewManager.isOccluded();
 
         final boolean hasArtwork = artworkDrawable != null;
+
+        final boolean keyguardVisible = (mState != StatusBarState.SHADE);
+        if(mKeyguardBottomArea.mVisualizerView != null &&
+                !mKeyguardFadingAway && keyguardVisible) {
+            mKeyguardBottomArea.mVisualizerView.setPlaying(
+                mMediaController != null &&
+                mMediaController.getPlaybackState() != null &&
+                mMediaController.getPlaybackState()
+                    .getState() == PlaybackState.STATE_PLAYING);
+        }
+
+        if (mKeyguardBottomArea.mVisualizerView != null &&
+                keyguardVisible && hasArtwork &&
+                (artworkDrawable instanceof BitmapDrawable)) {
+            mKeyguardBottomArea.mVisualizerView
+                .setBitmap(((BitmapDrawable)artworkDrawable).getBitmap());
+        }
 
         if ((hasArtwork || DEBUG_MEDIA_FAKE_ARTWORK)
                 && (mState != StatusBarState.SHADE || allowWhenShade)
@@ -5331,6 +5360,7 @@ public class StatusBar extends SystemUI implements DemoMode,
             setZenMode(mode);
 
             updateLockscreenNotificationSetting();
+            mKeyguardBottomArea.onLockscreenVisualizerChange();
         }
     };
 
