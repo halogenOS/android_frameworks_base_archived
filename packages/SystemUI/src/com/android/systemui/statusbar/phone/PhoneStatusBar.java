@@ -2420,7 +2420,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         final boolean hasArtwork = artworkDrawable != null;
         
         final boolean keyguardVisible = (mState != StatusBarState.SHADE);
-        if(hasArtwork && !mKeyguardFadingAway && keyguardVisible)
+        if(!mKeyguardFadingAway && keyguardVisible)
             mKeyguardBottomArea.mVisualizerView.setPlaying(
                 mMediaController != null
                     && mMediaController.getPlaybackState() != null
@@ -2431,8 +2431,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             (artworkDrawable instanceof BitmapDrawable))
             mKeyguardBottomArea.mVisualizerView
                 .setBitmap(((BitmapDrawable)artworkDrawable).getBitmap());
-        
-        mKeyguardBottomArea.mVisualizerView.prepare();
 
         if ((hasArtwork || DEBUG_MEDIA_FAKE_ARTWORK)
                 && (mState != StatusBarState.SHADE || allowWhenShade)

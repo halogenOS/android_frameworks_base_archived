@@ -223,7 +223,6 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
         mCameraImageView.setOnClickListener(this);
         mLeftAffordanceView.setOnClickListener(this);
         initAccessibility();
-        mVisualizerView.ready();
     }
 
     private void initAccessibility() {
@@ -708,23 +707,19 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
         @Override
         public void onScreenTurnedOn() {
             mLockIcon.setScreenOn(true);
-            mVisualizerView.prepare();
-            mVisualizerView.setScreenOn(true);
-            mVisualizerView.setVisible(true);
+            mVisualizerView.onScreenOn();
         }
 
         @Override
         public void onScreenTurnedOff() {
             mLockIcon.setScreenOn(false);
-            mVisualizerView.setScreenOn(false);
-            mVisualizerView.setVisible(false);
-            mVisualizerView.vanish();
+            mVisualizerView.onScreenOff();
         }
 
         @Override
         public void onKeyguardVisibilityChanged(boolean showing) {
             mLockIcon.update();
-            if(!showing) mVisualizerView.vanish();
+            mVisualizerView.setKeyguardShowing(showing);
         }
 
         @Override
