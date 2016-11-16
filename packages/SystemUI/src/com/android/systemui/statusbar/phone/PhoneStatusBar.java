@@ -536,8 +536,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                 if (!isPlaybackActive(state.getState())) {
                     clearCurrentMediaNotification();
                     updateMediaMetaData(true, true);
-                    mKeyguardBottomArea.mVisualizerView
-                        .setPlaying(state.getState() == PlaybackState.STATE_PLAYING);
+                    if(mKeyguardBottomArea.mVisualizerView != null)
+                        mKeyguardBottomArea.mVisualizerView
+                            .setPlaying(state.getState() == PlaybackState.STATE_PLAYING);
                 }
             }
         }
@@ -710,12 +711,16 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.SHOW_NAVBAR), false, this,
                     UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.SHOW_LOCKSCREEN_VISUALIZER), false, this,
+                    UserHandle.USER_ALL);
         }
 
         @Override
         public void onChange(boolean selfChange) {
             onNavbarChange(Settings.System.getIntForUser(mContext.getContentResolver(),
                 Settings.System.SHOW_NAVBAR, -1, UserHandle.USER_CURRENT) == 1);
+            mKeyguardBottomArea.onLockscreenVisualizerChange();
         }
     }
 
@@ -913,6 +918,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                         R.id.keyguard_indication_text),
                 mKeyguardBottomArea.getLockIcon());
         mKeyguardBottomArea.setKeyguardIndicationController(mKeyguardIndicationController);
+        mKeyguardBottomArea.onLockscreenVisualizerChange();
 
         // set the initial view visibility
         setAreThereNotifications();
@@ -2420,14 +2426,16 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         final boolean hasArtwork = artworkDrawable != null;
         
         final boolean keyguardVisible = (mState != StatusBarState.SHADE);
-        if(!mKeyguardFadingAway && keyguardVisible)
+        if(mKeyguardBottomArea.mVisualizerView != null &&
+            !mKeyguardFadingAway && keyguardVisible)
             mKeyguardBottomArea.mVisualizerView.setPlaying(
                 mMediaController != null
                     && mMediaController.getPlaybackState() != null
                     && mMediaController.getPlaybackState().getState()
                             == PlaybackState.STATE_PLAYING);
         
-        if (keyguardVisible && hasArtwork &&
+        if (mKeyguardBottomArea.mVisualizerView != null &&
+            keyguardVisible && hasArtwork &&
             (artworkDrawable instanceof BitmapDrawable))
             mKeyguardBottomArea.mVisualizerView
                 .setBitmap(((BitmapDrawable)artworkDrawable).getBitmap());

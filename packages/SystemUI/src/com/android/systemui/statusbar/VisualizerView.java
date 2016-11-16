@@ -37,8 +37,6 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
     private static final String TAG = VisualizerView.class.getSimpleName();
     private static final boolean DEBUG = false;
 
-    public boolean isVisualizerEnabled = true;
-
     private Paint mPaint;
     private Visualizer mVisualizer;
     private ObjectAnimator mVisualizerColorAnimator;
@@ -354,16 +352,11 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
 
     protected void checkStateChanged() {
         if(!mAlive) return;
-        if(!isVisualizerEnabled) {
-            if(DEBUG) Log.d(TAG, "Visualizer not enabled!");
-            return;
-        }
         if(DEBUG)
             Log.d(TAG,
                  "mState.mVisible: " + mState.mVisible +
                 " mState.mPlaying: " + mState.mPlaying +
                 " mState.mPowerSaveMode: " + mState.mPowerSaveMode +
-                " mState.mVisualizerEnabled: "  + mState.mVisualizerEnabled +
                 " mState.mOccluded: " + mState.mOccluded +
                 " mState.mScreenOn: " + mState.mScreenOn +
                 " mState.mDisplaying: " + mState.mDisplaying +
@@ -371,8 +364,7 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
                 " color: " + mState.mColor
             );
         if (getVisibility() == View.VISIBLE && mState.mScreenOn &&
-                mState.mVisible && mState.mPlaying &&
-                mState.mVisualizerEnabled) {
+                mState.mVisible && mState.mPlaying) {
             if(DEBUG) Log.d(TAG, "We are good!");
             if (!mState.mDisplaying) {
                 if(DEBUG) Log.d(TAG, "Setting visualizer on fire!");
