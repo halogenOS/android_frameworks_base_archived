@@ -3773,6 +3773,15 @@ public final class Settings {
          */
         public static final String HARDWARE_BUTTONS_ENABLED =
                                 "hardware_buttons_enabled";
+        
+        /**
+         * Lockscreen Visualizer
+         * 
+         * @hide
+         */
+        public static final String SHOW_LOCKSCREEN_VISUALIZER =
+                                "show_lockscreen_visualizer";
+        public static final int SHOW_LOCKSCREEN_VISUALIZER_DEFAULT = 1;
 
         /**
          * IMPORTANT: If you add a new public settings you also have to add it to
@@ -3836,7 +3845,8 @@ public final class Settings {
             LOCK_TO_APP_ENABLED,
             NOTIFICATION_SOUND,
             ACCELEROMETER_ROTATION,
-            SHOW_NAVBAR
+            SHOW_NAVBAR,
+            SHOW_LOCKSCREEN_VISUALIZER
         };
 
         /**
@@ -3898,6 +3908,7 @@ public final class Settings {
             PUBLIC_SETTINGS.add(HARDWARE_BUTTONS_ENABLED);
             PUBLIC_SETTINGS.add(BUTTON_BACKLIGHT_BRIGHTNESS);
             PUBLIC_SETTINGS.add(BUTTON_BACKLIGHT_TIMEOUT);
+            PUBLIC_SETTINGS.add(SHOW_LOCKSCREEN_VISUALIZER);
         }
 
         /**

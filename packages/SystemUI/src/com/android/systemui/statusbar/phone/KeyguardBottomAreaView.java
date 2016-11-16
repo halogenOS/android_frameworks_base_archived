@@ -38,6 +38,7 @@ import android.os.RemoteException;
 import android.os.SystemProperties;
 import android.os.UserHandle;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.service.media.CameraPrewarmService;
 import android.telecom.TelecomManager;
 import android.util.AttributeSet;
@@ -96,6 +97,8 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
     private static final int DOZE_ANIMATION_ELEMENT_DURATION = 250;
     
     public VisualizerViewWrapper mVisualizerView;
+    public boolean mVisualizerEnabled =
+            Settings.System.SHOW_LOCKSCREEN_VISUALIZER_DEFAULT == 1;
 
     private EmergencyButton mEmergencyButton;
     private KeyguardAffordanceView mCameraImageView;
@@ -150,11 +153,6 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
     public KeyguardBottomAreaView(Context context, AttributeSet attrs, int defStyleAttr,
             int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        lsvInit(context);
-    }
-    
-    private void lsvInit(Context context) {
-        mVisualizerView = new VisualizerViewWrapper(context, this);
     }
 
     private AccessibilityDelegate mAccessibilityDelegate = new AccessibilityDelegate() {
@@ -654,6 +652,21 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
             });
         }
     };
+    
+    public final void onLockscreenVisualizerChange() {
+        mVisualizerEnabled = Settings.System.getIntForUser(mContext.getContentResolver(),
+                Settings.System.SHOW_LOCKSCREEN_VISUALIZER,
+                Settings.System.SHOW_LOCKSCREEN_VISUALIZER_DEFAULT,
+                UserHandle.USER_CURRENT) == 1;
+        if(mVisualizerEnabled && mVisualizerView == null) {
+            mVisualizerView = new VisualizerViewWrapper(getContext(), this);
+        } else if(!mVisualizerEnabled && mVisualizerView != null) {
+            synchronized(mVisualizerView) {
+                mVisualizerView.vanish();
+                mVisualizerView = null;
+            }
+        }
+    }
 
     private final KeyguardUpdateMonitorCallback mUpdateMonitorCallback =
             new KeyguardUpdateMonitorCallback() {
@@ -675,19 +688,22 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
         @Override
         public void onScreenTurnedOn() {
             mLockIcon.setScreenOn(true);
-            mVisualizerView.onScreenOn();
+            if(mVisualizerView != null)
+                mVisualizerView.onScreenOn();
         }
 
         @Override
         public void onScreenTurnedOff() {
             mLockIcon.setScreenOn(false);
-            mVisualizerView.onScreenOff();
+            if(mVisualizerView != null)
+                mVisualizerView.onScreenOff();
         }
 
         @Override
         public void onKeyguardVisibilityChanged(boolean showing) {
             mLockIcon.update();
-            mVisualizerView.setKeyguardShowing(showing);
+            if(mVisualizerView != null)
+                mVisualizerView.setKeyguardShowing(showing);
         }
 
         @Override

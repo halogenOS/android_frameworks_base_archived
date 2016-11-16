@@ -29,7 +29,6 @@ public class VisualizerViewWrapper {
     
     static final class StateHolder {
         public boolean
-                mVisualizerEnabled  = true,
                 mVisible            = false,
                 mPlayingIndependent = false,
                 mPlaying            = false,
