@@ -439,6 +439,21 @@ public class NetworkManagementService extends INetworkManagementService.Stub
     }
 
     /**
+     * Notify our observers of a change in the data activity state of the interface
+     */
+    private void notifyInterfaceMessage(String message) {
+        final int length = mObservers.beginBroadcast();
+        for (int i = 0; i < length; i++) {
+            try {
+                mObservers.getBroadcastItem(i). interfaceMessageRecevied(message);
+            } catch (RemoteException e) {
+            } catch (RuntimeException e) {
+            }
+        }
+        mObservers.finishBroadcast();
+    }
+
+    /**
      * Notify our observers of an interface removal.
      */
     private void notifyInterfaceRemoved(String iface) {
@@ -583,21 +598,6 @@ public class NetworkManagementService extends INetworkManagementService.Stub
         if (!nativeServiceAvailable) {
             Slog.wtf(TAG, "Can't connect to NativeNetdService " + NETD_SERVICE_NAME);
         }
-    }
-
-    /**
-     * Notify our observers of a change in the data activity state of the interface
-     */
-    private void notifyInterfaceMessage(String message) {
-        final int length = mObservers.beginBroadcast();
-        for (int i = 0; i < length; i++) {
-            try {
-                mObservers.getBroadcastItem(i).interfaceMessageRecevied(message);
-            } catch (RemoteException e) {
-            } catch (RuntimeException e) {
-            }
-        }
-        mObservers.finishBroadcast();
     }
 
     /**
