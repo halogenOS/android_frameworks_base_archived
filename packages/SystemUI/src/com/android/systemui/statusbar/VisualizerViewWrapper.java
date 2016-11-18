@@ -88,6 +88,14 @@ public class VisualizerViewWrapper {
     
     public synchronized void setPlaying(boolean playing) {
         log("setPlaying=" + playing);
+        // Reset color when stopping, so that the next time when a song is played
+        // the color won't fade from the one of the previous song to the new song,
+        // it will fade in only. This only happens when the user stops the music
+        // and e. g. unlocks his device and doesn't use it for some time. Later,
+        // when he wants to listen to another song, it will just fade out from
+        // transparent into the new color instead of using the old color.
+        if(state.mPlayingIndependent && !playing)
+            state.mColor = Color.TRANSPARENT;
         state.mPlayingIndependent = playing;
         state.mPlaying = playing;
         checkState();
@@ -117,7 +125,10 @@ public class VisualizerViewWrapper {
     public synchronized void setBitmap(Bitmap bitmap) {
         log("setBitmap=[not null: " + (bitmap != null) + "]");
         if(!isNull()) visualizerView.setBitmap(bitmap);
-        else state.mCurrentBitmap = bitmap;
+        else {
+            state.mColor = Color.TRANSPARENT;
+            state.mCurrentBitmap = bitmap;
+        }
     }
     
     private synchronized void ready() {
