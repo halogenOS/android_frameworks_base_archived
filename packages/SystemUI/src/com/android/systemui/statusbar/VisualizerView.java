@@ -24,7 +24,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.media.audiofx.Visualizer;
-import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.UserHandle;
 import android.support.v7.graphics.Palette;
@@ -119,17 +118,21 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
         }
     };
     
-    private final void unlinkVisualizerAsync() {
-        AsyncTask.execute(mUnlinkVisualizer);
+    private final void linkVisualizerAsync() {
+        new Thread(mLinkVisualizer).start();
     }
-
+    
+    private final void unlinkVisualizerAsync() {
+        new Thread(mUnlinkVisualizer).start();
+    }
+    
     private final Runnable mAsyncUnlinkVisualizer = new Runnable() {
         @Override
         public void run() {
             unlinkVisualizerAsync();
         }
     };
-
+    
     private final Runnable mUnlinkVisualizer = new Runnable() {
         @Override
         public void run() {
@@ -140,6 +143,7 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
                         Log.w(TAG, "+++ mUnlinkVisualizer run(), mVisualizer: " + mVisualizer);
                     }
                     if (mVisualizer != null) {
+                        if(DEBUG) Log.d(TAG, "Releasing Visualizer component...");
                         mVisualizer.setEnabled(false);
                         mVisualizer.release();
                         mVisualizer = null;
@@ -369,7 +373,7 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
             if (!mState.mDisplaying) {
                 if(DEBUG) Log.d(TAG, "Setting visualizer on fire!");
                 mState.mDisplaying = true;
-                AsyncTask.execute(mLinkVisualizer);
+                linkVisualizerAsync();
                 animate()
                         .alpha(1f)
                         .withEndAction(null)
