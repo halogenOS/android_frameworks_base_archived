@@ -324,7 +324,7 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
     protected void setColor(int color) {
         if(!mAlive) return;
         
-        Log.d(TAG, "Set color: " + color);
+        if(DEBUG) Log.d(TAG, "Set color: " + color);
         
         if (color == Color.TRANSPARENT) {
             color = Color.WHITE;
