@@ -217,7 +217,6 @@
   <java-symbol type="id" name="permission_remember_layout" />
   <java-symbol type="id" name="permission_remember_choice_checkbox" />
   <java-symbol type="id" name="permission_remember_choice_text" />
-
   <java-symbol type="attr" name="actionModeShareDrawable" />
   <java-symbol type="attr" name="alertDialogCenterButtons" />
   <java-symbol type="attr" name="fragmentBreadCrumbsStyle" />
@@ -314,6 +313,7 @@
   <java-symbol type="bool" name="config_guestUserEphemeral" />
   <java-symbol type="bool" name="config_localDisplaysMirrorContent" />
   <java-symbol type="bool" name="config_enableAppWidgetService" />
+  <java-symbol type="bool" name="single_hand_mode" />
   <java-symbol type="string" name="config_defaultPictureInPictureBounds" />
   <java-symbol type="integer" name="config_wifi_framework_5GHz_preference_boost_threshold" />
   <java-symbol type="integer" name="config_wifi_framework_5GHz_preference_boost_factor" />
