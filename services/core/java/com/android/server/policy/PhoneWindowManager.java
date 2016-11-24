@@ -890,6 +890,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     Settings.System.SHOW_NAVBAR), false, this,
                     UserHandle.USER_ALL);
             updateSettings();
+            updateCustomSettings();
         }
 
         @Override public void onChange(boolean selfChange) {
