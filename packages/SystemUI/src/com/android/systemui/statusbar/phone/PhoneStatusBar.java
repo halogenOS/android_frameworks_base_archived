@@ -689,8 +689,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
         @Override
         public void onChange(boolean selfChange) {
-            onNavbarChange(Settings.System.getIntForUser(mContext.getContentResolver(),
-                Settings.System.SHOW_NAVBAR, -1, UserHandle.USER_CURRENT) == 1);
+            int nav = Settings.System.getIntForUser(mContext.getContentResolver(),
+                Settings.System.SHOW_NAVBAR, -1, UserHandle.USER_CURRENT);
+            onNavbarChange(nav == 1 || nav == -2 /* -2 = has navbar by default */);
             mKeyguardBottomArea.onLockscreenVisualizerChange();
         }
     }
