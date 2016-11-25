@@ -454,7 +454,7 @@ public class NotificationStackScrollLayout extends ViewGroup
                     (int) (mBackgroundFadeAmount * Color.blue(mBgColor)
                             + alphaInv * Color.blue(scrimColor)));
         } else {
-            int a = Color.alpha(mBgColor) + 
+            int a = Color.alpha(mBgColor) +
                 Color.alpha(mScrimController.getScrimBehindColor());
             if(a > 255) a = 255;
             else if(a < 0) /* shouldn't happen */ a = 0;
