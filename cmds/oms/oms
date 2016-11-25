@@ -1,0 +1,4 @@
+#!/system/bin/sh
+# Command for Overlay Manager Service
+
+cmd overlay $@
