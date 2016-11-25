@@ -116,17 +116,17 @@
     <bool name="config_sendAudioBecomingNoisy">true</bool>
 
     <!-- The duration (in milliseconds) of a short animation. -->
-    <integer name="config_shortAnimTime">200</integer>
+    <integer name="config_shortAnimTime">180</integer>
 
     <!-- The duration (in milliseconds) of a medium-length animation. -->
-    <integer name="config_mediumAnimTime">400</integer>
+    <integer name="config_mediumAnimTime">360</integer>
 
     <!-- The duration (in milliseconds) of a long animation. -->
-    <integer name="config_longAnimTime">500</integer>
+    <integer name="config_longAnimTime">480</integer>
 
     <!-- The duration (in milliseconds) of the activity open/close and fragment open/close animations. -->
     <integer name="config_activityShortDur">150</integer>
-    <integer name="config_activityDefaultDur">220</integer>
+    <integer name="config_activityDefaultDur">210</integer>
 
     <!-- Duration for the dim animation behind a dialog.  This may be either
          a percentage, which is relative to the duration of the enter/open
@@ -510,7 +510,7 @@
     <integer translatable="false" name="config_wifi_no_network_periodic_scan_interval">300000</integer>
 
     <!-- Integer indicating disconnect mode short scan interval in milliseconds -->
-    <integer translatable="false" name="config_wifi_disconnected_short_scan_interval">15000</integer>
+    <integer translatable="false" name="config_wifi_disconnected_short_scan_interval">18000</integer>
 
     <!-- Integer indicating associated partial scan short interval in milliseconds -->
     <integer translatable="false" name="config_wifi_associated_short_scan_interval">20000</integer>
@@ -623,7 +623,7 @@
 
     <!-- If true, the screen can be rotated via the accelerometer in all 4
          rotations as the default behavior. -->
-    <bool name="config_allowAllRotations">false</bool>
+    <bool name="config_allowAllRotations">true</bool>
 
     <!-- If true, the direction rotation is applied to get to an application's requested
          orientation is reversed.  Normally, the model is that landscape is
@@ -838,7 +838,7 @@
             1 - Toggle theater mode setting
             2 - Brightness boost
     -->
-    <integer name="config_triplePressOnPowerBehavior">0</integer>
+    <integer name="config_triplePressOnPowerBehavior">2</integer>
 
     <!-- Control the behavior when the user presses the sleep button.
             0 - Go to sleep (doze)
@@ -956,31 +956,31 @@
     <color name="config_defaultNotificationColor">#ffffffff</color>
 
     <!-- Default LED on time for notification LED in milliseconds. -->
-    <integer name="config_defaultNotificationLedOn">500</integer>
+    <integer name="config_defaultNotificationLedOn">550</integer>
 
     <!-- Default LED off time for notification LED in milliseconds. -->
     <integer name="config_defaultNotificationLedOff">2000</integer>
 
     <!-- Default value for led color when battery is low on charge -->
-    <integer name="config_notificationsBatteryLowARGB">0xFFFF0000</integer>
+    <integer name="config_notificationsBatteryLowARGB">0xFFFE1204</integer>
 
     <!-- Default value for led color when battery is medium charged -->
-    <integer name="config_notificationsBatteryMediumARGB">0xFFFFFF00</integer>
+    <integer name="config_notificationsBatteryMediumARGB">0xFFFEDF08</integer>
 
     <!-- Default value for led color when battery is fully charged -->
-    <integer name="config_notificationsBatteryFullARGB">0xFF00FF00</integer>
+    <integer name="config_notificationsBatteryFullARGB">0xFF00B4E7</integer>
 
     <!-- Default value for LED on time when the battery is low on charge in miliseconds -->
-    <integer name="config_notificationsBatteryLedOn">125</integer>
+    <integer name="config_notificationsBatteryLedOn">140</integer>
 
     <!-- Is the notification LED intrusive? Used to decide if there should be a disable option -->
     <bool name="config_intrusiveNotificationLed">false</bool>
 
     <!-- Default value for LED off time when the battery is low on charge in miliseconds -->
-    <integer name="config_notificationsBatteryLedOff">2875</integer>
+    <integer name="config_notificationsBatteryLedOff">2800</integer>
 
     <!-- Number of notifications to keep in the notification service historical archive -->
-    <integer name="config_notificationServiceArchiveSize">100</integer>
+    <integer name="config_notificationServiceArchiveSize">98</integer>
 
     <!-- Allow the menu hard key to be disabled in LockScreen on some devices -->
     <bool name="config_disableMenuKeyInLockScreen">false</bool>
@@ -1031,7 +1031,7 @@
 
     <!-- Minimum screen brightness setting allowed by the power manager.
          The user is forbidden from setting the brightness below this level. -->
-    <integer name="config_screenBrightnessSettingMinimum">10</integer>
+    <integer name="config_screenBrightnessSettingMinimum">8</integer>
 
     <!-- Maximum screen brightness allowed by the power manager.
          The user is forbidden from setting the brightness above this level. -->
@@ -1039,7 +1039,7 @@
 
     <!-- Default screen brightness setting.
          Must be in the range specified by minimum and maximum. -->
-    <integer name="config_screenBrightnessSettingDefault">102</integer>
+    <integer name="config_screenBrightnessSettingDefault">100</integer>
 
     <!-- Screen brightness used to dim the screen while dozing in a very low power state.
          May be less than the minimum allowed brightness setting
@@ -1054,11 +1054,11 @@
          when adapting to brighter or darker environments.  This parameter controls how quickly
          brightness changes occur in response to an observed change in light level that exceeds the
          hysteresis threshold. -->
-    <integer name="config_autoBrightnessBrighteningLightDebounce">4000</integer>
-    <integer name="config_autoBrightnessDarkeningLightDebounce">8000</integer>
+    <integer name="config_autoBrightnessBrighteningLightDebounce">3900</integer>
+    <integer name="config_autoBrightnessDarkeningLightDebounce">7800</integer>
 
     <!-- Light sensor event rate in milliseconds for automatic brightness control. -->
-    <integer name="config_autoBrightnessLightSensorRate">250</integer>
+    <integer name="config_autoBrightnessLightSensorRate">150</integer>
 
     <!-- The maximum range of gamma adjustment possible using the screen
          auto-brightness adjustment setting. -->
@@ -1336,13 +1336,13 @@
     <bool name="config_bluetooth_reload_supported_profiles_when_enabled">false</bool>
 
     <!-- The default data-use polling period. -->
-    <integer name="config_datause_polling_period_sec">600</integer>
+    <integer name="config_datause_polling_period_sec">500</integer>
 
     <!-- The default data-use threshold in bytes. 0 disables-->
     <integer name="config_datause_threshold_bytes">0</integer>
 
     <!-- The default reduced-datarate value in kilobits per sec -->
-    <integer name="config_datause_throttle_kbitsps">300</integer>
+    <integer name="config_datause_throttle_kbitsps">500</integer>
 
     <!-- The default iface on which to monitor data use -->
     <string name="config_datause_iface" translatable="false">rmnet0</string>
@@ -1479,16 +1479,16 @@
     <!-- Max space (in MB) allocated to DownloadManager to store the downloaded
          files if they are to be stored in DownloadManager's data dir,
          which typically is /data/data/com.android.providers.downloads/files -->
-    <integer name="config_downloadDataDirSize">200</integer>
+    <integer name="config_downloadDataDirSize">240</integer>
 
     <!-- Max number of downloads allowed to proceed concurrently -->
-    <integer name="config_MaxConcurrentDownloadsAllowed">5</integer>
+    <integer name="config_MaxConcurrentDownloadsAllowed">25</integer>
 
     <!-- When the free space available in DownloadManager's data dir falls
          below the percentage value specified by this param, DownloadManager
          starts removing files to try to make percentage of available
          free space above this threshold value. -->
-    <integer name="config_downloadDataDirLowSpaceThreshold">10</integer>
+    <integer name="config_downloadDataDirLowSpaceThreshold">11</integer>
 
     <!-- The URL that should be sent in an x-wap-profile header with an HTTP request,
          as defined in the Open Mobile Alliance User Agent Profile specification
@@ -1604,7 +1604,7 @@
     <integer name="config_ntpPollingIntervalShorter">60000</integer>
     <!-- Number of times to try again with the shorter interval, before backing
          off until the normal polling interval. A value < 0 indicates infinite. -->
-    <integer name="config_ntpRetry">3</integer>
+    <integer name="config_ntpRetry">4</integer>
     <!-- If the time difference is greater than this threshold in milliseconds,
          then update the time. -->
     <integer name="config_ntpThreshold">5000</integer>
@@ -1767,17 +1767,17 @@
     <dimen name="config_viewConfigurationTouchSlop">8dp</dimen>
 
     <!-- Minimum velocity to initiate a fling, as measured in dips per second. -->
-    <dimen name="config_viewMinFlingVelocity">50dp</dimen>
+    <dimen name="config_viewMinFlingVelocity">60dp</dimen>
 
     <!-- Maximum velocity to initiate a fling, as measured in dips per second. -->
     <dimen name="config_viewMaxFlingVelocity">8000dp</dimen>
 
     <!-- Amount of time in ms the user needs to press the relevant key to bring up the global actions dialog -->
-    <integer name="config_globalActionsKeyTimeout">500</integer>
+    <integer name="config_globalActionsKeyTimeout">510</integer>
 
     <!-- Maximum number of grid columns permitted in the ResolverActivity
          used for picking activities to handle an intent. -->
-    <integer name="config_maxResolverActivityColumns">3</integer>
+    <integer name="config_maxResolverActivityColumns">4</integer>
 
     <!-- Array of OEM specific USB mode override config.
          OEM can override a certain USB mode depending on ro.bootmode.
@@ -1793,10 +1793,10 @@
     <bool name="config_syncstorageengine_masterSyncAutomatically">true</bool>
 
     <!--  Maximum number of supported users -->
-    <integer name="config_multiuserMaximumUsers">1</integer>
+    <integer name="config_multiuserMaximumUsers">100</integer>
 
     <!-- Whether UI for multi user should be shown -->
-    <bool name="config_enableMultiUserUI">false</bool>
+    <bool name="config_enableMultiUserUI">true</bool>
 
     <!-- If true, then we do not ask user for permission for apps to connect to USB devices.
          Do not set this to true for production devices. Doing so will cause you to fail CTS. -->
