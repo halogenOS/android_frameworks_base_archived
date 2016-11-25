@@ -86,6 +86,7 @@
     <protected-broadcast android:name="android.intent.action.OVERLAY_REMOVED" />
     <protected-broadcast android:name="android.intent.action.OVERLAY_PRIORITY_CHANGED" />
 
+    <protected-broadcast android:name="Auth_password_wrong" />
     <protected-broadcast android:name="android.os.action.POWER_SAVE_MODE_CHANGED" />
     <protected-broadcast android:name="android.os.action.POWER_SAVE_MODE_CHANGING" />
     <protected-broadcast android:name="android.os.action.DEVICE_IDLE_MODE_CHANGED" />
@@ -314,6 +315,7 @@
     <protected-broadcast android:name="android.net.wifi.p2p.PEERS_CHANGED" />
     <protected-broadcast android:name="android.net.wifi.p2p.CONNECTION_STATE_CHANGE" />
     <protected-broadcast android:name="android.net.wifi.p2p.PERSISTENT_GROUPS_CHANGED" />
+    <protected-broadcast android:name="codeaurora.net.conn.TETHER_CONNECT_STATE_CHANGED" />
     <protected-broadcast android:name="android.net.conn.TETHER_STATE_CHANGED" />
     <protected-broadcast android:name="android.net.conn.INET_CONDITION_ACTION" />
     <protected-broadcast android:name="android.net.conn.NETWORK_CONDITIONS_MEASURED" />
