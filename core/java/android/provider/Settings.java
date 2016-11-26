@@ -6519,6 +6519,14 @@ public final class Settings {
          */
         public static final String MANAGED_PROFILE_CONTACT_REMOTE_SEARCH =
                 "managed_profile_contact_remote_search";
+        
+        /**
+         * Whether to disable dropbox
+         * 
+         * @hide
+         */
+        public static final String DISABLE_DROPBOX =
+                "debug_disable_dropbox";
 
         /**
          * This are the settings to be backed up.
