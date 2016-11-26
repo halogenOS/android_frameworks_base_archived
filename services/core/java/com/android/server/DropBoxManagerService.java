@@ -214,6 +214,9 @@ public final class DropBoxManagerService extends SystemService {
     }
 
     public void add(DropBoxManager.Entry entry) {
+        if(Settings.Secure.getInt(mContentResolver,
+            Settings.Secure.DISABLE_DROPBOX, 0) == 1)
+            return;
         File temp = null;
         InputStream input = null;
         OutputStream output = null;
@@ -707,6 +710,10 @@ public final class DropBoxManagerService extends SystemService {
         if (!mAllFiles.contents.isEmpty()) {
             t = Math.max(t, mAllFiles.contents.last().timestampMillis + 1);
         }
+        
+        if(Settings.Secure.getInt(mContentResolver,
+            Settings.Secure.DISABLE_DROPBOX, 0) == 1)
+            return t;
 
         if (future != null) {
             for (EntryFile late : future) {
