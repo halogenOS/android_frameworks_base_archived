@@ -3812,6 +3812,14 @@ public final class Settings {
         public static final int SHOW_LOCKSCREEN_VISUALIZER_DEFAULT = 1;
 
         /**
+         * Modern Services
+         * 
+         * @hide
+         */
+        public static final String ENABLE_MODERN_SERVICES =
+                                "enable_modern_services";
+
+        /**
          * IMPORTANT: If you add a new public settings you also have to add it to
          * PUBLIC_SETTINGS below. If the new setting is hidden you have to add
          * it to PRIVATE_SETTINGS below. Also add a validator that can validate
@@ -3937,6 +3945,7 @@ public final class Settings {
             PUBLIC_SETTINGS.add(BUTTON_BACKLIGHT_BRIGHTNESS);
             PUBLIC_SETTINGS.add(BUTTON_BACKLIGHT_TIMEOUT);
             PUBLIC_SETTINGS.add(SHOW_LOCKSCREEN_VISUALIZER);
+            PUBLIC_SETTINGS.add(ENABLE_MODERN_SERVICES);
         }
 
         /**
