@@ -460,6 +460,7 @@ public class NavigationBarView extends LinearLayout {
     }
 
     private void setUseFadingAnimations(boolean useFadingAnimations) {
+        if(getWindowToken() == null) return;
         WindowManager.LayoutParams lp = (WindowManager.LayoutParams) getLayoutParams();
         if (lp != null) {
             boolean old = lp.windowAnimations != 0;
