@@ -456,6 +456,7 @@ public class NavigationBarView extends LinearLayout {
     }
 
     private void setUseFadingAnimations(boolean useFadingAnimations) {
+        if(getWindowToken() == null) return;
         WindowManager.LayoutParams lp = (WindowManager.LayoutParams) getLayoutParams();
         if (lp != null) {
             boolean old = lp.windowAnimations != 0;
@@ -472,6 +473,7 @@ public class NavigationBarView extends LinearLayout {
     }
 
     public void setSlippery(boolean newSlippery) {
+        if(getWindowToken() == null) return;
         WindowManager.LayoutParams lp = (WindowManager.LayoutParams) getLayoutParams();
         if (lp != null) {
             boolean oldSlippery = (lp.flags & WindowManager.LayoutParams.FLAG_SLIPPERY) != 0;
