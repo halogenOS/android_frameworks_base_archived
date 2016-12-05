@@ -19,7 +19,6 @@ package com.android.systemui;
 import android.animation.ArgbEvaluator;
 import android.annotation.Nullable;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.database.ContentObserver;
@@ -40,7 +39,6 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.StopMotionVectorDrawable;
 import android.net.Uri;
-import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
 import android.util.Log;
@@ -71,6 +69,7 @@ public class BatteryMeterDrawable extends Drawable implements
     public static final int BATTERY_STYLE_HIDDEN    = 4;
     public static final int BATTERY_STYLE_LANDSCAPE = 5;
     public static final int BATTERY_STYLE_TEXT      = 6;
+    public static final int BATTERY_STYLE_SOLID     = 7;
 
     private final int[] mColors;
     private final int mIntrinsicWidth;
@@ -326,7 +325,7 @@ public class BatteryMeterDrawable extends Drawable implements
 
     private void updateForceChargeBatteryText() {
         mForceChargeBatteryText = Settings.Secure.getInt(mContext.getContentResolver(),
-                FORCE_CHARGE_BATTERY_TEXT, 0) == 1 ? true : false;
+                FORCE_CHARGE_BATTERY_TEXT, 0) == 1;
     }
 
     private int getColorForLevel(int percent) {
@@ -511,6 +510,8 @@ public class BatteryMeterDrawable extends Drawable implements
                 return R.drawable.ic_battery_circle;
             case BATTERY_STYLE_PORTRAIT:
                 return R.drawable.ic_battery_portrait;
+            case BATTERY_STYLE_SOLID:
+                return R.drawable.ic_battery_solid;
             default:
                 return 0;
         }
@@ -524,6 +525,8 @@ public class BatteryMeterDrawable extends Drawable implements
                 return R.style.BatteryMeterViewDrawable_Circle;
             case BATTERY_STYLE_PORTRAIT:
                 return R.style.BatteryMeterViewDrawable_Portrait;
+            case BATTERY_STYLE_SOLID:
+                return R.style.BatteryMeterViewDrawable_Solid;
             default:
                 return R.style.BatteryMeterViewDrawable;
         }
@@ -551,6 +554,9 @@ public class BatteryMeterDrawable extends Drawable implements
                 textSize = widthDiv2 - (int)(mContext.getResources().getDisplayMetrics().density * 1.5f + 0.5f);
                 break;
             case BATTERY_STYLE_LANDSCAPE:
+                textSize = widthDiv2 - (int)(mContext.getResources().getDisplayMetrics().density * 1.1f + 0.5f);
+                break;
+            case BATTERY_STYLE_SOLID:
                 textSize = widthDiv2 - (int)(mContext.getResources().getDisplayMetrics().density * 1.1f + 0.5f);
                 break;
             default:
@@ -690,14 +696,22 @@ public class BatteryMeterDrawable extends Drawable implements
 
     private Paint.Align getPaintAlignmentFromGravity(int gravity) {
         final boolean isRtl = getLayoutDirection() == View.LAYOUT_DIRECTION_RTL;
-        if ((gravity & Gravity.START) == Gravity.START) {
-            return isRtl ? Paint.Align.RIGHT : Paint.Align.LEFT;
+        switch ((gravity & Gravity.START)) {
+            case Gravity.START:
+                return isRtl ? Paint.Align.RIGHT : Paint.Align.LEFT;
         }
-        if ((gravity & Gravity.END) == Gravity.END) {
-            return isRtl ? Paint.Align.LEFT : Paint.Align.RIGHT;
+        switch ((gravity & Gravity.END)) {
+            case Gravity.END:
+                return isRtl ? Paint.Align.LEFT : Paint.Align.RIGHT;
         }
-        if ((gravity & Gravity.LEFT) == Gravity.LEFT) return Paint.Align.LEFT;
-        if ((gravity & Gravity.RIGHT) == Gravity.RIGHT) return Paint.Align.RIGHT;
+        switch ((gravity & Gravity.LEFT)) {
+            case Gravity.LEFT:
+                return Paint.Align.LEFT;
+        }
+        switch ((gravity & Gravity.RIGHT)) {
+            case Gravity.RIGHT:
+                return Paint.Align.RIGHT;
+        }
 
         // Default to center
         return Paint.Align.CENTER;

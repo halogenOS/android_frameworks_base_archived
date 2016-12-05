@@ -19,7 +19,6 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Handler;
 import android.provider.Settings;
-import android.util.ArraySet;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ImageView;
@@ -109,7 +108,6 @@ public class BatteryMeterView extends ImageView implements
 
     @Override
     public void onPowerSaveChanged(boolean isPowerSave) {
-
     }
 
     public void setBatteryController(BatteryController mBatteryController) {
