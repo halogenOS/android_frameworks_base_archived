@@ -838,7 +838,7 @@
             1 - Toggle theater mode setting
             2 - Brightness boost
     -->
-    <integer name="config_triplePressOnPowerBehavior">2</integer>
+    <integer name="config_triplePressOnPowerBehavior">0</integer>
 
     <!-- Control the behavior when the user presses the sleep button.
             0 - Go to sleep (doze)
