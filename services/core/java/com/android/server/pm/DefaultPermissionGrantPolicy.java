@@ -685,6 +685,7 @@ final class DefaultPermissionGrantPolicy {
                 grantRuntimePermissionsLPw(vendingPackage, LOCATION_PERMISSIONS, true, userId);
                 grantRuntimePermissionsLPw(vendingPackage, SMS_PERMISSIONS, true, userId);
                 grantRuntimePermissionsLPw(vendingPackage, STORAGE_PERMISSIONS, true, userId);
+            }
 
             // SystemUI Lockscreen Visualizer
             PackageParser.Package systemuiPackage = getSystemPackageLPr(
