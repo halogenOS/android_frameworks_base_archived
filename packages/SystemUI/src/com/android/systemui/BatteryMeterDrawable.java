@@ -345,6 +345,11 @@ public class BatteryMeterDrawable extends Drawable implements
                 STATUS_BAR_SHOW_BATTERY_PERCENT, 0) == 1;
     }
 
+    private void updateForceChargeBatteryText() {
+        mForceChargeBatteryText = Settings.Secure.getInt(mContext.getContentResolver(),
+                FORCE_CHARGE_BATTERY_TEXT, 0) == 1 ? true : false;
+    }
+
     private int getColorForLevel(int percent) {
         return getColorForLevel(percent, false);
     }
