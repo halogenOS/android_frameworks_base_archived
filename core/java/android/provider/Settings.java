@@ -6185,13 +6185,7 @@ public final class Settings {
          */
         public static final int INCALL_POWER_BUTTON_BEHAVIOR_DEFAULT =
                 INCALL_POWER_BUTTON_BEHAVIOR_SCREEN_OFF;
-
-        /**
-         * Whether to include options in power menu for rebooting into recovery and bootloader
-         * @hide
-         */
-        public static final String ADVANCED_REBOOT = "advanced_reboot";
-
+                
         /**
          * Whether the device should wake when the wake gesture sensor detects motion.
          * @hide
@@ -6602,8 +6596,7 @@ public final class Settings {
             ENHANCED_VOICE_PRIVACY_ENABLED,
             TTY_MODE_ENABLED,
             INCALL_POWER_BUTTON_BEHAVIOR,
-            WIFI_DISCONNECT_DELAY_DURATION,
-            ADVANCED_REBOOT
+            WIFI_DISCONNECT_DELAY_DURATION
         };
 
         /**
