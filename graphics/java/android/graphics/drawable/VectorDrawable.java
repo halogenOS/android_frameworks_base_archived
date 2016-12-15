@@ -763,13 +763,6 @@ public class VectorDrawable extends Drawable {
         return mVectorState.mAutoMirrored;
     }
 
-    /**
-     * @hide
-     */
-    public long getNativeTree() {
-        return mVectorState.getNativeRenderer();
-    }
-
     static class VectorDrawableState extends ConstantState {
         // Variables below need to be copied (deep copy if applicable) for mutation.
         int[] mThemeAttrs;

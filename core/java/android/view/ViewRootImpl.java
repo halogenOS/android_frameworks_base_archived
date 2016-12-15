@@ -44,7 +44,6 @@ import android.graphics.PointF;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.Region;
-import android.graphics.drawable.AnimatedVectorDrawable;
 import android.graphics.drawable.Drawable;
 import android.hardware.display.DisplayManager;
 import android.hardware.display.DisplayManager.DisplayListener;
@@ -820,13 +819,6 @@ public final class ViewRootImpl implements ViewParent,
                 mAttachInfo.mPendingAnimatingRenderNodes = new ArrayList<RenderNode>();
             }
             mAttachInfo.mPendingAnimatingRenderNodes.add(animator);
-        }
-    }
-
-    public void registerVectorDrawableAnimator(
-            AnimatedVectorDrawable.VectorDrawableAnimatorRT animator) {
-        if (mAttachInfo.mHardwareRenderer != null) {
-            mAttachInfo.mHardwareRenderer.registerVectorDrawableAnimator(animator);
         }
     }
 

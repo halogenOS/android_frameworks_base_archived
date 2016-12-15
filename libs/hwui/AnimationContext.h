@@ -100,8 +100,6 @@ public:
 
     ANDROID_API virtual void destroy();
 
-    ANDROID_API virtual void detachAnimators() {}
-
 private:
     friend class AnimationHandle;
     void addAnimationHandle(AnimationHandle* handle);

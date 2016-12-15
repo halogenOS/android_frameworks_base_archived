@@ -69,11 +69,6 @@ typedef DisplayListOp BaseOpType;
 typedef DrawRenderNodeOp NodeOpType;
 #endif
 
-namespace VectorDrawable {
-class Tree;
-};
-typedef uirenderer::VectorDrawable::Tree VectorDrawableRoot;
-
 /**
  * Holds data used in the playback a tree of DisplayLists.
  */
@@ -113,6 +108,16 @@ struct ReplayStateStruct : public PlaybackStateStruct {
 
     Rect& mDirty;
     LinearAllocator mReplayAllocator;
+};
+
+/**
+ * Functor that can be used for objects with data in both UI thread and RT to keep the data
+ * in sync. This functor, when added to DisplayList, will be call during DisplayList sync.
+ */
+struct PushStagingFunctor {
+    PushStagingFunctor() {}
+    virtual ~PushStagingFunctor() {}
+    virtual void operator ()() {}
 };
 
 struct FunctorContainer {
@@ -156,7 +161,7 @@ public:
 
     const LsaVector<const SkBitmap*>& getBitmapResources() const { return bitmapResources; }
     const LsaVector<FunctorContainer>& getFunctors() const { return functors; }
-    const LsaVector<VectorDrawableRoot*>& getVectorDrawables() { return vectorDrawables; }
+    const LsaVector<PushStagingFunctor*>& getPushStagingFunctors() { return pushStagingFunctors; }
 
     size_t addChild(NodeOpType* childOp);
 
@@ -198,10 +203,10 @@ private:
     // List of functors
     LsaVector<FunctorContainer> functors;
 
-    // List of VectorDrawables that need to be notified of pushStaging. Note that this list gets nothing
+    // List of functors that need to be notified of pushStaging. Note that this list gets nothing
     // but a callback during sync DisplayList, unlike the list of functors defined above, which
     // gets special treatment exclusive for webview.
-    LsaVector<VectorDrawableRoot*> vectorDrawables;
+    LsaVector<PushStagingFunctor*> pushStagingFunctors;
 
     bool hasDrawOps; // only used if !HWUI_NEW_OPS
 

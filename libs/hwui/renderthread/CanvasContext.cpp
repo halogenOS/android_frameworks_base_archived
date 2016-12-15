@@ -282,7 +282,6 @@ void CanvasContext::prepareTree(TreeInfo& info, int64_t* uiFrameInfo,
 
 void CanvasContext::stopDrawing() {
     mRenderThread.removeFrameCallback(this);
-    mAnimationContext->detachAnimators();
 }
 
 void CanvasContext::notifyFramePending() {
