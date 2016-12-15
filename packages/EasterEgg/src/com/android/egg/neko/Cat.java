@@ -31,12 +31,15 @@ import com.android.egg.R;
 
 public class Cat extends Drawable {
     public static final long[] PURR = {0, 40, 20, 40, 20, 40, 20, 40, 20, 40, 20, 40};
+    public static String[] CAT_NAMES = null;
 
     private Random mNotSoRandom;
+    private Random rand;
     private Bitmap mBitmap;
     private long mSeed;
     private String mName;
     private int mBodyColor;
+    private int i;
 
     private synchronized Random notSoRandom(long seed) {
         if (mNotSoRandom == null) {
@@ -126,11 +129,15 @@ public class Cat extends Drawable {
     }
 
     public Cat(Context context, long seed) {
+        if(CAT_NAMES == null)
+            CAT_NAMES = context.getResources().getStringArray(R.array.cat_names);
+
         D = new CatParts(context);
         mSeed = seed;
-
+        rand = new Random();
+        i = rand.nextInt(CAT_NAMES.length);
         setName(context.getString(R.string.default_cat_name,
-                String.valueOf(mSeed).substring(0, 3)));
+                String.valueOf(CAT_NAMES[i])));
 
         final Random nsr = notSoRandom(seed);
 
