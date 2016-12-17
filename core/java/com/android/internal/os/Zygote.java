@@ -118,7 +118,11 @@ public final class Zygote {
             if(SystemProperties.get("sf.enable_modern_services").equals("1")) {
                 for(String s : MODERN_SERVICES)
                     if(niceName.contains(s)) {
-                        Build.MODEL = "Pixel XL";
+                        Build.MODEL         = "Pixel XL";
+                        Build.PRODUCT       = "Pixel XL";
+                        Build.DEVICE        = "Pixel XL";
+                        Build.MANUFACTURER  = "Google"  ;
+                        Build.BRAND         = "Google"  ;
                         break;
                     }
             }
