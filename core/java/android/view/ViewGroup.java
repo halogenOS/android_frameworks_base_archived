@@ -2154,8 +2154,8 @@ public abstract class ViewGroup extends View implements ViewParent, ViewManager 
 
         boolean handled = false;
         if (onFilterTouchEventForSecurity(ev)) {
-            final int action = ev.getAction();
-            final int actionMasked = action & MotionEvent.ACTION_MASK;
+            final int action = ev.getAction(),
+                      actionMasked = action & MotionEvent.ACTION_MASK;
 
             // Handle an initial down.
             if (actionMasked == MotionEvent.ACTION_DOWN) {
@@ -2191,14 +2191,13 @@ public abstract class ViewGroup extends View implements ViewParent, ViewManager 
 
             // Check for cancelation.
             final boolean canceled = resetCancelNextUpFlag(this)
-                    || actionMasked == MotionEvent.ACTION_CANCEL;
+                            || actionMasked == MotionEvent.ACTION_CANCEL;
 
             // Update list of touch targets for pointer down, if needed.
             final boolean split = (mGroupFlags & FLAG_SPLIT_MOTION_EVENTS) != 0;
             TouchTarget newTouchTarget = null;
             boolean alreadyDispatchedToNewTouchTarget = false;
             if (!canceled && !intercepted) {
-
                 // If the event is targeting accessiiblity focus we give it to the
                 // view that has accessibility focus and if it does not handle it
                 // we clear the flag and dispatch the event to all children as usual.
@@ -2210,8 +2209,8 @@ public abstract class ViewGroup extends View implements ViewParent, ViewManager 
                 if (actionMasked == MotionEvent.ACTION_DOWN
                         || (split && actionMasked == MotionEvent.ACTION_POINTER_DOWN)
                         || actionMasked == MotionEvent.ACTION_HOVER_MOVE) {
-                    final int actionIndex = ev.getActionIndex(); // always 0 for down
-                    final int idBitsToAssign = split ? 1 << ev.getPointerId(actionIndex)
+                    final int actionIndex = ev.getActionIndex(), // always 0 for down
+                              idBitsToAssign = split ? 1 << ev.getPointerId(actionIndex)
                             : TouchTarget.ALL_POINTER_IDS;
 
                     // Clean up earlier touch targets for this pointer id in case they
@@ -2220,8 +2219,8 @@ public abstract class ViewGroup extends View implements ViewParent, ViewManager 
 
                     final int childrenCount = mChildrenCount;
                     if (newTouchTarget == null && childrenCount != 0) {
-                        final float x = ev.getX(actionIndex);
-                        final float y = ev.getY(actionIndex);
+                        final float x = ev.getX(actionIndex),
+                                    y = ev.getY(actionIndex);
                         // Find a child that can receive the event.
                         // Scan children from front to back.
                         final ArrayList<View> preorderedList = buildTouchDispatchChildList();
@@ -2309,8 +2308,8 @@ public abstract class ViewGroup extends View implements ViewParent, ViewManager 
             } else {
                 // Dispatch to touch targets, excluding the new touch target if we already
                 // dispatched to it.  Cancel touch targets if necessary.
-                TouchTarget predecessor = null;
-                TouchTarget target = mFirstTouchTarget;
+                TouchTarget predecessor = null,
+                            target = mFirstTouchTarget;
                 while (target != null) {
                     final TouchTarget next = target.next;
                     if (alreadyDispatchedToNewTouchTarget && target == newTouchTarget) {
@@ -2344,8 +2343,8 @@ public abstract class ViewGroup extends View implements ViewParent, ViewManager 
                     || actionMasked == MotionEvent.ACTION_HOVER_MOVE) {
                 resetTouchState();
             } else if (split && actionMasked == MotionEvent.ACTION_POINTER_UP) {
-                final int actionIndex = ev.getActionIndex();
-                final int idBitsToRemove = 1 << ev.getPointerId(actionIndex);
+                final int actionIndex = ev.getActionIndex(),
+                          idBitsToRemove = 1 << ev.getPointerId(actionIndex);
                 removePointersFromTouchTargets(idBitsToRemove);
             }
         }

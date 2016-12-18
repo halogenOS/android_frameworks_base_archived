@@ -1312,14 +1312,14 @@ public class ScrollView extends FrameLayout {
             //         will be a window where mScrollX/Y is different from what the app
             //         thinks it is.
             //
-            int oldX = mScrollX;
-            int oldY = mScrollY;
-            int x = mScroller.getCurrX();
-            int y = mScroller.getCurrY();
+            int oldX = mScrollX,
+                oldY = mScrollY,
+                   x = mScroller.getCurrX(),
+                   y = mScroller.getCurrY();
 
             if (oldX != x || oldY != y) {
-                final int range = getScrollRange();
-                final int overscrollMode = getOverScrollMode();
+                final int range = getScrollRange(),
+                          overscrollMode = getOverScrollMode();
                 final boolean canOverscroll = overscrollMode == OVER_SCROLL_ALWAYS ||
                         (overscrollMode == OVER_SCROLL_IF_CONTENT_SCROLLS && range > 0);
 
@@ -1398,11 +1398,11 @@ public class ScrollView extends FrameLayout {
     protected int computeScrollDeltaToGetChildRectOnScreen(Rect rect) {
         if (getChildCount() == 0) return 0;
 
-        int height = getHeight();
-        int screenTop = getScrollY();
-        int screenBottom = screenTop + height;
-
-        int fadingEdge = getVerticalFadingEdgeLength();
+        int height = getHeight(),
+            screenTop = getScrollY(),
+            screenBottom = screenTop + height,
+            fadingEdge = getVerticalFadingEdgeLength(),
+            scrollYDelta = 0;
 
         // leave room for top fading edge as long as rect isn't at very top
         if (rect.top > 0) {
@@ -1413,8 +1413,6 @@ public class ScrollView extends FrameLayout {
         if (rect.bottom < getChildAt(0).getHeight()) {
             screenBottom -= fadingEdge;
         }
-
-        int scrollYDelta = 0;
 
         if (rect.bottom > screenBottom && rect.top > screenTop) {
             // need to move down to get it in view: move down just enough so
@@ -1430,10 +1428,9 @@ public class ScrollView extends FrameLayout {
             }
 
             // make sure we aren't scrolling beyond the end of our content
-            int bottom = getChildAt(0).getBottom();
-            int distanceToBottom = bottom - screenBottom;
+            int bottom = getChildAt(0).getBottom(),
+                distanceToBottom = bottom - screenBottom;
             scrollYDelta = Math.min(scrollYDelta, distanceToBottom);
-
         } else if (rect.top < screenTop && rect.bottom < screenBottom) {
             // need to move up to get it in view: move up just enough so that
             // entire rectangle is in view (or at least the first screen
@@ -1478,24 +1475,16 @@ public class ScrollView extends FrameLayout {
 
         // convert from forward / backward notation to up / down / left / right
         // (ugh).
-        if (direction == View.FOCUS_FORWARD) {
-            direction = View.FOCUS_DOWN;
-        } else if (direction == View.FOCUS_BACKWARD) {
-            direction = View.FOCUS_UP;
-        }
+        direction = direction == View.FOCUS_FORWARD  ? View.FOCUS_DOWN
+                  : direction == View.FOCUS_BACKWARD ? View.FOCUS_UP
+                  : direction;
 
         final View nextFocus = previouslyFocusedRect == null ?
                 FocusFinder.getInstance().findNextFocus(this, null, direction) :
                 FocusFinder.getInstance().findNextFocusFromRect(this,
                         previouslyFocusedRect, direction);
 
-        if (nextFocus == null) {
-            return false;
-        }
-
-        if (isOffScreen(nextFocus)) {
-            return false;
-        }
+        if (nextFocus == null || isOffScreen(nextFocus)) return false;
 
         return nextFocus.requestFocus(direction, previouslyFocusedRect);
     }
@@ -1602,8 +1591,8 @@ public class ScrollView extends FrameLayout {
      */
     public void fling(int velocityY) {
         if (getChildCount() > 0) {
-            int height = getHeight() - mPaddingBottom - mPaddingTop;
-            int bottom = getChildAt(0).getHeight();
+            int height = getHeight() - mPaddingBottom - mPaddingTop,
+                bottom = getChildAt(0).getHeight();
 
             mScroller.fling(mScrollX, mScrollY, 0, velocityY, 0, 0, 0,
                     Math.max(0, bottom - height), 0, height/2);
@@ -1724,11 +1713,9 @@ public class ScrollView extends FrameLayout {
             final int scrollY = mScrollY;
             final boolean clipToPadding = getClipToPadding();
             if (!mEdgeGlowTop.isFinished()) {
-                final int restoreCount = canvas.save();
-                final int width;
-                final int height;
-                final float translateX;
-                final float translateY;
+                final int restoreCount = canvas.save(), width, height;
+                final float translateX,
+                            translateY;
                 if (clipToPadding) {
                     width = getWidth() - mPaddingLeft - mPaddingRight;
                     height = getHeight() - mPaddingTop - mPaddingBottom;
@@ -1737,8 +1724,7 @@ public class ScrollView extends FrameLayout {
                 } else {
                     width = getWidth();
                     height = getHeight();
-                    translateX = 0;
-                    translateY = 0;
+                    translateX = translateY = 0;
                 }
                 canvas.translate(translateX, Math.min(0, scrollY) + translateY);
                 mEdgeGlowTop.setSize(width, height);
@@ -1748,11 +1734,9 @@ public class ScrollView extends FrameLayout {
                 canvas.restoreToCount(restoreCount);
             }
             if (!mEdgeGlowBottom.isFinished()) {
-                final int restoreCount = canvas.save();
-                final int width;
-                final int height;
-                final float translateX;
-                final float translateY;
+                final int restoreCount = canvas.save(), width, height;
+                final float translateX,
+                            translateY;
                 if (clipToPadding) {
                     width = getWidth() - mPaddingLeft - mPaddingRight;
                     height = getHeight() - mPaddingTop - mPaddingBottom;
@@ -1761,8 +1745,7 @@ public class ScrollView extends FrameLayout {
                 } else {
                     width = getWidth();
                     height = getHeight();
-                    translateX = 0;
-                    translateY = 0;
+                    translateX = translateY = 0;
                 }
                 canvas.translate(-width + translateX,
                             Math.max(getScrollRange(), scrollY) + height + translateY);

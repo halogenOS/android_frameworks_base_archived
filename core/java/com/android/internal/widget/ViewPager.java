@@ -1492,13 +1492,13 @@ public class ViewPager extends ViewGroup {
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         final int count = getChildCount();
-        int width = r - l;
-        int height = b - t;
-        int paddingLeft = getPaddingLeft();
-        int paddingTop = getPaddingTop();
-        int paddingRight = getPaddingRight();
-        int paddingBottom = getPaddingBottom();
-        final int scrollX = getScrollX();
+        int width           = r - l,
+            height          = b - t,
+            paddingLeft     = getPaddingLeft(),
+            paddingTop      = getPaddingTop(),
+            paddingRight    = getPaddingRight(),
+            paddingBottom   = getPaddingBottom();
+        final int scrollX   = getScrollX();
 
         int decorCount = 0;
 
@@ -1508,11 +1508,10 @@ public class ViewPager extends ViewGroup {
             final View child = getChildAt(i);
             if (child.getVisibility() != GONE) {
                 final LayoutParams lp = (LayoutParams) child.getLayoutParams();
-                int childLeft = 0;
-                int childTop = 0;
+                int childLeft = 0, childTop = 0;
                 if (lp.isDecor) {
-                    final int hgrav = lp.gravity & Gravity.HORIZONTAL_GRAVITY_MASK;
-                    final int vgrav = lp.gravity & Gravity.VERTICAL_GRAVITY_MASK;
+                    final int hgrav = lp.gravity & Gravity.HORIZONTAL_GRAVITY_MASK,
+                              vgrav = lp.gravity & Gravity.  VERTICAL_GRAVITY_MASK;
                     switch (hgrav) {
                         default:
                             childLeft = paddingLeft;
@@ -1587,9 +1586,9 @@ public class ViewPager extends ViewGroup {
                 child.measure(widthSpec, heightSpec);
             }
 
-            final int childMeasuredWidth = child.getMeasuredWidth();
-            final int startOffset = (int) (childWidth * ii.offset);
-            final int childLeft;
+            final int childMeasuredWidth = child.getMeasuredWidth(),
+                      startOffset = (int) (childWidth * ii.offset),
+                      childLeft;
             if (isLayoutRtl()) {
                 childLeft = MAX_SCROLL_X - paddingRight - startOffset - childMeasuredWidth;
             } else {
@@ -1614,18 +1613,16 @@ public class ViewPager extends ViewGroup {
     @Override
     public void computeScroll() {
         if (!mScroller.isFinished() && mScroller.computeScrollOffset()) {
-            final int oldX = getScrollX();
-            final int oldY = getScrollY();
-            final int x = mScroller.getCurrX();
-            final int y = mScroller.getCurrY();
+            final int   oldX = getScrollX(),
+                        oldY = getScrollY(),
+                           x = mScroller.getCurrX(),
+                           y = mScroller.getCurrY();
 
             if (oldX != x || oldY != y) {
-                scrollTo(x, y);
-
                 if (!pageScrolled(x)) {
                     mScroller.abortAnimation();
                     scrollTo(0, y);
-                }
+                } else scrollTo(x, y);
             }
 
             // Keep on drawing until the animation has finished.
@@ -1689,11 +1686,11 @@ public class ViewPager extends ViewGroup {
     protected void onPageScrolled(int position, float offset, int offsetPixels) {
         // Offset any decor views if needed - keep them on-screen at all times.
         if (mDecorChildCount > 0) {
-            final int scrollX = getScrollX();
-            int paddingLeft = getPaddingLeft();
-            int paddingRight = getPaddingRight();
-            final int width = getWidth();
-            final int childCount = getChildCount();
+            int paddingLeft      = getPaddingLeft(),
+                paddingRight     = getPaddingRight();
+            final int scrollX    = getScrollX(),
+                      width      = getWidth(),
+                      childCount = getChildCount();
             for (int i = 0; i < childCount; i++) {
                 final View child = getChildAt(i);
                 final LayoutParams lp = (LayoutParams) child.getLayoutParams();
@@ -1735,8 +1732,8 @@ public class ViewPager extends ViewGroup {
         }
 
         if (mPageTransformer != null) {
-            final int scrollX = getScrollX();
-            final int childCount = getChildCount();
+            final int scrollX = getScrollX(),
+                      childCount = getChildCount();
             for (int i = 0; i < childCount; i++) {
                 final View child = getChildAt(i);
                 final LayoutParams lp = (LayoutParams) child.getLayoutParams();
