@@ -1012,6 +1012,16 @@ public final class LoadedApk {
 
     static final class ReceiverDispatcher {
 
+        static final boolean DEBUG_BLACKLIST = false;
+
+        /**
+         * List of things which aren't supposed to receive anything.
+         * A common reason is battery drain.
+         */
+        static final String[] blacklist = {
+            "com.qualcomm.ims.vt.LowBatteryHandler"
+        };
+
         final static class InnerReceiver extends IIntentReceiver.Stub {
             final WeakReference<LoadedApk.ReceiverDispatcher> mDispatcher;
             final LoadedApk.ReceiverDispatcher mStrongRef;
@@ -1110,6 +1120,24 @@ public final class LoadedApk {
                         sendFinished(mgr);
                     }
                     return;
+                }
+
+                String className = receiver != null ? receiver.getClass().getName()
+                                                    : "unknown";
+                try {
+                    for ( String s : blacklist ) {
+                        if(className.startsWith(s)) {
+                            if(DEBUG_BLACKLIST)
+                                Slog.i(ActivityThread.TAG,
+                                    "Ignoring blacklisted " + className);
+                            return;
+                        }
+                    }
+                } catch(Exception e) {
+                    Slog.w(ActivityThread.TAG,
+                        "An error occured while checking blacklist for " +
+                            className);
+                    e.printStackTrace();
                 }
 
                 Trace.traceBegin(Trace.TRACE_TAG_ACTIVITY_MANAGER, "broadcastReceiveReg");
