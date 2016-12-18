@@ -7705,13 +7705,11 @@ public class TextView extends View implements ViewTreeObserver.OnPreDrawListener
 
     @Override
     public void computeScroll() {
-        if (mScroller != null) {
-            if (mScroller.computeScrollOffset()) {
-                mScrollX = mScroller.getCurrX();
-                mScrollY = mScroller.getCurrY();
-                invalidateParentCaches();
-                postInvalidate();  // So we draw again
-            }
+        if (mScroller != null && mScroller.computeScrollOffset()) {
+            mScrollX = mScroller.getCurrX();
+            mScrollY = mScroller.getCurrY();
+            invalidateParentCaches();
+            postInvalidate();  // So we draw again
         }
     }
 
