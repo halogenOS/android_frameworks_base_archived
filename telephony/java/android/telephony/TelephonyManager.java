@@ -4789,7 +4789,7 @@ public class TelephonyManager {
             ITelephony telephony = getITelephony();
             if (telephony != null)
                 return telephony.needsOtaServiceProvisioning();
-        } catch (RemoteException e | NullPointerException e) {
+        } catch (RemoteException | NullPointerException e) {
             Log.e(TAG, "Error calling ITelephony#isDataPossibleForSubscription", e);
         }
         return false;
