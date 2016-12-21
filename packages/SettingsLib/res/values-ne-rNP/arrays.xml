@@ -95,6 +95,7 @@
   <string-array name="window_animation_scale_entries">
     <item msgid="8134156599370824081">"सजीविकरण बन्द"</item>
     <item msgid="6624864048416710414">"सजीविकरण मापन .5x"</item>
+    <item msgid="2219332261255416635">"सजीविकरण मापन 0.8x"</item>
     <item msgid="2219332261255416635">"सजीविकरण मापन 1x"</item>
     <item msgid="3544428804137048509">"सजीविकरण मापन 1.5x"</item>
     <item msgid="3110710404225974514">"एनिमेसन मापन 2x"</item>
@@ -104,6 +105,7 @@
   <string-array name="transition_animation_scale_entries">
     <item msgid="8464255836173039442">"एनिमेसन बन्द छ"</item>
     <item msgid="3375781541913316411">"सजीविकरण मापन .5x"</item>
+    <item msgid="1991041427801869945">"सजीविकरण मापन 0.8x"</item>
     <item msgid="1991041427801869945">"सजीविकरण मापन 1x"</item>
     <item msgid="4012689927622382874">"सजीविकरण मापन 1.5x"</item>
     <item msgid="3289156759925947169">"सजीविकरण मापन 2x"</item>
