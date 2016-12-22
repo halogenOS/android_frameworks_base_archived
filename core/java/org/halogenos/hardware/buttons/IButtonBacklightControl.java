@@ -51,9 +51,14 @@ public class IButtonBacklightControl {
 
     public int CONTROL_TYPE = CONTROL_TYPE_NONE;
 
+    public boolean HAVE_TWO_BACKLIGHT_PATHS = false;
+
     public String
         BUTTON_BACKLIGHT_PATH =
             "/sys/class/leds/button-backlight/",
+        BUTTON_BACKLIGHT_PATH2 =
+            "/sys/class/leds/button-backlight1/",
+        BUTTON_BACKLIGHT_PATHS[] = {},
         BRIGHTNESS_CONTROL =
             BUTTON_BACKLIGHT_PATH + "brightness",
         MAX_BRIGHTNESS_CONTORL =
@@ -79,10 +84,11 @@ public class IButtonBacklightControl {
     private void setBrightnessDirect(int brightness) {
         if(currentBrightness == brightness) return;
         if(DEBUG) Log.d(TAG, "Setting brightness: " + brightness);
-        FileUtils.writeLine(
-            BRIGHTNESS_CONTROL,
-            String.valueOf(brightness)
-        );
+        for (String path : BUTTON_BACKLIGHT_PATHS)
+            FileUtils.writeLine(
+                path,
+                String.valueOf(brightness)
+            );
         currentBrightness = brightness;
     }
 
@@ -146,6 +152,12 @@ public class IButtonBacklightControl {
      * @hide
      **/
     public final void ready() {
+        if (HAVE_TWO_BACKLIGHT_PATHS && BUTTON_BACKLIGHT_PATHS.length == 0)
+            BUTTON_BACKLIGHT_PATHS = new String[]
+                {BUTTON_BACKLIGHT_PATH,BUTTON_BACKLIGHT_PATH2};
+        else if(BUTTON_BACKLIGHT_PATHS.length == 0)
+            BUTTON_BACKLIGHT_PATHS = new String[]
+                {BUTTON_BACKLIGHT_PATH};
         try {
             if (MAXIMUM_BRIGHTNESS == -1)
                 MAXIMUM_BRIGHTNESS =
