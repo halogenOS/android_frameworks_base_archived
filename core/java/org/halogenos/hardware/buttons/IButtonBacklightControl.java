@@ -24,19 +24,19 @@ import org.cyanogenmod.internal.util.FileUtils;
 
 /**
  * This class is supposed to control button backlight
- * 
+ *
  * Consider this as a template.
  * Create your own class in the device tree.
  * Example: https://github.com/halogenOS/android_device_oneplus_oneplus2/blob/XOS-7.0/xoshw/ButtonBacklightControl.java
- * 
+ *
  * @hide
  */
 public class IButtonBacklightControl {
-    
+
     public static final String COMPONENT_NAME = "buttons.ButtonBacklightControl";
     private static final boolean DEBUG = false;
     private static final String TAG = IButtonBacklightControl.class.getSimpleName();
-    
+
     public static final int
             // Brightness not supported or no buttons
             CONTROL_TYPE_NONE = -1,
@@ -48,7 +48,7 @@ public class IButtonBacklightControl {
             // Backlight can only be turned on and off
             CONTROL_TYPE_SWITCH = -4
             ;
-    
+
     public int CONTROL_TYPE = CONTROL_TYPE_NONE;
 
     public String
@@ -62,7 +62,7 @@ public class IButtonBacklightControl {
 
     /// Device-specific maximum brightness value
     public int MAXIMUM_BRIGHTNESS = -1;
-    
+
     public int currentBrightnessSetting = 1000, currentTimeout = 3,
                currentBrightness = 0;
 
@@ -70,10 +70,10 @@ public class IButtonBacklightControl {
     public IButtonBacklightControl() {
 
     }
-    
+
     /**
      * Set the brightness directly without conversions
-     * 
+     *
      * @hide
      **/
     private void setBrightnessDirect(int brightness) {
@@ -90,10 +90,10 @@ public class IButtonBacklightControl {
      * Set the brightness of the buttons.
      * Measured in a scale of 0-1000, while 0 means off, and 1000
      * means maximum brightness.
-     * 
-     * @param brightness Brightness expressed in a 
+     *
+     * @param brightness Brightness expressed in a
      *                   number between 0 and 1000, both inclusive
-     * 
+     *
      * @hide
      */
     public final void setBrightness(int brightness) {
@@ -104,21 +104,21 @@ public class IButtonBacklightControl {
      * Get the current brightness of the buttons.
      *
      * See setBrightness(int brightness)
-     * 
+     *
      * @hide
      */
     public int getBrightness() {
         return Integer.parseInt(
             FileUtils.readOneLine(BRIGHTNESS_CONTROL)) / MAXIMUM_BRIGHTNESS * 1000;
     }
-    
+
     /**
      * Handle a brighthness change (this can also be used as a safer variant of setBrightness)
-     * 
+     *
      * Auto-Conversion of brightness values, no unallowed values.
-     * 
+     *
      * @param newBrightness New brightness in a scale from 0-1000
-     * 
+     *
      * @hide
      **/
     public final void handleBrightnessChange(int newBrightness) {
@@ -132,17 +132,17 @@ public class IButtonBacklightControl {
                 break;
             case CONTROL_TYPE_FULL:
                 setBrightness(
-                    newBrightness > 1000 ? 1000 : 
+                    newBrightness > 1000 ? 1000 :
                     (newBrightness < 0 ? 0 : newBrightness)
                 );
             case CONTROL_TYPE_NONE:
             default: break;
         }
     }
-    
+
     /**
      * Called when HardwareControlService wants this to be ready
-     * 
+     *
      * @hide
      **/
     public final void ready() {
@@ -155,12 +155,12 @@ public class IButtonBacklightControl {
             MAXIMUM_BRIGHTNESS = 100;
         }
     }
-    
+
     /**
      * Retrieve the current control type from settings
-     * 
+     *
      * @param resolver Content resolver
-     * 
+     *
      * @hide
      **/
     public static int currentControlType(ContentResolver resolver) {
@@ -168,27 +168,27 @@ public class IButtonBacklightControl {
                 Settings.System.BUTTON_BACKLIGHT_CONTROL_TYPE, CONTROL_TYPE_NONE,
                 UserHandle.USER_CURRENT);
     }
-    
+
     /**
      * Get the current timeout
-     * 
+     *
      * @hide
      **/
     public final int currentTimeout() {
         return currentTimeout;
     }
-    
+
     /**
      * Get the brightness chosen by the user.
-     * 
+     *
      * Using getBrightness() would return the real-time brightness,
      * not the brightness the user has chosen to be when the lights
      * are on.
-     * 
+     *
      * @hide
      **/
     public final int currentBrightnessSetting() {
         return currentBrightnessSetting;
     }
-    
+
 }
