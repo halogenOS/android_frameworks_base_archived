@@ -58,11 +58,9 @@ public class IButtonBacklightControl {
             "/sys/class/leds/button-backlight/",
         BUTTON_BACKLIGHT_PATH2 =
             "/sys/class/leds/button-backlight1/",
-        BUTTON_BACKLIGHT_PATHS[] = {},
-        BRIGHTNESS_CONTROL =
-            BUTTON_BACKLIGHT_PATH + "brightness",
-        MAX_BRIGHTNESS_CONTORL =
-            BUTTON_BACKLIGHT_PATH + "max_brightness"
+        BUTTON_BACKLIGHT_PATHS[] = null,
+        BRIGHTNESS_CONTROL = "brightness",
+        MAX_BRIGHTNESS_CONTORL = "max_brightness"
         ;
 
     /// Device-specific maximum brightness value
@@ -86,7 +84,7 @@ public class IButtonBacklightControl {
         if(DEBUG) Log.d(TAG, "Setting brightness: " + brightness);
         for (String path : BUTTON_BACKLIGHT_PATHS)
             FileUtils.writeLine(
-                path,
+                path + BRIGHTNESS_CONTROL,
                 String.valueOf(brightness)
             );
         currentBrightness = brightness;
@@ -152,12 +150,13 @@ public class IButtonBacklightControl {
      * @hide
      **/
     public final void ready() {
-        if (HAVE_TWO_BACKLIGHT_PATHS && BUTTON_BACKLIGHT_PATHS.length == 0)
+        if (HAVE_TWO_BACKLIGHT_PATHS && BUTTON_BACKLIGHT_PATHS == null)
             BUTTON_BACKLIGHT_PATHS = new String[]
                 {BUTTON_BACKLIGHT_PATH,BUTTON_BACKLIGHT_PATH2};
-        else if(BUTTON_BACKLIGHT_PATHS.length == 0)
+        else if(BUTTON_BACKLIGHT_PATHS == null)
             BUTTON_BACKLIGHT_PATHS = new String[]
                 {BUTTON_BACKLIGHT_PATH};
+        MAX_BRIGHTNESS_CONTORL = BUTTON_BACKLIGHT_PATHS[0] + MAX_BRIGHTNESS_CONTORL;
         try {
             if (MAXIMUM_BRIGHTNESS == -1)
                 MAXIMUM_BRIGHTNESS =
