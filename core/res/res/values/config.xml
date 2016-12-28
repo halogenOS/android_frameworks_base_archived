@@ -2690,4 +2690,9 @@
     <string-array name="config_disabledComponents" translatable="false">
     </string-array>
 
+    <!-- List of components which should be automatically re-enabled -->
+    <string-array name="config_reenableComponents" translatable="false">
+
+    </string-array>
+
 </resources>

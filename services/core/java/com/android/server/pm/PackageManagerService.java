@@ -2794,6 +2794,23 @@ public class PackageManagerService extends IPackageManager.Stub {
                 pkgSetting.disableComponentLPw(className, UserHandle.USER_OWNER);
             }
 
+            // Enable things that shouldn't be disabled
+            for (String name : mContext.getResources().getStringArray(
+                    com.android.internal.R.array.config_reenableComponents)) {
+                ComponentName cn = ComponentName.unflattenFromString(name);
+                String className = cn.getClassName();
+                PackageSetting pkgSetting = mSettings.mPackages
+                        .get(cn.getPackageName());
+                if (pkgSetting == null || pkgSetting.pkg == null
+                        || !pkgSetting.pkg.hasComponentClassName(className)
+                        ||  pkgSetting.getCurrentEnabledStateLPr(className,
+                                UserHandle.USER_OWNER) != COMPONENT_ENABLED_STATE_DISABLED) {
+                    continue;
+                }
+                Slog.v(TAG, "Re-enabling " + name);
+                pkgSetting.enableComponentLPw(className, UserHandle.USER_OWNER);
+            }
+
             // Prepare storage for system user really early during boot,
             // since core system apps like SettingsProvider and SystemUI
             // can't wait for user to start
