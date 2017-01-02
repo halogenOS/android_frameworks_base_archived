@@ -80,12 +80,12 @@ public class BatteryMeterDrawable extends Drawable implements
     private float mButtonHeightFraction;
     private float mSubpixelSmoothingLeft;
     private float mSubpixelSmoothingRight;
-    private float mTextHeight, mWarningTextHeight;
     private int mIconTint = Color.WHITE;
     private float mOldDarkIntensity = 0f;
 
     private int mHeight;
     private int mWidth;
+    private int mLessHeight;
     private String mWarningString;
     private final int mCriticalLevel;
     private int mChargeColor;
@@ -128,13 +128,6 @@ public class BatteryMeterDrawable extends Drawable implements
 
     private final int mLessHeight;
 
-    private final Runnable mInvalidate = new Runnable() {
-        @Override
-        public void run() {
-            invalidateSelf();
-        }
-    };
-
     private boolean mIsAnimating; // stores charge-animation status to remove callbacks
 
     private float mTextX, mTextY; // precalculated position for drawText() to appear centered
@@ -142,7 +135,6 @@ public class BatteryMeterDrawable extends Drawable implements
     private boolean mInitialized;
 
     private Paint mTextAndBoltPaint;
-    private Paint mWarningTextPaint;
     private Paint mClearPaint;
 
     private LayerDrawable mBatteryDrawable;
@@ -218,12 +210,6 @@ public class BatteryMeterDrawable extends Drawable implements
         mTextAndBoltPaint.setTextAlign(getPaintAlignmentFromGravity(mTextGravity));
         mTextAndBoltPaint.setXfermode(new PorterDuffXfermode(xferMode));
         mTextAndBoltPaint.setColor(mBoltOverlay || mCurrentFillColor == 0 ? getBoltColor() : mCurrentFillColor);
-
-        mWarningTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mWarningTextPaint.setColor(mColors[1]);
-        font = Typeface.create("sans-serif", Typeface.BOLD);
-        mWarningTextPaint.setTypeface(font);
-        mWarningTextPaint.setTextAlign(getPaintAlignmentFromGravity(mTextGravity));
 
         mClearPaint = new Paint();
         mClearPaint.setColor(0);
@@ -337,7 +323,6 @@ public class BatteryMeterDrawable extends Drawable implements
         super.setBounds(left, top, right, bottom);
         mHeight = bottom - top;
         mWidth = right - left;
-        mWarningTextHeight = -mWarningTextPaint.getFontMetrics().ascent;
     }
 
     private void updateShowPercent() {
@@ -388,11 +373,11 @@ public class BatteryMeterDrawable extends Drawable implements
                 }
             }
         }
+       return color;
+    }
 
     public void setDarkIntensity(float darkIntensity) {
-        if (darkIntensity == mOldDarkIntensity) {
-            return;
-        }
+        if (darkIntensity == mOldDarkIntensity) return;
         mCurrentBackgroundColor = getBackgroundColor(darkIntensity);
         mCurrentFillColor = getFillColor(darkIntensity);
         mIconTint = mCurrentFillColor;
@@ -579,7 +564,6 @@ public class BatteryMeterDrawable extends Drawable implements
                 break;
         }
         mTextAndBoltPaint.setTextSize(textSize);
-        mWarningTextPaint.setTextSize(textSize);
 
         Rect iconBounds = new Rect(0, 0, mWidth, mHeight);
         mBatteryDrawable.setBounds(iconBounds);
@@ -695,17 +679,18 @@ public class BatteryMeterDrawable extends Drawable implements
 
     private void drawPercentageText(Canvas canvas) {
         final int level = mLevel;
-        if (level > mCriticalLevel && mShowPercent && level != 100) {
+        if (mShowPercent && level != 100) {
             // Draw the percentage text
             String pctText = String.valueOf(SINGLE_DIGIT_PERCENT ? (level / 10) : level);
             mTextAndBoltPaint.setColor(getColorForLevel(level));
-            canvas.drawText(pctText, mTextX, mTextY, mTextAndBoltPaint);
+            if (level > mCriticalLevel) {
+                canvas.drawText(pctText, mTextX, mTextY, mTextAndBoltPaint);
+            } else {
+                canvas.drawText(mWarningString, mTextX, mTextY, mTextAndBoltPaint);
+            }
             if (mBoltOverlay) {
                 mBoltDrawable.setTint(getBoltColor());
             }
-        } else if (level <= mCriticalLevel) {
-            // Draw the warning text
-            canvas.drawText(mWarningString, mTextX, mTextY, mWarningTextPaint);
         }
     }
 
