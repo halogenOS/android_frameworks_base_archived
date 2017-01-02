@@ -1655,18 +1655,19 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         mNavigationBarView.reorient();
 
         ButtonDispatcher recentsButton = mNavigationBarView.getRecentsButton();
-        recentsButton.setOnClickListener(mRecentsClickListener);
-        recentsButton.setOnTouchListener(mRecentsPreloadOnTouchListener);
-        recentsButton.setLongClickable(true);
-        recentsButton.setOnLongClickListener(this::handleLongPressBackRecents);
+        recentsButton.setLongClickable(false);
+        // recentsButton.setOnClickListener(mRecentsClickListener);
+        // recentsButton.setOnTouchListener(mRecentsPreloadOnTouchListener);
+        // recentsButton.setOnLongClickListener(mRecentsLongClickListener);
 
         ButtonDispatcher backButton = mNavigationBarView.getBackButton();
-        backButton.setLongClickable(true);
-        backButton.setOnLongClickListener(this::handleLongPressBackRecents);
+        backButton.setLongClickable(false);
+        // backButton.setOnLongClickListener(mLongPressBackListener);
 
         ButtonDispatcher homeButton = mNavigationBarView.getHomeButton();
-        homeButton.setOnTouchListener(mHomeActionListener);
-        homeButton.setOnLongClickListener(mLongPressHomeListener);
+        homeButton.setLongClickable(false);
+        // homeButton.setOnTouchListener(mHomeActionListener);
+        // homeButton.setOnLongClickListener(mLongPressHomeListener);
 
         mAssistManager.onConfigurationChanged();
     }
