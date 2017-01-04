@@ -3571,6 +3571,12 @@ public final class Settings {
          */
         public static final String LOCK_TO_APP_ENABLED = "lock_to_app_enabled";
 
+        /**
+         * Whether to enable the pixel navbar animation
+         * @hide
+         */
+        public static final String PIXEL_NAV_ANIMATION = "pixel_nav_animation";
+
         /** @hide */
         public static final Validator LOCK_TO_APP_ENABLED_VALIDATOR = sBooleanValidator;
 
