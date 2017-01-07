@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Copyright (C) 2017 halogenOS
+   Copyright (C) 2017 Bruno Acerbis
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+
+   Translated by Bruno Acerbis
+-->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+    <!-- [CHAR LIMIT=NONE] Importance Tuner setting title -->
+    <string name="xos_power_notification_controls_description">Con i controlli avanzati delle notifiche, puoi impostare un livello di importanza da 0 a 6 per le notifiche di un\'app.
+        \n\n<b>Livello 6</b>
+        \n- Mostra in cima all\'elenco di notifiche
+        \n- Consenti interruzione a schermo intero
+        \n- Visualizza sempre
+        \n\n<b>Livello 5</b>
+        \n- Nessuna interruzione a schermo intero
+        \n- Visualizza sempre
+        \n\n<b>Livello 4</b>
+        \n- Nessuna interruzione a schermo intero
+        \n- Nessuna visualizzazione
+        \n\n<b>Livello 3</b>
+        \n- Nessuna interruzione a schermo intero
+        \n- Nessuna visualizzazione
+        \n- Nessun suono o vibrazione
+        \n\n<b>Livello 2</b>
+        \n- Nessuna interruzione a schermo intero
+        \n- Nessuna visualizzazione
+        \n- Nessun suono o vibrazione
+        \n- Nascondi dalla schermata di blocco
+        \n- Mostra in fondo all\'elenco di notifiche
+        \n\n<b>Livello 1</b>
+        \n- Nessuna interruzione a schermo intero
+        \n- Nessuna visualizzazione
+        \n- Nessun suono o vibrazione
+        \n- Nascondi dalla schermata di blocco e dalla barra di stato
+        \n- Mostra in fondo all\'elenco di notifiche
+        \n\n<b>Livello 0</b>
+        \n- Non mostrare mai notifiche di questa app
+    </string>
+
+    <!-- Notification importance level title-->
+    <string name="importance_level_title">Importanza: Livello %1$d</string>
+
+    <!-- [CHAR LIMIT=100] Notification Importance slider: very low importance level description -->
+    <string name="notification_importance_very_low">Nessun suono, vibrazione, visualizz. o interruz. a schermo intero. Nascondi da schermata blocco.</string>
+
+    <!-- Quick Settings tiles -->
+    <string name="quick_settings_screenshot_label">Schermata</string>
+    <string name="quick_settings_sync_label">Sincronizzazione</string>
+    <string name="accessibility_quick_settings_sync_off">Sincronizzazione off</string>
+    <string name="accessibility_quick_settings_sync_on">Sincronizzazione on</string>
+    <string name="accessibility_quick_settings_sync_changed_off">Sincronizzazione disattivata</string>
+    <string name="accessibility_quick_settings_sync_changed_on">Sincronizzazione attivata</string>
+    <string name="quick_settings_expanded_desktop_label">Desktop esteso</string>
+    <string name="quick_settings_expanded_desktop">Esteso</string>
+    <string name="quick_settings_expanded_desktop_off">Normale</string>
+    <string name="quick_settings_reboot_label">Riavvia</string>
+    <string name="quick_settings_reboot_recovery_label">Recovery</string>
+    <string name="accessibility_quick_settings_usb_tether_off">Tethering USB off</string>
+    <string name="accessibility_quick_settings_usb_tether_on">Tethering USB on</string>
+    <string name="accessibility_quick_settings_usb_tether_changed_off">Tethering USB disattivato</string>
+    <string name="accessibility_quick_settings_usb_tether_changed_on">Tethering USB attivato</string>
+    <string name="quick_settings_usb_tether_label">Tethering USB</string>
+    <string name="quick_settings_music_label">Musica</string>
+    <string name="quick_settings_music_play">Play</string>
+    <string name="quick_settings_music_pause">Pausa</string>
+    <string name="quick_settings_ime_label">Metodo di input</string>
+    <string name="quick_settings_caffeine_label">Caffeina</string>
+    <string name="accessibility_quick_settings_caffeine_off">Caffeina off</string>
+    <string name="accessibility_quick_settings_caffeine_on">Caffeina on</string>
+
+</resources>
