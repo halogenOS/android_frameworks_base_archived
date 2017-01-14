@@ -108,6 +108,7 @@ import com.android.systemui.statusbar.policy.ConfigurationController;
 import com.android.systemui.statusbar.policy.DeviceProvisionedController;
 import com.android.systemui.statusbar.policy.ExtensionController;
 import com.android.systemui.statusbar.policy.KeyguardStateController;
+import com.android.systemui.statusbar.policy.BurnInProtectionController;
 import com.android.systemui.statusbar.policy.UserInfoControllerImpl;
 import com.android.systemui.statusbar.policy.UserSwitcherController;
 import com.android.systemui.statusbar.window.StatusBarWindowController;
@@ -241,7 +242,8 @@ public interface StatusBarPhoneModule {
             Optional<StartingSurface> startingSurfaceOptional,
             TunerService tunerService,
             DumpManager dumpManager,
-            ActivityLaunchAnimator activityLaunchAnimator) {
+            ActivityLaunchAnimator activityLaunchAnimator,
+            BurnInProtectionController burnInProtectionController) {
         return new StatusBar(
                 context,
                 notificationsController,
@@ -342,7 +344,8 @@ public interface StatusBarPhoneModule {
                 startingSurfaceOptional,
                 tunerService,
                 dumpManager,
-                activityLaunchAnimator
+                activityLaunchAnimator,
+                burnInProtectionController
         );
     }
 }
