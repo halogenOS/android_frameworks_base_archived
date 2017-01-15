@@ -35,12 +35,12 @@ public class ViewConfiguration {
      * Defines the width of the horizontal scrollbar and the height of the vertical scrollbar in
      * dips
      */
-    private static final int SCROLL_BAR_SIZE = 10;
+    private static final int SCROLL_BAR_SIZE = 8;
 
     /**
      * Duration of the fade when scrollbars fade away in milliseconds
      */
-    private static final int SCROLL_BAR_FADE_DURATION = 250;
+    private static final int SCROLL_BAR_FADE_DURATION = 280;
 
     /**
      * Default delay before the scrollbars fade in milliseconds
@@ -56,7 +56,7 @@ public class ViewConfiguration {
      * Defines the duration in milliseconds of the pressed state in child
      * components.
      */
-    private static final int PRESSED_STATE_DURATION = 64;
+    private static final int PRESSED_STATE_DURATION = 60;
 
     /**
      * Defines the default duration in milliseconds before a press turns into
@@ -122,7 +122,7 @@ public class ViewConfiguration {
      * Defines the duration in milliseconds we want to display zoom controls in response
      * to a user panning within an application.
      */
-    private static final int ZOOM_CONTROLS_TIMEOUT = 3000;
+    private static final int ZOOM_CONTROLS_TIMEOUT = 2800;
 
     /**
      * Inset in dips to look for touchable content when the user touches the edge of the screen
@@ -206,7 +206,7 @@ public class ViewConfiguration {
     /**
      * Max distance in dips to overscroll for edge effects
      */
-    private static final int OVERSCROLL_DISTANCE = 0;
+    private static final int OVERSCROLL_DISTANCE = 12;
 
     /**
      * Max distance in dips to overfling for edge effects
