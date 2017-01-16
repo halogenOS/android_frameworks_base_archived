@@ -104,7 +104,7 @@ public class BatteryMeterDrawable extends Drawable implements
     private static final int ANIM_DURATION = 500;
     private int mAnimOffset;
     private boolean mCharging;
-    
+
     private final int mLessHeight;
 
     private final Runnable mInvalidate = new Runnable() {
@@ -214,7 +214,12 @@ public class BatteryMeterDrawable extends Drawable implements
     }
 
     private void postInvalidate() {
-        mHandler.post(mInvalidate);
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                invalidateSelf();
+            }
+        });
     }
 
     public void setBatteryController(BatteryController batteryController) {
@@ -226,7 +231,7 @@ public class BatteryMeterDrawable extends Drawable implements
     public void onBatteryLevelChanged(int level, boolean pluggedIn, boolean charging) {
         mLevel = level;
         mPluggedIn = pluggedIn;
-        mCharging = charging;
+
         postInvalidate();
     }
 
@@ -234,26 +239,6 @@ public class BatteryMeterDrawable extends Drawable implements
     public void onPowerSaveChanged(boolean isPowerSave) {
         mPowerSaveEnabled = isPowerSave;
         invalidateSelf();
-    }
-
-    private int updateChargingAnimLevel() {
-        int curLevel = mLevel;
-        if (!mCharging) {
-            mAnimOffset = 0;
-            mHandler.removeCallbacks(mInvalidate);
-        } else {
-            curLevel += mAnimOffset;
-            if (curLevel >= FULL) {
-                curLevel = 100;
-                mAnimOffset = 0;
-            } else {
-                mAnimOffset += ADD_LEVEL;
-            }
-
-            mHandler.removeCallbacks(mInvalidate);
-            mHandler.postDelayed(mInvalidate, ANIM_DURATION);
-        }
-        return curLevel;
     }
 
     private static float[] loadBoltPoints(Resources res) {
@@ -358,11 +343,7 @@ public class BatteryMeterDrawable extends Drawable implements
 
     @Override
     public void draw(Canvas c) {
-        final boolean showChargingAnim
-                = mContext.getResources().getBoolean(R.bool.config_show_battery_charging_anim);
-        final int level = showChargingAnim
-                ? updateChargingAnimLevel()
-                : mLevel;
+        final int level = mLevel;
 
         if (level == -1) return;
 
@@ -556,4 +537,5 @@ public class BatteryMeterDrawable extends Drawable implements
             postInvalidate();
         }
     }
+
 }
