@@ -6548,6 +6548,12 @@ public final class Settings {
         public static final String STATUS_BAR_BATTERY_STYLE_TILE = "status_bar_battery_style_tile";
 
         /**
+         * One Handed mode toggle
+         * @hide
+         */
+        public static final String ONE_HANDED_MODE_UI = "one_handed_mode_ui";
+
+        /**
          * Whether the camera double twist gesture to flip between front and back mode should be
          * enabled.
          *
