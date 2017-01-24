@@ -152,6 +152,7 @@ public class UsbDeviceManager {
     private UsbDebuggingManager mDebuggingManager;
     private final UsbAlsaManager mUsbAlsaManager;
     private Intent mBroadcastedIntent;
+    private boolean mPendingBootBroadcast;
 
     private class AdbSettingsObserver extends ContentObserver {
         public AdbSettingsObserver() {
@@ -776,6 +777,8 @@ public class UsbDeviceManager {
                         }
                         updateUsbStateBroadcastIfNeeded();
                         updateUsbFunctions();
+                    } else {
+                        mPendingBootBroadcast = true;
                     }
                     break;
                 case MSG_UPDATE_HOST_STATE:
@@ -787,6 +790,8 @@ public class UsbDeviceManager {
                     updateUsbNotification();
                     if (mBootCompleted) {
                         updateUsbStateBroadcastIfNeeded();
+                    } else {
+                        mPendingBootBroadcast = true;
                     }
                     break;
                 case MSG_UPDATE_CHARGING_STATE:
@@ -811,6 +816,10 @@ public class UsbDeviceManager {
                     break;
                 case MSG_BOOT_COMPLETED:
                     mBootCompleted = true;
+                    if (mPendingBootBroadcast) {
+                        updateUsbStateBroadcastIfNeeded(false);
+                        mPendingBootBroadcast = false;
+                    }
                     if (mCurrentAccessory != null) {
                         getCurrentSettings().accessoryAttached(mCurrentAccessory);
                     }
