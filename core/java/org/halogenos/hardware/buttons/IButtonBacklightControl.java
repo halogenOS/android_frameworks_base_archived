@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 halogenOS
+ * Copyright (C) 2016-2017 halogenOS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import org.cyanogenmod.internal.util.FileUtils;
  *
  * Consider this as a template.
  * Create your own class in the device tree.
- * Example: https://github.com/halogenOS/android_device_oneplus_oneplus2/blob/XOS-7.0/xoshw/ButtonBacklightControl.java
+ * Example: https://github.com/halogenOS/android_device_oneplus_oneplus2/blob/XOS-7.1/xoshw/ButtonBacklightControl.java
  *
  * @hide
  */
