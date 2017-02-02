@@ -82,5 +82,21 @@
     <string name="quick_settings_caffeine_label">Caffeina</string>
     <string name="accessibility_quick_settings_caffeine_off">Caffeina off</string>
     <string name="accessibility_quick_settings_caffeine_on">Caffeina on</string>
+    <string name="accessibility_quick_settings_location_battery_saving">Geolocalizzazione: modalità basso consumo.</string>
+    <string name="accessibility_quick_settings_location_gps_only">Geolocalizzazione: modalità solo dispositivo.</string>
+    <string name="accessibility_quick_settings_location_high_accuracy">Geolocalizzazione: modalità alta precisione.</string>
+    <string name="accessibility_quick_settings_location_changed_battery_saving">La geolocalizzazione è ora in modalità basso consumo.</string>
+    <string name="accessibility_quick_settings_location_changed_gps_only">La geolocalizzazione è ora in modalità solo dispositivo.</string>
+    <string name="accessibility_quick_settings_location_changed_high_accuracy">La geolocalizzazione è ora in modalità alta precisione.</string>
+    <string name="quick_settings_location_detail_title">Mod. geolocalizzazione</string>
+    <string name="quick_settings_location_battery_saving_label">Basso consumo</string>
+    <string name="quick_settings_location_gps_only_label">Solo dispositivo</string>
+    <string name="quick_settings_location_high_accuracy_label">Alta precisione</string>
+    <string name="quick_settings_location_off_label">Non attiva</string>
 
+    <!-- Wi-Fi hotspot label when enabled -->
+    <plurals name="wifi_hotspot_connected_clients_label">
+        <item quantity="one">%1$d client</item>
+        <item quantity="other">%1$d client</item>
+    </plurals>
 </resources>
