@@ -19,6 +19,7 @@ package android.hardware;
 
 import android.annotation.SystemApi;
 import android.os.Build;
+import android.os.SystemProperties;
 
 /**
  * Class representing a sensor. Use {@link SensorManager#getSensorList} to get
@@ -805,6 +806,11 @@ public final class Sensor {
     private int     mMaxDelay;
     private int     mFlags;
     private int     mId;
+    /// For sensors that are not allowed to be wake up sensors
+    /// e. g. significant motion detector
+    private static boolean mForceNoWakeup = SystemProperties.get(
+                        "sensor.sm.force.nowakeup", "0")
+                                .equals("1");
 
     Sensor() {
     }
@@ -981,6 +987,8 @@ public final class Sensor {
      * @return <code>true</code> if this is a wake-up sensor, <code>false</code> otherwise.
      */
     public boolean isWakeUpSensor() {
+        if (mType == TYPE_SIGNIFICANT_MOTION && mForceNoWakeup)
+          return false;
         return (mFlags & SENSOR_FLAG_WAKE_UP_SENSOR) != 0;
     }
 
