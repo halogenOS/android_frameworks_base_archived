@@ -2218,5 +2218,8 @@ message MetricsEvent {
 
     // Quick setting tiles
     QUICK_SETTINGS = 520;
+
+    // halogenOS constants
+    XOS = 900;
   }
 }
