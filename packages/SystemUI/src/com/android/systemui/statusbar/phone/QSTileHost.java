@@ -47,6 +47,7 @@ import com.android.systemui.qs.tiles.CaffeineTile;
 import com.android.systemui.qs.tiles.CastTile;
 import com.android.systemui.qs.tiles.CellularTile;
 import com.android.systemui.qs.tiles.ColorInversionTile;
+import com.android.systemui.qs.tiles.CustomizationsTile;
 import com.android.systemui.qs.tiles.DataSaverTile;
 import com.android.systemui.qs.tiles.DndTile;
 import com.android.systemui.qs.tiles.ExpandedDesktopTile;
@@ -449,6 +450,7 @@ public class QSTileHost implements QSTile.Host, Tunable {
         else if (tileSpec.equals("music")) return new MusicTile(this);
         else if (tileSpec.equals("ime")) return new ImeTile(this);
         else if (tileSpec.equals("caffeine")) return new CaffeineTile(this);
+        else if (tileSpec.equals("customizations")) return new CustomizationsTile(this);
         // Intent tiles.
         else if (tileSpec.startsWith(IntentTile.PREFIX)) return IntentTile.create(this,tileSpec);
         else if (tileSpec.startsWith(CustomTile.PREFIX)) return CustomTile.create(this,tileSpec);
