@@ -181,6 +181,10 @@ public final class SystemServer {
             "com.android.server.content.ContentService$Lifecycle",
                                 WALLPAPER_SERVICE_CLASS =
             "com.android.server.wallpaper.WallpaperManagerService$Lifecycle",
+                                WIFI_SCANNING_SERVICE_CLASS =
+            "com.android.server.wifi.scanner.WifiScanningService",
+                                WIFI_RTT_SERVICE_CLASS =
+            "com.android.server.wifi.RttService",
                                 HARDWARE_CONTROL_SERVICE_CLASS =
             "com.android.server.HardwareControlService";
 
