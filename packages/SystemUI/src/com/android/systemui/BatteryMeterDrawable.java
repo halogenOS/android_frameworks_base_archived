@@ -547,10 +547,10 @@ public class BatteryMeterDrawable extends Drawable implements
         // text size is width / 2 - 2dp for wiggle room
         final float textSize;
         switch(mStyle) {
-            case 2:
+            case BATTERY_STYLE_CIRCLE:
                 textSize = widthDiv2 - mContext.getResources().getDisplayMetrics().density / 1.3f;
                 break;
-            case 5:
+            case BATTERY_STYLE_LANDSCAPE:
                 textSize = widthDiv2 * 1.3f;
                 break;
             default:
