@@ -548,13 +548,13 @@ public class BatteryMeterDrawable extends Drawable implements
         final float textSize;
         switch(mStyle) {
             case BATTERY_STYLE_CIRCLE:
-                textSize = widthDiv2 - mContext.getResources().getDisplayMetrics().density / 1.3f;
+                textSize = widthDiv2 - (int)(mContext.getResources().getDisplayMetrics().density * 1.5f + 0.5f);
                 break;
             case BATTERY_STYLE_LANDSCAPE:
-                textSize = widthDiv2 * 1.3f;
+                textSize = widthDiv2 - (int)(mContext.getResources().getDisplayMetrics().density * 1.1f + 0.5f);
                 break;
             default:
-                textSize = widthDiv2;
+                textSize = widthDiv2 - (int)(mContext.getResources().getDisplayMetrics().density * 0.4f + 0.5f);
                 break;
         }
         mTextAndBoltPaint.setTextSize(textSize);
@@ -586,7 +586,7 @@ public class BatteryMeterDrawable extends Drawable implements
         } else if ((mTextGravity & Gravity.BOTTOM) == Gravity.BOTTOM) {
             mTextY = mHeight;
         } else {
-            mTextY = widthDiv2 + bounds.height() / 2.0f;
+            mTextY = widthDiv2 + bounds.height() / 2.0f - (int)(mContext.getResources().getDisplayMetrics().density * 0.4f + 0.5f);
         }
 
         updateBoltDrawableLayer(mBatteryDrawable, mBoltDrawable);
