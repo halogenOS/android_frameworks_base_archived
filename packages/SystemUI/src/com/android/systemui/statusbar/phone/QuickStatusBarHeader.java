@@ -161,7 +161,7 @@ public class QuickStatusBarHeader extends BaseStatusBarHeader implements
         FontSizeUtils.updateFontSize(mEmergencyOnly, R.dimen.qs_emergency_calls_only_text_size);
 
         Builder builder = new Builder()
-                .addFloat(mShowFullAlarm ? mAlarmStatus : findViewById(R.id.date), "alpha", 0, 1)
+                .addFloat(mShowFullAlarm ? mAlarmStatus : findViewById(R.id.date), "alpha", 1, 1)
                 .addFloat(mEmergencyOnly, "alpha", 0, 1);
         if (mShowFullAlarm) {
             builder.addFloat(mAlarmStatusCollapsed, "alpha", 1, 0);
@@ -249,7 +249,7 @@ public class QuickStatusBarHeader extends BaseStatusBarHeader implements
 
     private void updateAlarmVisibilities() {
         mAlarmStatus.setVisibility(mAlarmShowing && mShowFullAlarm ? View.VISIBLE : View.INVISIBLE);
-        mAlarmStatusCollapsed.setVisibility(mAlarmShowing ? View.VISIBLE : View.INVISIBLE);
+        mAlarmStatusCollapsed.setVisibility(mAlarmShowing && mExpanded ? View.VISIBLE : View.INVISIBLE);
     }
 
     public void setListening(boolean listening) {
@@ -280,6 +280,7 @@ public class QuickStatusBarHeader extends BaseStatusBarHeader implements
         mMultiUserSwitch.setVisibility(mExpanded && mMultiUserSwitch.hasMultipleUsers() && !isDemo
                 ? View.VISIBLE : View.INVISIBLE);
         mEdit.setVisibility(isDemo || !mExpanded ? View.INVISIBLE : View.VISIBLE);
+        mDate.setVisibility(View.VISIBLE);
     }
 
     private void updateDateTimePosition() {
