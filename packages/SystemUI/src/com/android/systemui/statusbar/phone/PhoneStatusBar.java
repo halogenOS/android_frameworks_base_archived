@@ -772,8 +772,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                     mShowOperatorNameObserver);
         }
 
-        addNavigationBar();
-
         // Lastly, call to the icon policy to install/update all the icons.
         mIconPolicy = new PhoneStatusBarPolicy(mContext, mIconController, mCastController,
                 mHotspotController, mUserInfoController, mBluetoothController,
@@ -790,9 +788,18 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                     Settings.Global.getUriFor(SETTING_HEADS_UP_TICKER), true,
                     mHeadsUpObserver);
         }
-        
+
         Handler handler = new Handler();
         mSbSettingsObserver = new SettingsObserver(handler);
+
+        if(mContext.getResources()
+            .getBoolean(com.android.internal.R.bool.config_showNavigationBar) &&
+            (Settings.System.getIntForUser(mContext.getContentResolver(),
+                Settings.System.SHOW_NAVBAR, -1, UserHandle.USER_CURRENT) < 0 ||
+                SystemProperties.get("qemu.hw.mainkeys", "1").equals("0")))
+            Settings.System.putIntForUser(mContext.getContentResolver(),
+                Settings.System.SHOW_NAVBAR, 1, UserHandle.USER_CURRENT);
+
         mSbSettingsObserver.observe();
         mSbSettingsObserver.onChange(true);
         
@@ -1336,6 +1343,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                 createNavigationBarView(mContext);
                 prepareNavigationBarView();
                 addNavigationBar();
+                notifyUiVisibilityChanged(View.SYSTEM_UI_FLAG_VISIBLE);
             }
         } else {
             if(mNavigationBarView != null && mNavigationBarView.getWindowToken() != null)
