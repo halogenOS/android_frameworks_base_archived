@@ -252,6 +252,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     private static final int KEY_ACTION_SPLIT_SCREEN = 8;
     private static final int KEY_ACTION_SCREEN_OFF = 9;
     private static final int KEY_ACTION_SCREENSHOT = 10;
+    private static final int KEY_ACTION_ONEHAND_LEFT = 11;
+    private static final int KEY_ACTION_ONEHAND_RIGHT = 12;
 
     // Special values, used internal only.
     private static final int KEY_ACTION_HOME = 100;
@@ -3830,6 +3832,12 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 break;
             case KEY_ACTION_SCREENSHOT:
                 takeScreenshot(TAKE_SCREENSHOT_FULLSCREEN);
+                break;
+            case KEY_ACTION_ONEHAND_LEFT:
+                toggleSingleHand(mContext, true);
+                break;
+            case KEY_ACTION_ONEHAND_RIGHT:
+                toggleSingleHand(mContext, false);
                 break;
         }
     }
@@ -9204,5 +9212,12 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 
     public void freezeOrThawRotation(int rotation) {
         mDesiredRotation = rotation;
+    }
+
+    private void toggleSingleHand(Context context, boolean isLeft) {
+        Settings.Global.putString(context.getContentResolver(), Settings.Global.SINGLE_HAND_MODE,
+                Settings.Global.getString(context.getContentResolver(),
+                    Settings.Global.SINGLE_HAND_MODE).isEmpty() ?
+                    isLeft ? "left" : "right" : "");
     }
 }
