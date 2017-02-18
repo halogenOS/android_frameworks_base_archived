@@ -160,12 +160,17 @@ public class QuickStatusBarHeader extends BaseStatusBarHeader implements
         FontSizeUtils.updateFontSize(mAlarmStatus, R.dimen.qs_date_collapsed_size);
         FontSizeUtils.updateFontSize(mEmergencyOnly, R.dimen.qs_emergency_calls_only_text_size);
 
-        Builder builder = new Builder()
-                .addFloat(mShowFullAlarm ? mAlarmStatus : findViewById(R.id.date), "alpha", 1, 1)
-                .addFloat(mEmergencyOnly, "alpha", 0, 1);
-        if (mShowFullAlarm) {
-            builder.addFloat(mAlarmStatusCollapsed, "alpha", 1, 0);
+        Builder builder = new Builder();
+
+        if(mShowFullAlarm) {
+            builder
+                .addFloat(mEmergencyOnly, "alpha", 0, 1)
+                .addFloat(mAlarmStatus, "alpha", 0, 1)
+                .addFloat(mAlarmStatusCollapsed, "alpha", 1, 0);
+        } else {
+            mAlarmStatusCollapsed.setVisibility(View.GONE);
         }
+
         mAnimator = builder.build();
 
         updateSettingsAnimator();
