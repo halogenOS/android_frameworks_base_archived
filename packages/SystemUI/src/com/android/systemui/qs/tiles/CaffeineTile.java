@@ -72,6 +72,11 @@ public class CaffeineTile extends QSTile<QSTile.BooleanState> {
     }
 
     @Override
+    public void handleLongClick() {
+        // Do absolutely NOTHING
+    }
+
+    @Override
     public Intent getLongClickIntent() {
         return null;
     }
