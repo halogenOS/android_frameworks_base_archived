@@ -177,7 +177,6 @@ import com.android.systemui.statusbar.policy.BatteryController.BatteryStateChang
 import com.android.systemui.statusbar.policy.BatteryControllerImpl;
 import com.android.systemui.statusbar.policy.BluetoothControllerImpl;
 import com.android.systemui.statusbar.policy.BrightnessMirrorController;
-import com.android.systemui.statusbar.policy.BurnInProtectionController;
 import com.android.systemui.statusbar.policy.CastControllerImpl;
 import com.android.systemui.statusbar.policy.EncryptionHelper;
 import com.android.systemui.statusbar.policy.FlashlightController;
@@ -358,7 +357,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     LightStatusBarController mLightStatusBarController;
     protected LockscreenWallpaper mLockscreenWallpaper;
 
-    private BurnInProtectionController mBurnInProtectionController;
+    private SettingsObserver mSbSettingsObserver;
 
     int mNaturalBarHeight = -1;
 
@@ -597,8 +596,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     private int mLastCameraLaunchSource;
     private PowerManager.WakeLock mGestureWakeLock;
     private Vibrator mVibrator;
-    
-    private SettingsObserver mSbSettingsObserver;
 
     // Fingerprint (as computed by getLoggingFingerprint() of the last logged state.
     private int mLastLoggedStateFingerprint;
@@ -728,17 +725,12 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             // Observe all users' changes
             ContentResolver resolver = mContext.getContentResolver();
             resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.SHOW_NAVBAR), false, this,
-                    UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.SHOW_LOCKSCREEN_VISUALIZER), false, this,
                     UserHandle.USER_ALL);
         }
 
         @Override
         public void onChange(boolean selfChange) {
-            onNavbarChange(Settings.System.getIntForUser(mContext.getContentResolver(),
-                Settings.System.SHOW_NAVBAR, -1, UserHandle.USER_CURRENT) == 1);
             mKeyguardBottomArea.onLockscreenVisualizerChange();
         }
     }
@@ -772,6 +764,8 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                     mShowOperatorNameObserver);
         }
 
+        addNavigationBar();
+
         // Lastly, call to the icon policy to install/update all the icons.
         mIconPolicy = new PhoneStatusBarPolicy(mContext, mIconController, mCastController,
                 mHotspotController, mUserInfoController, mBluetoothController,
@@ -789,20 +783,10 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                     mHeadsUpObserver);
         }
 
-        Handler handler = new Handler();
-        mSbSettingsObserver = new SettingsObserver(handler);
-
-        if(mContext.getResources()
-            .getBoolean(com.android.internal.R.bool.config_showNavigationBar) &&
-            (Settings.System.getIntForUser(mContext.getContentResolver(),
-                Settings.System.SHOW_NAVBAR, -1, UserHandle.USER_CURRENT) < 0 ||
-                SystemProperties.get("qemu.hw.mainkeys", "1").equals("0")))
-            Settings.System.putIntForUser(mContext.getContentResolver(),
-                Settings.System.SHOW_NAVBAR, 1, UserHandle.USER_CURRENT);
-
+        mSbSettingsObserver = new SettingsObserver(new Handler());
         mSbSettingsObserver.observe();
         mSbSettingsObserver.onChange(true);
-        
+
         mUnlockMethodCache = UnlockMethodCache.getInstance(mContext);
         mUnlockMethodCache.addListener(this);
         startKeyguard();
@@ -879,12 +863,14 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             mNotificationPanelDebugText.setVisibility(View.VISIBLE);
         }
 
-        mBurnInProtectionController = new BurnInProtectionController(mContext, mStatusBarView);
-
         try {
-            onNavbarChange(mWindowManagerService.hasNavigationBar());
-        } catch(RemoteException e) {
-            // Have fun with no Window Manager xD
+            boolean showNav = mWindowManagerService.hasNavigationBar();
+            if (DEBUG) Log.v(TAG, "hasNavigationBar=" + showNav);
+            if (showNav) {
+                createNavigationBarView(context);
+            }
+        } catch (RemoteException ex) {
+            // no window manager? good luck with that
         }
 
         mAssistManager = SystemUIFactory.getInstance().createAssistManager(this, context);
@@ -1284,95 +1270,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         if (signalCluster != null) {
             signalCluster.setSecurityController(mSecurityController);
             signalCluster.setNetworkController(mNetworkController);
-        }
-    }
-    
-    private synchronized void doNavbarSanityCheckInternal() throws Exception {
-        if
-        /* Translation:
-         * ------------
-         *
-         * If navbar is enabled, but navbar view is null
-         * OR navbar is disabled, but navbar view not null
-         * OR navbar view is not null, but is not attached to window
-         * OR... (Hehe, you can't check if a nulled navbar view has a window token :P
-         *        Only typical chut... (like me when I was 14) would be able to 
-         *        cause such a dumb NullPointerException
-         *          (I know nil pointers are bad (maybe), but why should
-         *          you complain about nal now? NUL is useful in some cases, if not
-         *          more than only some)
-         *       )
-         * => THEN try to handle the navbar properly again because something is terribly wrong
-         *  --> This is just to avoid crashes or any other bugs with navbar.
-         *  ---> User could have spammed toggle
-         *  ---> halogenOS system might have a bad day
-         *  ---> User's phone doesn't like the user
-         *  ---> Or there is just something wrong
-         * BTW: Don't think this implementation is bad just because it could cause
-         *      issues if the user is mad. Other implementations are not better than
-         *      this AFAIK and as far as I have experienced.
-         * BTW BTW: If you ever wonder which mad boy wrote this code:
-         *          @xdevs23
-         * Have fun
-         * 
-         * Yours sincerely
-         * The mad boy who wrote this code
-         */
-        (
-            ( mNavigationBarEnabled && mNavigationBarView == null) ||
-            (!mNavigationBarEnabled && mNavigationBarView != null) ||
-            ( mNavigationBarView != null && mNavigationBarView.getWindowToken() == null)
-        ) onNavbarChangeInternal(mNavigationBarEnabled);
-        if(!mNavigationBarEnabled && mNavigationBarView != null)
-            mNavigationBarView = null;
-    }
-    
-    private synchronized boolean doNavbarSanityCheck() {
-        try {
-            doNavbarSanityCheckInternal();
-            return true;
-        } catch(Exception t) {
-            return false;
-        }
-    }
-    
-    private synchronized void onNavbarChangeInternal(boolean enabled) throws Exception {
-        if(enabled) {
-            if(mNavigationBarView == null || mNavigationBarView.getWindowToken() == null) {
-                mNavigationBarView = null;
-                createNavigationBarView(mContext);
-                prepareNavigationBarView();
-                addNavigationBar();
-                notifyUiVisibilityChanged(View.SYSTEM_UI_FLAG_VISIBLE);
-            }
-        } else {
-            if(mNavigationBarView != null && mNavigationBarView.getWindowToken() != null)
-                mWindowManager.removeView(mNavigationBarView);
-            mNavigationBarView = null;
-        }
-        mNavigationBarEnabled = enabled;
-        mBurnInProtectionController.setNavigationBarView(enabled ? mNavigationBarView : null);
-    }
-    
-    private synchronized void onNavbarChange(final boolean enabled) {
-        try {
-            onNavbarChangeInternal(enabled);
-        } catch(Exception ex) {
-            // It is possible that the user has spammed the toggle
-            // so hard that SystemUI would crash at this point
-            // But we can just catch the exception, as it doesn't matter.
-            // It will continue working fine, it's the user's fault if
-            // something is broken at this point :D
-            // But let's try to clean it up anyways.
-            Log.d(TAG, "Please don't spam the toggle!");
-            try {
-                if(mNavigationBarView != null && mNavigationBarView.getWindowToken() == null) {
-                    mNavigationBarView = null;
-                    onNavbarChangeInternal(enabled);
-                }
-            } catch(Exception iex) {
-                doNavbarSanityCheck();
-            }
         }
     }
 
@@ -2999,7 +2896,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             return;
         }
 
-        doNavbarSanityCheck();
         mExpandedVisible = true;
 
         // Expand the window to encompass the full screen in anticipation of the drag.
@@ -3137,7 +3033,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
         mNotificationPanel.closeQs();
 
-        doNavbarSanityCheck();
         mExpandedVisible = false;
 
         visibilityChanged(false);
@@ -5056,9 +4951,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         mWakeUpTouchLocation = null;
         mStackScroller.setAnimationsEnabled(false);
         updateVisibleToUser();
-        if (mBurnInProtectionController != null) {
-            mBurnInProtectionController.stopSwiftTimer();
-        }
         if (mLaunchCameraOnFinishedGoingToSleep) {
             mLaunchCameraOnFinishedGoingToSleep = false;
 
@@ -5078,9 +4970,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         mStackScroller.setAnimationsEnabled(true);
         mNotificationPanel.setTouchDisabled(false);
         updateVisibleToUser();
-        if (mBurnInProtectionController != null) {
-            mBurnInProtectionController.startSwiftTimer();
-        }
     }
 
     public void onScreenTurningOn() {

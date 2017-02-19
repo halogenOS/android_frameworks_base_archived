@@ -3767,15 +3767,6 @@ public final class Settings {
                                 "long_press_home_button_behavior";
 
         /**
-         * Navbar toggle
-         *
-         * @hide
-         */
-        public static final String SHOW_NAVBAR =
-                                "user_wants_show_navbar";
-
-
-        /**
          * Button backlight brightness
          *
          * @hide
@@ -3908,7 +3899,6 @@ public final class Settings {
             LOCK_TO_APP_ENABLED,
             NOTIFICATION_SOUND,
             ACCELEROMETER_ROTATION,
-            SHOW_NAVBAR,
             SHOW_LOCKSCREEN_VISUALIZER,
             KEY_ENABLE_HEADSUP_NOTIFICATIONS
         };
@@ -3968,7 +3958,6 @@ public final class Settings {
             PUBLIC_SETTINGS.add(PROXIMITY_ON_WAKE);
             PUBLIC_SETTINGS.add(DEVICE_SPECIFIC_SETTINGS);
             PUBLIC_SETTINGS.add(LONG_PRESS_HOME_BUTTON_BEHAVIOR);
-            PUBLIC_SETTINGS.add(SHOW_NAVBAR);
             PUBLIC_SETTINGS.add(HARDWARE_BUTTONS_ENABLED);
             PUBLIC_SETTINGS.add(BUTTON_BACKLIGHT_BRIGHTNESS);
             PUBLIC_SETTINGS.add(BUTTON_BACKLIGHT_TIMEOUT);
