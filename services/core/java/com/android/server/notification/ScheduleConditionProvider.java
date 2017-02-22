@@ -178,7 +178,7 @@ public class ScheduleConditionProvider extends SystemConditionProviderService {
                 } else {
                     notifyCondition(conditionId, Condition.STATE_FALSE, "!meetsSchedule");
                     removeSnoozed(conditionId);
-                    if (nextUserAlarmTime == 0) {
+                    if (cal != null && nextUserAlarmTime == 0) {
                         cal.maybeSetNextAlarm(now, nextUserAlarmTime);
                     } else {
                         notifyCondition(conditionId, Condition.STATE_FALSE, "!meetsSchedule");
