@@ -44,6 +44,8 @@ import com.android.systemui.statusbar.policy.UserInfoController;
 import com.android.systemui.statusbar.policy.UserSwitcherController;
 import com.android.systemui.tuner.TunerService;
 
+import com.android.internal.util.omni.PackageUtils;
+
 import java.text.NumberFormat;
 
 /**
@@ -94,6 +96,9 @@ public class KeyguardStatusBarView extends RelativeLayout
     private void showStatusBarCarrier() {
         mShowCarrierLabel = Settings.System.getIntForUser(getContext().getContentResolver(),
                 Settings.System.STATUS_BAR_SHOW_CARRIER, 1, UserHandle.USER_CURRENT);
+        if (PackageUtils.isImageTileInstalled(getContext())) {
+            mShowCarrierLabel = 3;
+        }
     }
 
     @Override

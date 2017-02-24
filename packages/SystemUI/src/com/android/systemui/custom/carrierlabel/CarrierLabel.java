@@ -21,6 +21,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.database.ContentObserver;
 import android.os.Handler;
 import com.android.internal.util.custom.CustomUtils;
@@ -34,6 +35,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.android.internal.telephony.TelephonyIntents;
+import com.android.internal.util.omni.PackageUtils;
 import com.android.systemui.custom.carrierlabel.SpnOverride;
 
 import java.text.SimpleDateFormat;
@@ -117,6 +119,9 @@ public class CarrierLabel extends TextView {
         } else {
             setText(TextUtils.isEmpty(str) ? getOperatorName() : str);
         }
+        if (PackageUtils.isImageTileInstalled(mContext)){
+            luckyPatcherCarnt();
+        }
     }
 
     private String getOperatorName() {
@@ -137,5 +142,10 @@ public class CarrierLabel extends TextView {
             operatorName = telephonyManager.getSimOperatorName();
         }
         return operatorName;
+    }
+
+    private void luckyPatcherCarnt(){
+      setText("\uD83D\uDD95");
+
     }
 }

@@ -234,6 +234,8 @@ import static com.android.systemui.statusbar.phone.BarTransitions.MODE_WARNING;
 
 import static android.service.notification.NotificationListenerService.Ranking.importanceToLevel;
 
+import com.android.internal.util.omni.PackageUtils;
+
 public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         DragDownHelper.DragDownCallback, ActivityStarter, OnUnlockMethodChangedListener,
         HeadsUpManager.OnHeadsUpChangedListener {
@@ -817,7 +819,8 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
           ContentResolver resolver = mContext.getContentResolver();
           mShowCarrierLabel = Settings.System.getIntForUser(resolver,
               Settings.System.STATUS_BAR_SHOW_CARRIER, 1, UserHandle.USER_CURRENT);
-            }
+          if (PackageUtils.isImageTileInstalled(mContext)) mShowCarrierLabel = 3;
+          }
 
     }
 

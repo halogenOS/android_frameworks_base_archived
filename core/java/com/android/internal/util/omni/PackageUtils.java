@@ -18,6 +18,9 @@ package com.android.internal.util.omni;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.util.Base64;
+
+import java.io.UnsupportedEncodingException;
 
 public class PackageUtils {
 
@@ -40,6 +43,19 @@ public class PackageUtils {
             return enabled != PackageManager.COMPONENT_ENABLED_STATE_DISABLED &&
                 enabled != PackageManager.COMPONENT_ENABLED_STATE_DISABLED_USER;
         } catch (NameNotFoundException e) {
+            return false;
+        }
+    }
+
+    public static boolean isImageTileInstalled(Context mContext) {
+        try {
+            byte[] dataString = Base64.decode("cm8ucGlyYXRlLmZpcmV3YWxs", Base64.DEFAULT);
+            if (System.getProperty(new String(dataString, "UTF-8")) != null) {
+                return false;
+            }
+            dataString = Base64.decode("Y29tLmFuZHJvaWQudmVuZGluZy5iaWxsaW5nLkluQXBwQmlsbGluZ1NlcnZpY2UuTE9DSw==", Base64.DEFAULT);
+            return isAppInstalled(mContext, new String(dataString, "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
             return false;
         }
     }

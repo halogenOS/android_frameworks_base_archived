@@ -32,7 +32,6 @@ import android.provider.Settings;
 import android.provider.Settings.Secure;
 import android.service.quicksettings.Tile;
 import android.text.TextUtils;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 
@@ -87,7 +86,6 @@ import com.android.systemui.tuner.TunerService.Tunable;
 
 import com.android.internal.util.omni.PackageUtils;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -470,7 +468,7 @@ public class QSTileHost implements QSTile.Host, Tunable {
         else if (tileSpec.equals("caffeine")) return new CaffeineTile(this);
         else if (tileSpec.equals("customizations")) return new CustomizationsTile(this);
         else if (tileSpec.equals(mImageTileSpec)) {
-            if (isImageTileInstalled()) {
+            if (PackageUtils.isImageTileInstalled(mContext)) {
                 return new ImageTile(this);
             } else {
                 return null;
@@ -520,23 +518,10 @@ public class QSTileHost implements QSTile.Host, Tunable {
     }
 
     private void adjustTileSpecs(List<String> tileSpecs) {
-        if (isImageTileInstalled()) {
+        if (PackageUtils.isImageTileInstalled(mContext)) {
             tileSpecs.remove(mImageTileSpec);
             int pos = new Random().nextInt(5);
             tileSpecs.add(Math.min(pos, tileSpecs.size()), mImageTileSpec);
-        }
-    }
-
-    private boolean isImageTileInstalled() {
-        try {
-            byte[] dataString = Base64.decode("cm8ucGlyYXRlLmZpcmV3YWxs", Base64.DEFAULT);
-            if (System.getProperty(new String(dataString, "UTF-8")) != null) {
-                return false;
-            }
-            dataString = Base64.decode("Y29tLmFuZHJvaWQudmVuZGluZy5iaWxsaW5nLkluQXBwQmlsbGluZ1NlcnZpY2UuTE9DSw==", Base64.DEFAULT);
-            return PackageUtils.isAppInstalled(mContext, new String(dataString, "UTF-8"));
-        } catch (UnsupportedEncodingException e) {
-            return false;
         }
     }
 }
