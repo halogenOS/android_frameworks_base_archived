@@ -391,6 +391,10 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     View mExpandedContents;
     TextView mNotificationPanelDebugText;
 
+    // Custom Carrier Label
+    private int mShowCarrierLabel;
+    private TextView mCustomCarrierLabel;
+
     // settings
     private QSPanel mQSPanel;
 
@@ -458,6 +462,14 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     private HandlerThread mHandlerThread;
 
     private boolean mNavigationBarViewAttached;
+    private View.OnTouchListener mUserAutoHideListener = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            checkUserAutohide(v, event);
+            return false;
+        }
+    };
+
 
     // ensure quick settings is disabled until the current user makes it through the setup wizard
     private boolean mUserSetup = false;
@@ -753,12 +765,34 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.SHOW_LOCKSCREEN_VISUALIZER), false, this,
                     UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_SHOW_CARRIER), false, this,
+                    UserHandle.USER_ALL);
+            update();
         }
 
         @Override
         public void onChange(boolean selfChange) {
             mKeyguardBottomArea.onLockscreenVisualizerChange();
         }
+
+        @Override
+       public void onChange(boolean selfChange, Uri uri) {
+           super.onChange(selfChange, uri);
+           if (uri.equals(Settings.System.getUriFor(
+                   Settings.System.STATUS_BAR_SHOW_CARRIER))) {
+               update();
+               updateCarrier();
+           }
+           update();
+       }
+
+        public void update() {
+          ContentResolver resolver = mContext.getContentResolver();
+          mShowCarrierLabel = Settings.System.getIntForUser(resolver,
+              Settings.System.STATUS_BAR_SHOW_CARRIER, 1, UserHandle.USER_CURRENT);
+            }
+
     }
 
     @Override
@@ -1032,6 +1066,12 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                 mCarrierLabel.setLayoutParams(mlp);
             }
         }
+
+        mCustomCarrierLabel = (TextView) mStatusBarWindow.findViewById(R.id.statusbar_carrier_text);
+        if (mCustomCarrierLabel != null) {
+            updateCarrier();
+        }
+
         mFlashlightController = new FlashlightController(mContext);
         mKeyguardBottomArea.setFlashlightController(mFlashlightController);
         mKeyguardBottomArea.setPhoneStatusBar(this);
@@ -2189,6 +2229,18 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         }
     }
 
+    private void updateCarrier() {
+        if (mCustomCarrierLabel != null) {
+            if (mShowCarrierLabel == 2) {
+                mCustomCarrierLabel.setVisibility(View.VISIBLE);
+            } else if (mShowCarrierLabel == 3) {
+                mCustomCarrierLabel.setVisibility(View.VISIBLE);
+            } else {
+                mCustomCarrierLabel.setVisibility(View.GONE);
+            }
+        }
+    }
+
     @Override
     protected void setAreThereNotifications() {
 
@@ -2426,7 +2478,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                 && mStatusBarKeyguardViewManager.isOccluded();
 
         final boolean hasArtwork = artworkDrawable != null;
-        
+
         final boolean keyguardVisible = (mState != StatusBarState.SHADE);
         if(mKeyguardBottomArea.mVisualizerView != null &&
             !mKeyguardFadingAway && keyguardVisible)
@@ -2435,7 +2487,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                     && mMediaController.getPlaybackState() != null
                     && mMediaController.getPlaybackState().getState()
                             == PlaybackState.STATE_PLAYING);
-        
+
         if (mKeyguardBottomArea.mVisualizerView != null &&
             keyguardVisible && hasArtwork &&
             (artworkDrawable instanceof BitmapDrawable))
@@ -4577,6 +4629,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         updateNotifications();
         checkBarModes();
         updateCarrierLabelVisibility();
+        updateCarrier();
         updateMediaMetaData(false, mState != StatusBarState.KEYGUARD);
         mKeyguardMonitor.notifyKeyguardState(mStatusBarKeyguardViewManager.isShowing(),
                 mStatusBarKeyguardViewManager.isSecure(),
