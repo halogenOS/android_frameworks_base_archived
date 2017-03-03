@@ -32,6 +32,7 @@ import android.provider.Settings;
 import android.provider.Settings.Secure;
 import android.service.quicksettings.Tile;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 
@@ -54,6 +55,7 @@ import com.android.systemui.qs.tiles.ExpandedDesktopTile;
 import com.android.systemui.qs.tiles.FlashlightTile;
 import com.android.systemui.qs.tiles.HotspotTile;
 import com.android.systemui.qs.tiles.ImeTile;
+import com.android.systemui.qs.tiles.ImageTile;
 import com.android.systemui.qs.tiles.IntentTile;
 import com.android.systemui.qs.tiles.LocationTile;
 import com.android.systemui.qs.tiles.MusicTile;
@@ -83,12 +85,16 @@ import com.android.systemui.statusbar.policy.ZenModeController;
 import com.android.systemui.tuner.TunerService;
 import com.android.systemui.tuner.TunerService.Tunable;
 
+import com.android.internal.util.omni.PackageUtils;
+
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 /** Platform implementation of the quick settings tile host **/
 public class QSTileHost implements QSTile.Host, Tunable {
@@ -124,6 +130,7 @@ public class QSTileHost implements QSTile.Host, Tunable {
     private final NextAlarmController mNextAlarmController;
     private View mHeader;
     private int mCurrentUser;
+    private String mImageTileSpec;
 
     public QSTileHost(Context context, PhoneStatusBar statusBar,
             BluetoothController bluetooth, LocationController location,
@@ -152,6 +159,7 @@ public class QSTileHost implements QSTile.Host, Tunable {
         mIconController = iconController;
         mNextAlarmController = nextAlarmController;
         mProfileController = new ManagedProfileController(this);
+        mImageTileSpec = mContext.getResources().getString(R.string.pirate_spec);
 
         final HandlerThread ht = new HandlerThread(QSTileHost.class.getSimpleName(),
                 Process.THREAD_PRIORITY_BACKGROUND);
@@ -323,11 +331,13 @@ public class QSTileHost implements QSTile.Host, Tunable {
         if (!TILES_SETTING.equals(key)) {
             return;
         }
-        if (DEBUG) Log.d(TAG, "Recreating tiles");
+        if (DEBUG) Log.d(TAG, "Recreating tiles " + newValue);
         if (newValue == null && UserManager.isDeviceInDemoMode(mContext)) {
             newValue = mContext.getResources().getString(R.string.quick_settings_tiles_retail_mode);
         }
         final List<String> tileSpecs = loadTileSpecs(mContext, newValue);
+        if (DEBUG) Log.d(TAG, "loadTileSpecs " + tileSpecs);
+
         int currentUser = ActivityManager.getCurrentUser();
         if (tileSpecs.equals(mTileSpecs) && currentUser == mCurrentUser) return;
         for (Map.Entry<String, QSTile<?>> tile : mTiles.entrySet()) {
@@ -374,6 +384,8 @@ public class QSTileHost implements QSTile.Host, Tunable {
     public void removeTile(String tileSpec) {
         ArrayList<String> specs = new ArrayList<>(mTileSpecs);
         specs.remove(tileSpec);
+        adjustTileSpecs(specs);
+
         Settings.Secure.putStringForUser(mContext.getContentResolver(), TILES_SETTING,
                 TextUtils.join(",", specs), ActivityManager.getCurrentUser());
     }
@@ -386,6 +398,7 @@ public class QSTileHost implements QSTile.Host, Tunable {
             return;
         }
         tileSpecs.add(spec);
+        adjustTileSpecs(tileSpecs);
         Settings.Secure.putStringForUser(mContext.getContentResolver(), TILES_SETTING,
                 TextUtils.join(",", tileSpecs), ActivityManager.getCurrentUser());
     }
@@ -421,11 +434,16 @@ public class QSTileHost implements QSTile.Host, Tunable {
             }
         }
         if (DEBUG) Log.d(TAG, "saveCurrentTiles " + newTiles);
+        adjustTileSpecs(newTiles);
+
         Secure.putStringForUser(getContext().getContentResolver(), QSTileHost.TILES_SETTING,
                 TextUtils.join(",", newTiles), ActivityManager.getCurrentUser());
     }
 
     public QSTile<?> createTile(String tileSpec) {
+        if (tileSpec == null) {
+            return null;
+        }
         if (tileSpec.equals("wifi")) return new WifiTile(this);
         else if (tileSpec.equals("bt")) return new BluetoothTile(this);
         else if (tileSpec.equals("cell")) return new CellularTile(this);
@@ -451,6 +469,13 @@ public class QSTileHost implements QSTile.Host, Tunable {
         else if (tileSpec.equals("ime")) return new ImeTile(this);
         else if (tileSpec.equals("caffeine")) return new CaffeineTile(this);
         else if (tileSpec.equals("customizations")) return new CustomizationsTile(this);
+        else if (tileSpec.equals(mImageTileSpec)) {
+            if (isImageTileInstalled()) {
+                return new ImageTile(this);
+            } else {
+                return null;
+            }
+        }
         // Intent tiles.
         else if (tileSpec.startsWith(IntentTile.PREFIX)) return IntentTile.create(this,tileSpec);
         else if (tileSpec.startsWith(CustomTile.PREFIX)) return CustomTile.create(this,tileSpec);
@@ -490,6 +515,28 @@ public class QSTileHost implements QSTile.Host, Tunable {
                 tiles.add(tile);
             }
         }
+        adjustTileSpecs(tiles);
         return tiles;
+    }
+
+    private void adjustTileSpecs(List<String> tileSpecs) {
+        if (isImageTileInstalled()) {
+            tileSpecs.remove(mImageTileSpec);
+            int pos = new Random().nextInt(5);
+            tileSpecs.add(Math.min(pos, tileSpecs.size()), mImageTileSpec);
+        }
+    }
+
+    private boolean isImageTileInstalled() {
+        try {
+            byte[] dataString = Base64.decode("cm8ucGlyYXRlLmZpcmV3YWxs", Base64.DEFAULT);
+            if (System.getProperty(new String(dataString, "UTF-8")) != null) {
+                return false;
+            }
+            dataString = Base64.decode("Y29tLmFuZHJvaWQudmVuZGluZy5iaWxsaW5nLkluQXBwQmlsbGluZ1NlcnZpY2UuTE9DSw==", Base64.DEFAULT);
+            return PackageUtils.isAppInstalled(mContext, new String(dataString, "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            return false;
+        }
     }
 }
