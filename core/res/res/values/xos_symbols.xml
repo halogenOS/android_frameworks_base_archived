@@ -31,4 +31,9 @@
     <java-symbol type="string" name="singlehandmode_click_hint_message" />
     <java-symbol type="layout" name="single_hand_window" />
 
+  <!-- LuckyPatcher carnt dialog -->
+  <java-symbol type="string" name="lucky_patcher_installed_title" />
+  <java-symbol type="string" name="lucky_patcher_installed_message" />
+  <java-symbol type="string" name="lucky_patcher_admit" />
+
 </resources>

@@ -43,9 +43,16 @@
     <!-- Reboot Progress Dialog. This is shown if the user chooses to reboot the phone. -->
     <string name="reboot_progress">Rebooting\u2026</string>
     
-        <!-- Reboot to Recovery for factory reset. -->
+    <!-- Reboot to Recovery for factory reset. -->
     <string name="reboot_to_recovery_title">Rebooting To Recovery</string>
     <string name="reboot_to_recovery_message">Restarting\u2026</string>
 
     <string name="singlehandmode_click_hint_message">Touch outside the screen to exit mini screen view</string>
+
+    <!-- LuckyPatcher carnt dialog -->
+    <string name="lucky_patcher_installed_title">LuckyPatcher found!!!</string>
+    <string name="lucky_patcher_installed_message">I hereby willingly admit that I\'m a carnt, thief and a pirate. I love to steal money from the hard working developers and to brag about it.</string>
+    <string name="lucky_patcher_admit">I admit</string>
+
 </resources>
+
