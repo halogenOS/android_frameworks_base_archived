@@ -160,15 +160,16 @@ public class QuickStatusBarHeader extends BaseStatusBarHeader implements
         FontSizeUtils.updateFontSize(mAlarmStatus, R.dimen.qs_date_collapsed_size);
         FontSizeUtils.updateFontSize(mEmergencyOnly, R.dimen.qs_emergency_calls_only_text_size);
 
-        Builder builder = new Builder();
+        Builder builder = new Builder().addFloat(mEmergencyOnly, "alpha", 0, 1);
 
         if(mShowFullAlarm) {
             builder
-                .addFloat(mEmergencyOnly, "alpha", 0, 1)
-                .addFloat(mAlarmStatus, "alpha", 0, 1)
-                .addFloat(mAlarmStatusCollapsed, "alpha", 1, 0);
+                .addFloat(mAlarmStatus, "alpha", 1, 1)
+                .addFloat(mAlarmStatusCollapsed, "alpha", 0, 0);
         } else {
-            mAlarmStatusCollapsed.setVisibility(View.GONE);
+            builder
+                .addFloat(mAlarmStatus, "alpha", 0, 0)
+                .addFloat(mAlarmStatusCollapsed, "alpha", 1, 1);
         }
 
         mAnimator = builder.build();
@@ -253,8 +254,11 @@ public class QuickStatusBarHeader extends BaseStatusBarHeader implements
     }
 
     private void updateAlarmVisibilities() {
-        mAlarmStatus.setVisibility(mAlarmShowing && mShowFullAlarm ? View.VISIBLE : View.INVISIBLE);
-        mAlarmStatusCollapsed.setVisibility(mAlarmShowing && mExpanded ? View.VISIBLE : View.INVISIBLE);
+        mAlarmStatus.setVisibility(
+            mAlarmShowing && mShowFullAlarm ? View.VISIBLE : View.INVISIBLE);
+        mAlarmStatusCollapsed.setVisibility(
+            mAlarmShowing && mExpanded && !mShowFullAlarm
+            ? View.VISIBLE : View.INVISIBLE);
     }
 
     public void setListening(boolean listening) {
