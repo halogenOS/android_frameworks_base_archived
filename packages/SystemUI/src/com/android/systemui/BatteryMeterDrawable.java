@@ -625,6 +625,10 @@ public class BatteryMeterDrawable extends Drawable implements
             mTextX = widthDiv2;
         }
 
+        // Make the text appear on the correct position if circle/solid
+        if (mStyle == BATTERY_STYLE_CIRCLE || mStyle == BATTERY_STYLE_SOLID)
+            mTextX -= /* 1 * */ mContext.getResources().getDisplayMetrics().density;
+
         // Compute mTextY based on text gravity
         if ((mTextGravity & Gravity.TOP) == Gravity.TOP) {
             mTextY = bounds.height();
