@@ -95,6 +95,10 @@ public class MobileSignalController extends SignalController<
     private int mStyle = STATUS_BAR_STYLE_ANDROID_DEFAULT;
     private DataEnabledSettingObserver mDataEnabledSettingObserver;
 
+    private int[] mCarrierOneThresholdValues = null;
+    private boolean mIsCarrierOneNetwork = false;
+    private String[] mCarrieroneMccMncs = null;
+
     // TODO: Reduce number of vars passed in, if we have the NetworkController, probably don't
     // need listener lists anymore.
     public MobileSignalController(Context context, Config config, boolean hasMobileData,
@@ -146,6 +150,10 @@ public class MobileSignalController extends SignalController<
         mLastState.iconGroup = mCurrentState.iconGroup = mDefaultIcons;
         // Get initial data sim state.
         updateDataSim();
+        mCarrieroneMccMncs = mContext.getResources().getStringArray(
+                R.array.config_carrier_one_networks);
+        mCarrierOneThresholdValues = mContext.getResources().getIntArray(
+                R.array.carrier_one_strength_threshold_values);
     }
 
     //TODO - Remove this when carrier pack is enabled for carrier one
@@ -691,7 +699,7 @@ public class MobileSignalController extends SignalController<
                 mCurrentState.level = mSignalStrength.getCdmaLevel();
             } else {
                 mCurrentState.level = mSignalStrength.getLevel();
-                if (mConfig.showRsrpSignalLevelforLTE) {
+                if (mConfig.showRsrpSignalLevelforLTE && !mIsCarrierOneNetwork) {
                     int dataType = mServiceState.getDataNetworkType();
                     if (dataType == TelephonyManager.NETWORK_TYPE_LTE ||
                             dataType == TelephonyManager.NETWORK_TYPE_LTE_CA) {
@@ -740,6 +748,8 @@ public class MobileSignalController extends SignalController<
         if (mStyle == STATUS_BAR_STYLE_EXTENDED) {
             mCurrentState.imsRadioTechnology = getImsRadioTechnology();
         }
+
+        mCurrentState.dataNetType = mDataNetType;
 
         notifyListenersIfNecessary();
     }
@@ -1032,7 +1042,26 @@ public class MobileSignalController extends SignalController<
                         ((signalStrength == null) ? "" : (" level=" + signalStrength.getLevel())));
             }
             mSignalStrength = signalStrength;
+
+            if (mIsCarrierOneNetwork && mSignalStrength != null &&
+                    mCarrierOneThresholdValues != null) {
+                mSignalStrength.setThreshRsrp(mCarrierOneThresholdValues);
+            }
             updateTelephony();
+        }
+
+        private boolean isCarrierOneOperatorRegistered(ServiceState state) {
+            String operatornumeric = state.getOperatorNumeric();
+            if (mCarrieroneMccMncs == null || mCarrieroneMccMncs.length == 0 ||
+                    TextUtils.isEmpty(operatornumeric)) {
+                return false;
+            }
+            for (String numeric : mCarrieroneMccMncs) {
+                if (operatornumeric.equals(numeric)) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         @Override
@@ -1043,6 +1072,11 @@ public class MobileSignalController extends SignalController<
             }
             mServiceState = state;
             mDataNetType = state.getDataNetworkType();
+
+            mIsCarrierOneNetwork = isCarrierOneOperatorRegistered(mServiceState);
+            Log.d(mTag, "onServiceStateChanged mIsCarrierOneNetwork =" +
+                    mIsCarrierOneNetwork);
+
             updateNetworkName(mLastShowSpn, mLastSpn, mLastDataSpn, mLastShowPlmn, mLastPlmn);
             if (mDataNetType == TelephonyManager.NETWORK_TYPE_LTE && mServiceState != null &&
                     mServiceState.isUsingCarrierAggregation()) {
@@ -1159,6 +1193,7 @@ public class MobileSignalController extends SignalController<
         int dataActivity;
         int voiceLevel;
         int imsRadioTechnology;
+        int dataNetType;
 
         @Override
         public void copyFrom(State s) {
@@ -1177,6 +1212,7 @@ public class MobileSignalController extends SignalController<
             dataActivity = state.dataActivity;
             voiceLevel = state.voiceLevel;
             imsRadioTechnology = state.imsRadioTechnology;
+            dataNetType = state.dataNetType;
         }
 
         @Override
@@ -1197,6 +1233,7 @@ public class MobileSignalController extends SignalController<
             builder.append("voiceLevel=").append(voiceLevel).append(',');
             builder.append("carrierNetworkChangeMode=").append(carrierNetworkChangeMode);
             builder.append("imsRadioTechnology=").append(imsRadioTechnology);
+            builder.append("dataNetType=").append(dataNetType);
         }
 
         @Override
@@ -1213,7 +1250,8 @@ public class MobileSignalController extends SignalController<
                     && ((MobileState) o).userSetup == userSetup
                     && ((MobileState) o).voiceLevel == voiceLevel
                     && ((MobileState) o).isDefault == isDefault
-                    && ((MobileState) o).imsRadioTechnology == imsRadioTechnology;
+                    && ((MobileState) o).imsRadioTechnology == imsRadioTechnology
+                    && ((MobileState) o).dataNetType == dataNetType;
         }
     }
 

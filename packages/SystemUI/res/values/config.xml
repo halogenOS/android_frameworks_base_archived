@@ -351,4 +351,11 @@
     <bool name="config_always_hide_roaming_indicator">false</bool>
     <!-- When true,show the AutoBrightness checkbox -->
     <bool name="config_show_auto_brightness">false</bool>
+
+    <!-- List of Carrier one mcc mncs-->
+    <string-array name="config_carrier_one_networks" translatable="false">
+    </string-array>
+
+    <integer-array name="carrier_one_strength_threshold_values">
+    </integer-array>
 </resources>

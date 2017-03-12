@@ -171,6 +171,7 @@ public class BatteryMeterDrawable extends Drawable implements
         }
         levels.recycle();
         colors.recycle();
+        mBatteryPct = context.getResources().getBoolean(R.bool.config_showBatteryPercentage);
         updateShowPercent();
         updateForceChargeBatteryText();
         mWarningString = context.getString(R.string.battery_meter_very_low_overlay_symbol);

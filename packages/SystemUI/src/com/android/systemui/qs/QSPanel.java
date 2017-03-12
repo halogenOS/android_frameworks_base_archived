@@ -51,6 +51,7 @@ import java.util.Collection;
 public class QSPanel extends LinearLayout implements Tunable, Callback {
 
     public static final String QS_SHOW_BRIGHTNESS = "qs_show_brightness";
+    public static final String QS_SHOW_SIMSWICHER = "qs_show_simswicher";
 
     protected final Context mContext;
     protected final ArrayList<TileRecord> mRecords = new ArrayList<TileRecord>();
@@ -77,6 +78,7 @@ public class QSPanel extends LinearLayout implements Tunable, Callback {
     private Record mDetailRecord;
 
     private BrightnessMirrorController mBrightnessMirrorController;
+    public boolean mIsCarrierOneSupported = false;
 
     public QSPanel(Context context) {
         this(context, null);
@@ -87,8 +89,8 @@ public class QSPanel extends LinearLayout implements Tunable, Callback {
         mContext = context;
 
         setOrientation(VERTICAL);
-
-        if(MobileSignalController.isCarrierOneSupported()) {
+        mIsCarrierOneSupported = MobileSignalController.isCarrierOneSupported();
+        if(mIsCarrierOneSupported) {
             mSimSwitcherView = LayoutInflater.from(context).inflate(
                 R.layout.sim_switcher, this, false);
             addView(mSimSwitcherView);
@@ -133,6 +135,9 @@ public class QSPanel extends LinearLayout implements Tunable, Callback {
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
         TunerService.get(mContext).addTunable(this, QS_SHOW_BRIGHTNESS);
+        if(mIsCarrierOneSupported){
+            TunerService.get(mContext).addTunable(this, QS_SHOW_SIMSWICHER);
+        }
         if (mHost != null) {
             setTiles(mHost.getTiles());
         }
@@ -157,6 +162,10 @@ public class QSPanel extends LinearLayout implements Tunable, Callback {
     public void onTuningChanged(String key, String newValue) {
         if (QS_SHOW_BRIGHTNESS.equals(key)) {
             mBrightnessView.setVisibility(newValue == null || Integer.parseInt(newValue) != 0
+                    ? VISIBLE : GONE);
+        }
+        if(mIsCarrierOneSupported && QS_SHOW_SIMSWICHER.equals(key)){
+            mSimSwitcherView.setVisibility(newValue == null || Integer.parseInt(newValue) != 0
                     ? VISIBLE : GONE);
         }
     }
