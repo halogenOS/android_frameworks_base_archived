@@ -24,8 +24,6 @@ import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.media.MediaMetadata;
 import android.os.Handler;
-import android.os.UserHandle;
-import android.provider.Settings;
 import android.service.notification.StatusBarNotification;
 import android.text.Layout.Alignment;
 import android.text.StaticLayout;
@@ -56,7 +54,7 @@ public abstract class Ticker {
     private ImageSwitcher mIconSwitcher;
     private TextSwitcher mTextSwitcher;
     private float mIconScale;
-    private ColorStateList mIconTint = null;
+    private int mIconTint =  0xffffffff;
     private int mTextColor = 0xffffffff;
     private int mDarkModeFillColor;
     private int mLightModeFillColor;
@@ -229,7 +227,7 @@ public abstract class Ticker {
                     && n.getNotification().icon == seg.notification.getNotification().icon
                     && n.getNotification().iconLevel == seg.notification.getNotification().iconLevel
                     && charSequencesEqual(seg.notification.getNotification().tickerText,
-                        n.getNotification().tickerText)) {
+                    n.getNotification().tickerText)) {
                 return;
             }
         }
@@ -255,11 +253,9 @@ public abstract class Ticker {
             Segment seg = mSegments.get(0);
             seg.first = false;
 
-            boolean isGrayscale = mNotificationColorUtil.isGrayscaleIcon(seg.icon);
-
             mIconSwitcher.setAnimateFirstView(false);
             mIconSwitcher.reset();
-            mIconSwitcher.setColoredImageDrawable(seg.icon, isGrayscale ? mIconTint : null);
+            setAppIconColor(seg.icon);
 
             mTextSwitcher.setAnimateFirstView(false);
             mTextSwitcher.reset();
@@ -318,8 +314,7 @@ public abstract class Ticker {
                     // this makes the icon slide in for the first one for a given
                     // notification even if there are two notifications with the
                     // same icon in a row
-                    boolean isGrayscale = mNotificationColorUtil.isGrayscaleIcon(seg.icon);
-                    mIconSwitcher.setColoredImageDrawable(seg.icon, isGrayscale ? mIconTint : null);
+                    setAppIconColor(seg.icon);
                 }
                 CharSequence text = seg.advance();
                 if (text == null) {
@@ -346,10 +341,6 @@ public abstract class Ticker {
     public abstract void tickerDone();
     public abstract void tickerHalting();
 
-    public void setIconColorTint(ColorStateList tint) {
-        mIconTint = tint;
-    }
-
     private int getColorForDarkIntensity(float darkIntensity, int lightColor, int darkColor) {
         return (int) ArgbEvaluator.getInstance().evaluate(darkIntensity, lightColor, darkColor);
     }
@@ -357,7 +348,17 @@ public abstract class Ticker {
     public void setDarkIntensity(float darkIntensity) {
         mTextColor = getColorForDarkIntensity(
                 darkIntensity, mLightModeFillColor, mDarkModeFillColor);
-        mTextSwitcher.setTextColor(mTextColor);
+        mIconTint = mTextColor;
+        if (mSegments.size() > 0) {
+            Segment seg = mSegments.get(0);
+            mTextSwitcher.setTextColor(mTextColor);
+            mIconSwitcher.reset();
+            setAppIconColor(seg.icon);
+        }
+    }
 
+    public void setAppIconColor(Drawable icon) {
+        boolean isGrayscale = mNotificationColorUtil.isGrayscaleIcon(icon);
+        mIconSwitcher.setImageDrawableTint(icon, mIconTint, isGrayscale);
     }
 }
