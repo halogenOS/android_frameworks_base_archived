@@ -159,18 +159,6 @@ public class UsageStatsService extends SystemService implements
         super(context);
     }
 
-    /* @hide */
-    static boolean isAppInstalled(String uri, PackageManager pm) {
-        try {
-            pm.getPackageInfo(uri, PackageManager.GET_ACTIVITIES);
-            return true;
-        } catch (PackageManager.NameNotFoundException e) {
-            // Nothing to do here
-        }
-
-        return false;
-    }
-
     @Override
     public void onStart() {
         mAppOps = (AppOpsManager) getContext().getSystemService(Context.APP_OPS_SERVICE);
@@ -201,8 +189,7 @@ public class UsageStatsService extends SystemService implements
                 null, mHandler);
 
         mAppIdleEnabled = getContext().getResources().getBoolean(
-                com.android.internal.R.bool.config_enableAutoPowerModes) &&
-                isAppInstalled("com.google.android.gms", mPackageManager);
+                com.android.internal.R.bool.config_enableAutoPowerModes);
         if (mAppIdleEnabled) {
             IntentFilter deviceStates = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
             deviceStates.addAction(BatteryManager.ACTION_DISCHARGING);

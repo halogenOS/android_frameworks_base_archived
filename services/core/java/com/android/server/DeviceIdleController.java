@@ -1299,18 +1299,6 @@ public class DeviceIdleController extends SystemService
     private static File getSystemDir() {
         return new File(Environment.getDataDirectory(), "system");
     }
-    
-    /* @hide */
-    static boolean isAppInstalled(String uri, PackageManager pm) {
-        try {
-            pm.getPackageInfo(uri, PackageManager.GET_ACTIVITIES);
-            return true;
-        } catch (PackageManager.NameNotFoundException e) {
-            // Nothing to do here
-        }
-
-        return false;
-    }
 
     @Override
     public void onStart() {
@@ -1318,8 +1306,7 @@ public class DeviceIdleController extends SystemService
 
         synchronized (this) {
             mLightEnabled = mDeepEnabled = getContext().getResources().getBoolean(
-                    com.android.internal.R.bool.config_enableAutoPowerModes) &&
-                    isAppInstalled("com.google.android.gms", pm);
+                    com.android.internal.R.bool.config_enableAutoPowerModes);
             SystemConfig sysConfig = SystemConfig.getInstance();
             ArraySet<String> allowPowerExceptIdle = sysConfig.getAllowInPowerSaveExceptIdle();
             for (int i=0; i<allowPowerExceptIdle.size(); i++) {
