@@ -271,7 +271,29 @@ public class BaseBundle {
                 Log.w(TAG, "Failed to parse Bundle, but defusing quietly", e);
                 map.erase();
             } else {
+                map.ensureCapacity(N);
                 throw e;
+            }
+            try {
+                parcelledData.readArrayMapInternal(map, N, mClassLoader);
+            } catch (BadParcelableException ex) {
+                if (sShouldDefuse) {
+                    Log.w(TAG, "Failed to parse Bundle, but defusing quietly", ex);
+                    map.erase();
+                } else {
+                    throw ex;
+                }
+            } catch (RuntimeException exc) {
+                if (sShouldDefuse && (exc.getCause() instanceof ClassNotFoundException)) {
+                    Log.w(TAG, "Failed to parse Bundle, but defusing quietly", exc);
+                    map.erase();
+                } else {
+                    throw exc;
+                }
+            } finally {
+                mMap = map;
+                parcelledData.recycle();
+                mParcelledData = null;
             }
         } finally {
             mMap = map;
