@@ -61,8 +61,7 @@ public final class Zygote {
     private static final String[] MODERN_SERVICES = {
         "com.google.android.apps.nexuslauncher",
         "com.google.android.googlequicksearchbox",
-        "com.google.android.apps.photos",
-        "com.android.vending"
+        "com.google.android.apps.photos"
     };
 
     private static final ZygoteHooks VM_HOOKS = new ZygoteHooks();
