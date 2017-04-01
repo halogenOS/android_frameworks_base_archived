@@ -16,6 +16,7 @@
 <resources>
 
     <!-- Clock -->
-    <color name="clock_white">#ffffffff</color>
+    <color name="clock_white">#feffffff</color>
     <color name="clock_gray">@*android:color/secondary_text_default_material_dark</color>
+
 </resources>

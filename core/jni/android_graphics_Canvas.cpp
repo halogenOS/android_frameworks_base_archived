@@ -574,7 +574,7 @@ static void freeTextLayoutCaches(JNIEnv* env, jobject) {
 
 static const JNINativeMethod gMethods[] = {
     {"getNativeFinalizer", "()J", (void*) CanvasJNI::getNativeFinalizer},
-    {"initRaster", "(Landroid/graphics/Bitmap;)J", (void*) CanvasJNI::initRaster},
+    {"initRaster", "!(Landroid/graphics/Bitmap;)J", (void*) CanvasJNI::initRaster},
     {"native_setBitmap", "!(JLandroid/graphics/Bitmap;)V", (void*) CanvasJNI::setBitmap},
     {"native_isOpaque","!(J)Z", (void*) CanvasJNI::isOpaque},
     {"native_getWidth","!(J)I", (void*) CanvasJNI::getWidth},
@@ -614,10 +614,10 @@ static const JNINativeMethod gMethods[] = {
     {"native_drawPath","!(JJJ)V", (void*) CanvasJNI::drawPath},
     {"nativeDrawVertices", "!(JII[FI[FI[II[SIIJ)V", (void*)CanvasJNI::drawVertices},
     {"native_drawNinePatch", "!(JJJFFFFJII)V", (void*)CanvasJNI::drawNinePatch},
-    {"native_drawBitmap","(JLandroid/graphics/Bitmap;FFJIII)V", (void*) CanvasJNI::drawBitmap},
+    {"native_drawBitmap","!(JLandroid/graphics/Bitmap;FFJIII)V", (void*) CanvasJNI::drawBitmap},
     {"nativeDrawBitmapMatrix", "!(JLandroid/graphics/Bitmap;JJ)V", (void*)CanvasJNI::drawBitmapMatrix},
-    {"native_drawBitmap","(JLandroid/graphics/Bitmap;FFFFFFFFJII)V", (void*) CanvasJNI::drawBitmapRect},
-    {"native_drawBitmap", "(J[IIIFFIIZJ)V", (void*)CanvasJNI::drawBitmapArray},
+    {"native_drawBitmap","!(JLandroid/graphics/Bitmap;FFFFFFFFJII)V", (void*) CanvasJNI::drawBitmapRect},
+    {"native_drawBitmap", "!(J[IIIFFIIZJ)V", (void*)CanvasJNI::drawBitmapArray},
     {"nativeDrawBitmapMesh", "!(JLandroid/graphics/Bitmap;II[FI[IIJ)V", (void*)CanvasJNI::drawBitmapMesh},
     {"native_drawText","!(J[CIIFFIJJ)V", (void*) CanvasJNI::drawTextChars},
     {"native_drawText","!(JLjava/lang/String;IIFFIJJ)V", (void*) CanvasJNI::drawTextString},

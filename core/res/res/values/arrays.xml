@@ -253,6 +253,7 @@
         <item>com.android.externalstorage</item>
         <item>com.android.providers.downloads.ui</item>
         <item>com.android.packageinstaller</item>
+        <item>com.google.android.deskclock</item>
     </string-array>
     <!-- Defines the shutdown options shown in the reboot dialog. -->
     <array name="shutdown_reboot_options" translatable="false">

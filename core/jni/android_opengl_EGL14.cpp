@@ -1214,10 +1214,10 @@ static const JNINativeMethod methods[] = {
 {"eglGetConfigs", "(Landroid/opengl/EGLDisplay;[Landroid/opengl/EGLConfig;II[II)Z", (void *) android_eglGetConfigs },
 {"eglChooseConfig", "(Landroid/opengl/EGLDisplay;[II[Landroid/opengl/EGLConfig;II[II)Z", (void *) android_eglChooseConfig },
 {"eglGetConfigAttrib", "(Landroid/opengl/EGLDisplay;Landroid/opengl/EGLConfig;I[II)Z", (void *) android_eglGetConfigAttrib },
-{"_eglCreateWindowSurface", "(Landroid/opengl/EGLDisplay;Landroid/opengl/EGLConfig;Ljava/lang/Object;[II)Landroid/opengl/EGLSurface;", (void *) android_eglCreateWindowSurface },
-{"_eglCreateWindowSurfaceTexture", "(Landroid/opengl/EGLDisplay;Landroid/opengl/EGLConfig;Ljava/lang/Object;[II)Landroid/opengl/EGLSurface;", (void *) android_eglCreateWindowSurfaceTexture },
-{"eglCreatePbufferSurface", "(Landroid/opengl/EGLDisplay;Landroid/opengl/EGLConfig;[II)Landroid/opengl/EGLSurface;", (void *) android_eglCreatePbufferSurface },
-{"eglCreatePixmapSurface", "(Landroid/opengl/EGLDisplay;Landroid/opengl/EGLConfig;I[II)Landroid/opengl/EGLSurface;", (void *) android_eglCreatePixmapSurface },
+{"_eglCreateWindowSurface", "!(Landroid/opengl/EGLDisplay;Landroid/opengl/EGLConfig;Ljava/lang/Object;[II)Landroid/opengl/EGLSurface;", (void *) android_eglCreateWindowSurface },
+{"_eglCreateWindowSurfaceTexture", "!(Landroid/opengl/EGLDisplay;Landroid/opengl/EGLConfig;Ljava/lang/Object;[II)Landroid/opengl/EGLSurface;", (void *) android_eglCreateWindowSurfaceTexture },
+{"eglCreatePbufferSurface", "!(Landroid/opengl/EGLDisplay;Landroid/opengl/EGLConfig;[II)Landroid/opengl/EGLSurface;", (void *) android_eglCreatePbufferSurface },
+{"eglCreatePixmapSurface", "!(Landroid/opengl/EGLDisplay;Landroid/opengl/EGLConfig;I[II)Landroid/opengl/EGLSurface;", (void *) android_eglCreatePixmapSurface },
 {"eglDestroySurface", "(Landroid/opengl/EGLDisplay;Landroid/opengl/EGLSurface;)Z", (void *) android_eglDestroySurface },
 {"eglQuerySurface", "(Landroid/opengl/EGLDisplay;Landroid/opengl/EGLSurface;I[II)Z", (void *) android_eglQuerySurface },
 {"eglBindAPI", "(I)Z", (void *) android_eglBindAPI },
@@ -1239,8 +1239,8 @@ static const JNINativeMethod methods[] = {
 {"eglQueryContext", "(Landroid/opengl/EGLDisplay;Landroid/opengl/EGLContext;I[II)Z", (void *) android_eglQueryContext },
 {"eglWaitGL", "()Z", (void *) android_eglWaitGL },
 {"eglWaitNative", "(I)Z", (void *) android_eglWaitNative },
-{"eglSwapBuffers", "(Landroid/opengl/EGLDisplay;Landroid/opengl/EGLSurface;)Z", (void *) android_eglSwapBuffers },
-{"eglCopyBuffers", "(Landroid/opengl/EGLDisplay;Landroid/opengl/EGLSurface;I)Z", (void *) android_eglCopyBuffers },
+{"eglSwapBuffers", "!(Landroid/opengl/EGLDisplay;Landroid/opengl/EGLSurface;)Z", (void *) android_eglSwapBuffers },
+{"eglCopyBuffers", "!(Landroid/opengl/EGLDisplay;Landroid/opengl/EGLSurface;I)Z", (void *) android_eglCopyBuffers },
 };
 
 int register_android_opengl_jni_EGL14(JNIEnv *_env)

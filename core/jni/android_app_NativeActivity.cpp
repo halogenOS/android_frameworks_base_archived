@@ -654,15 +654,15 @@ onContentRectChanged_native(JNIEnv* env, jobject clazz, jlong handle,
 
 static const JNINativeMethod g_methods[] = {
     { "loadNativeCode",
-        "(Ljava/lang/String;Ljava/lang/String;Landroid/os/MessageQueue;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILandroid/content/res/AssetManager;[BLjava/lang/ClassLoader;Ljava/lang/String;)J",
+        "!(Ljava/lang/String;Ljava/lang/String;Landroid/os/MessageQueue;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILandroid/content/res/AssetManager;[BLjava/lang/ClassLoader;Ljava/lang/String;)J",
         (void*)loadNativeCode_native },
     { "getDlError", "()Ljava/lang/String;", (void*) getDlError_native },
     { "unloadNativeCode", "(J)V", (void*)unloadNativeCode_native },
-    { "onStartNative", "(J)V", (void*)onStart_native },
-    { "onResumeNative", "(J)V", (void*)onResume_native },
+    { "onStartNative", "!(J)V", (void*)onStart_native },
+    { "onResumeNative", "!(J)V", (void*)onResume_native },
     { "onSaveInstanceStateNative", "(J)[B", (void*)onSaveInstanceState_native },
-    { "onPauseNative", "(J)V", (void*)onPause_native },
-    { "onStopNative", "(J)V", (void*)onStop_native },
+    { "onPauseNative", "!(J)V", (void*)onPause_native },
+    { "onStopNative", "!(J)V", (void*)onStop_native },
     { "onConfigurationChangedNative", "(J)V", (void*)onConfigurationChanged_native },
     { "onLowMemoryNative", "(J)V", (void*)onLowMemory_native },
     { "onWindowFocusChangedNative", "(JZ)V", (void*)onWindowFocusChanged_native },
@@ -681,7 +681,6 @@ static const char* const kNativeActivityPathName = "android/app/NativeActivity";
 
 int register_android_app_NativeActivity(JNIEnv* env)
 {
-    //ALOGD("register_android_app_NativeActivity");
     jclass clazz = FindClassOrDie(env, kNativeActivityPathName);
 
     gNativeActivityClassInfo.finish = GetMethodIDOrDie(env, clazz, "finish", "()V");

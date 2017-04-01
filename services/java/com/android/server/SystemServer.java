@@ -1558,17 +1558,12 @@ public final class SystemServer {
      **/
     void startAfterBootComponents() {
         try {
-            // Why would you need this?
-            boolean disableHardwareControlService =
-                SystemProperties.getBoolean("config.disable_hardwarecontrol", false);
-            if(!disableHardwareControlService) {
-                Slog.d(TAG, "Starting Hardware Control Service...");
-                HardwareControlService hws =
-                    mSystemServiceManager.startService(HardwareControlService.class);
-                mPowerManagerService.setButtonBacklightControl(
-                    hws.getButtonBacklightControl());
-                Slog.d(TAG, "Hardware Control Service started successfully.");
-            }
+            Slog.d(TAG, "Starting Hardware Control Service...");
+            HardwareControlService hws =
+                mSystemServiceManager.startService(HardwareControlService.class);
+            mPowerManagerService.setButtonBacklightControl(
+                hws.getButtonBacklightControl());
+            Slog.d(TAG, "Hardware Control Service started successfully.");
         } catch(Exception ex) {
             Slog.e(TAG, "Failed to start Hardware Control Service!");
             ex.printStackTrace();
@@ -1590,7 +1585,7 @@ public final class SystemServer {
                 String.valueOf(Settings.System.getInt(context.getContentResolver(),
                     Settings.System.ENABLE_MODERN_SERVICES, 1)));
         } catch(Exception ex) {
-            Slog.e(TAG, "Failed to apply settings on boot");
+            Slog.e(TAG, "Failed to start afterboot components!");
             ex.printStackTrace();
         }
     }

@@ -98,7 +98,7 @@ static const JNINativeMethod gMethods[] = {
     {"nativeCreateFromStream", "(Ljava/io/InputStream;[B)J", (void*)android_graphics_Picture_deserialize},
     {"nativeBeginRecording", "(JII)J", (void*) android_graphics_Picture_beginRecording},
     {"nativeEndRecording", "(J)V", (void*) android_graphics_Picture_endRecording},
-    {"nativeDraw", "(JJ)V", (void*) android_graphics_Picture_draw},
+    {"nativeDraw", "!(JJ)V", (void*) android_graphics_Picture_draw},
     {"nativeWriteToStream", "(JLjava/io/OutputStream;[B)Z", (void*)android_graphics_Picture_serialize},
     {"nativeDestructor","(J)V", (void*) android_graphics_Picture_killPicture}
 };

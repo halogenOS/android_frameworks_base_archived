@@ -574,7 +574,7 @@ static const JNINativeMethod gSurfaceMethods[] = {
     // HWUI context
     {"nHwuiCreate", "(JJ)J", (void*) hwui::create },
     {"nHwuiSetSurface", "(JJ)V", (void*) hwui::setSurface },
-    {"nHwuiDraw", "(J)V", (void*) hwui::draw },
+    {"nHwuiDraw", "!(J)V", (void*) hwui::draw },
     {"nHwuiDestroy", "(J)V", (void*) hwui::destroy },
 };
 

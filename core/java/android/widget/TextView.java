@@ -556,7 +556,7 @@ public class TextView extends View implements ViewTreeObserver.OnPreDrawListener
     private Layout mSavedMarqueeModeLayout;
 
     @ViewDebug.ExportedProperty(category = "text")
-    private CharSequence mText;
+    private CharSequence mText = "";
     private CharSequence mTransformed;
     private BufferType mBufferType = BufferType.NORMAL;
 
@@ -709,22 +709,8 @@ public class TextView extends View implements ViewTreeObserver.OnPreDrawListener
             Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
 
-        mText = "";
-
         final Resources res = getResources();
         final CompatibilityInfo compat = res.getCompatibilityInfo();
-
-        mTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-        mTextPaint.density = res.getDisplayMetrics().density;
-        mTextPaint.setCompatibilityScaling(compat.applicationScale);
-
-        mHighlightPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mHighlightPaint.setCompatibilityScaling(compat.applicationScale);
-
-        mMovement = getDefaultMovementMethod();
-
-        mTransformation = null;
-
         int textColorHighlight = 0;
         ColorStateList textColor = null;
         ColorStateList textColorHint = null;
@@ -742,6 +728,39 @@ public class TextView extends View implements ViewTreeObserver.OnPreDrawListener
         String fontFeatureSettings = null;
         mBreakStrategy = Layout.BREAK_STRATEGY_SIMPLE;
         mHyphenationFrequency = Layout.HYPHENATION_FREQUENCY_NONE;
+        boolean editable = getDefaultEditable();
+        CharSequence inputMethod = null;
+        int numeric = 0;
+        CharSequence digits = null;
+        boolean phone = false;
+        boolean autotext = false;
+        int autocap = -1;
+        int buffertype = 0;
+        boolean selectallonfocus = false;
+        Drawable drawableLeft = null, drawableTop = null, drawableRight = null,
+            drawableBottom = null, drawableStart = null, drawableEnd = null;
+        ColorStateList drawableTint = null;
+        PorterDuff.Mode drawableTintMode = null;
+        int drawablePadding = 0;
+        int ellipsize = -1;
+        boolean singleLine = false;
+        int maxlength = -1;
+        CharSequence text = "";
+        CharSequence hint = null;
+        boolean password = false;
+        int inputType = EditorInfo.TYPE_NULL;
+        TypedArray appearance = null;
+
+        mTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+        mTextPaint.density = res.getDisplayMetrics().density;
+        mTextPaint.setCompatibilityScaling(compat.applicationScale);
+
+        mHighlightPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mHighlightPaint.setCompatibilityScaling(compat.applicationScale);
+
+        mMovement = getDefaultMovementMethod();
+
+        mTransformation = null;
 
         final Resources.Theme theme = context.getTheme();
 
@@ -753,7 +772,6 @@ public class TextView extends View implements ViewTreeObserver.OnPreDrawListener
          */
         TypedArray a = theme.obtainStyledAttributes(attrs,
                 com.android.internal.R.styleable.TextViewAppearance, defStyleAttr, defStyleRes);
-        TypedArray appearance = null;
         int ap = a.getResourceId(
                 com.android.internal.R.styleable.TextViewAppearance_textAppearance, -1);
         a.recycle();
@@ -835,28 +853,6 @@ public class TextView extends View implements ViewTreeObserver.OnPreDrawListener
 
             appearance.recycle();
         }
-
-        boolean editable = getDefaultEditable();
-        CharSequence inputMethod = null;
-        int numeric = 0;
-        CharSequence digits = null;
-        boolean phone = false;
-        boolean autotext = false;
-        int autocap = -1;
-        int buffertype = 0;
-        boolean selectallonfocus = false;
-        Drawable drawableLeft = null, drawableTop = null, drawableRight = null,
-            drawableBottom = null, drawableStart = null, drawableEnd = null;
-        ColorStateList drawableTint = null;
-        PorterDuff.Mode drawableTintMode = null;
-        int drawablePadding = 0;
-        int ellipsize = -1;
-        boolean singleLine = false;
-        int maxlength = -1;
-        CharSequence text = "";
-        CharSequence hint = null;
-        boolean password = false;
-        int inputType = EditorInfo.TYPE_NULL;
 
         a = theme.obtainStyledAttributes(
                     attrs, com.android.internal.R.styleable.TextView, defStyleAttr, defStyleRes);

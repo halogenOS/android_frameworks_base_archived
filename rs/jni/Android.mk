@@ -30,6 +30,9 @@ LOCAL_C_INCLUDES += \
 
 LOCAL_CFLAGS += -Wno-unused-parameter -std=c++11
 LOCAL_CFLAGS += -Wall -Werror -Wunused -Wunreachable-code
+ifeq ($(TARGET_MORE_OPTIMIZATION),true)
+LOCAL_CFLAGS += -finline-functions
+endif
 
 LOCAL_ADDITIONAL_DEPENDENCIES := $(addprefix $(rs_generated_include_dir)/,rsgApiFuncDecl.h)
 LOCAL_MODULE:= librs_jni

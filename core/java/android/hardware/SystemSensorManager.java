@@ -47,8 +47,7 @@ import java.util.Map;
  * @hide
  */
 public class SystemSensorManager extends SensorManager {
-    //TODO: disable extra logging before release
-    private static boolean DEBUG_DYNAMIC_SENSOR = true;
+    private static boolean DEBUG_DYNAMIC_SENSOR = false;
 
     private static native void nativeClassInit();
     private static native long nativeCreate(String opPackageName);

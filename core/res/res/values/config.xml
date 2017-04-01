@@ -467,14 +467,14 @@
     <integer translatable="false" name="config_wifi_framework_SECURITY_AWARD">80</integer>
     <!-- Integer parameters of the wifi to cellular handover feature
          wifi should not stick to bad networks -->
-    <integer translatable="false" name="config_wifi_framework_wifi_score_bad_rssi_threshold_5GHz">-82</integer>
-    <integer translatable="false" name="config_wifi_framework_wifi_score_low_rssi_threshold_5GHz">-70</integer>
-    <integer translatable="false" name="config_wifi_framework_wifi_score_good_rssi_threshold_5GHz">-57</integer>
-    <integer translatable="false" name="config_wifi_framework_wifi_score_bad_rssi_threshold_24GHz">-85</integer>
-    <integer translatable="false" name="config_wifi_framework_wifi_score_low_rssi_threshold_24GHz">-73</integer>
-    <integer translatable="false" name="config_wifi_framework_wifi_score_good_rssi_threshold_24GHz">-60</integer>
-    <integer translatable="false" name="config_wifi_framework_wifi_score_bad_link_speed_24">6</integer>
-    <integer translatable="false" name="config_wifi_framework_wifi_score_bad_link_speed_5">12</integer>
+    <integer translatable="false" name="config_wifi_framework_wifi_score_bad_rssi_threshold_5GHz">-85</integer>
+    <integer translatable="false" name="config_wifi_framework_wifi_score_low_rssi_threshold_5GHz">-72</integer>
+    <integer translatable="false" name="config_wifi_framework_wifi_score_good_rssi_threshold_5GHz">-58</integer>
+    <integer translatable="false" name="config_wifi_framework_wifi_score_bad_rssi_threshold_24GHz">-86</integer>
+    <integer translatable="false" name="config_wifi_framework_wifi_score_low_rssi_threshold_24GHz">-74</integer>
+    <integer translatable="false" name="config_wifi_framework_wifi_score_good_rssi_threshold_24GHz">-62</integer>
+    <integer translatable="false" name="config_wifi_framework_wifi_score_bad_link_speed_24">4</integer>
+    <integer translatable="false" name="config_wifi_framework_wifi_score_bad_link_speed_5">10</integer>
     <integer translatable="false" name="config_wifi_framework_wifi_score_good_link_speed_24">24</integer>
     <integer translatable="false" name="config_wifi_framework_wifi_score_good_link_speed_5">36</integer>
     <string  translatable="false" name="config_wifi_random_mac_oui">DA-A1-19</string>
@@ -493,9 +493,9 @@
     <!-- Integer indicating wpa_supplicant scan interval in milliseconds -->
     <integer translatable="false" name="config_wifi_supplicant_scan_interval">25000</integer>
 
-    <!-- Integer indicating amount of time failed networks areblacklisted for the purpose
+    <!-- Integer indicating amount of time failed networks are blacklisted for the purpose
          of network switching in milliseconds -->
-    <integer translatable="false" name="config_wifi_network_switching_blacklist_time">172800000</integer>
+    <integer translatable="false" name="config_wifi_network_switching_blacklist_time">129600000</integer>
 
     <!-- Integer indicating wpa_supplicant scan interval when p2p is connected in milliseconds -->
     <integer translatable="false" name="config_wifi_scan_interval_p2p_connected">60000</integer>
@@ -789,12 +789,12 @@
     <integer name="config_defaultNightDisplayAutoMode">0</integer>
 
     <!-- Default time when Night display is automatically activated.
-         Represented as milliseconds from midnight (e.g. 79200000 == 10pm). -->
-    <integer name="config_defaultNightDisplayCustomStartTime">79200000</integer>
+         Represented as milliseconds from midnight (e.g. 79200000 == 9:30pm). -->
+    <integer name="config_defaultNightDisplayCustomStartTime">77400000</integer>
 
     <!-- Default time when Night display is automatically deactivated.
-         Represented as milliseconds from midnight (e.g. 21600000 == 6am). -->
-    <integer name="config_defaultNightDisplayCustomEndTime">21600000</integer>
+         Represented as milliseconds from midnight (e.g. 21600000 == 6:30am). -->
+    <integer name="config_defaultNightDisplayCustomEndTime">23400000</integer>
 
     <!-- Indicate whether to allow the device to suspend when the screen is off
          due to the proximity sensor.  This resource should only be set to true
@@ -959,13 +959,13 @@
     <integer name="config_defaultNotificationLedOn">550</integer>
 
     <!-- Default LED off time for notification LED in milliseconds. -->
-    <integer name="config_defaultNotificationLedOff">2000</integer>
+    <integer name="config_defaultNotificationLedOff">1850</integer>
 
     <!-- Default value for led color when battery is low on charge -->
     <integer name="config_notificationsBatteryLowARGB">0xFFFE1204</integer>
 
     <!-- Default value for led color when battery is medium charged -->
-    <integer name="config_notificationsBatteryMediumARGB">0xFFFEDF08</integer>
+    <integer name="config_notificationsBatteryMediumARGB">0xFFFEDA0A</integer>
 
     <!-- Default value for led color when battery is fully charged -->
     <integer name="config_notificationsBatteryFullARGB">0xFF00B4E7</integer>
@@ -997,7 +997,7 @@
     <!-- Enable translucent decor by default -->
     <bool name="config_enableTranslucentDecor">true</bool>
 
-    <!-- Is the device capable of hot swapping an UICC Card -->
+    <!-- Whether the device is capable of hot swapping an UICC Card -->
     <bool name="config_hotswapCapable">false</bool>
 
     <!-- Component name of the ICC hotswap prompt for restart dialog -->

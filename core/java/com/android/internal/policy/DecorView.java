@@ -115,7 +115,7 @@ public class DecorView extends FrameLayout implements RootViewSurfaceTaker, Wind
     // The height of a window which has focus in DIP.
     private final static int DECOR_SHADOW_FOCUSED_HEIGHT_IN_DIP = 20;
     // The height of a window which has not in DIP.
-    private final static int DECOR_SHADOW_UNFOCUSED_HEIGHT_IN_DIP = 5;
+    private final static int DECOR_SHADOW_UNFOCUSED_HEIGHT_IN_DIP = 4;
 
     // Cludge to address b/22668382: Set the shadow size to the maximum so that the layer
     // size calculation takes the shadow size into account. We set the elevation currently

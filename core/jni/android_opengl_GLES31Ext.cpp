@@ -1457,7 +1457,7 @@ static const JNINativeMethod methods[] = {
 {"glGetDebugMessageCallbackKHR", "()Landroid/opengl/GLES31Ext$DebugProcKHR;", (void *) android_glGetDebugMessageCallbackKHR },
 {"glMinSampleShadingOES", "(F)V", (void *) android_glMinSampleShadingOES__F },
 {"glTexStorage3DMultisampleOES", "(IIIIIIZ)V", (void *) android_glTexStorage3DMultisampleOES__IIIIIIZ },
-{"glCopyImageSubDataEXT", "(IIIIIIIIIIIIIII)V", (void *) android_glCopyImageSubDataEXT__IIIIIIIIIIIIIII },
+{"glCopyImageSubDataEXT", "!(IIIIIIIIIIIIIII)V", (void *) android_glCopyImageSubDataEXT__IIIIIIIIIIIIIII },
 {"glEnableiEXT", "(II)V", (void *) android_glEnableiEXT__II },
 {"glDisableiEXT", "(II)V", (void *) android_glDisableiEXT__II },
 {"glBlendEquationiEXT", "(II)V", (void *) android_glBlendEquationiEXT__II },

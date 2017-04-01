@@ -142,8 +142,8 @@ static const JNINativeMethod methods[] = {
     {"native_mmap",  "(Ljava/io/FileDescriptor;II)J", (void*)android_os_MemoryFile_mmap},
     {"native_munmap", "(JI)V", (void*)android_os_MemoryFile_munmap},
     {"native_close", "(Ljava/io/FileDescriptor;)V", (void*)android_os_MemoryFile_close},
-    {"native_read",  "(Ljava/io/FileDescriptor;J[BIIIZ)I", (void*)android_os_MemoryFile_read},
-    {"native_write", "(Ljava/io/FileDescriptor;J[BIIIZ)V", (void*)android_os_MemoryFile_write},
+    {"native_read",  "!(Ljava/io/FileDescriptor;J[BIIIZ)I", (void*)android_os_MemoryFile_read},
+    {"native_write", "!(Ljava/io/FileDescriptor;J[BIIIZ)V", (void*)android_os_MemoryFile_write},
     {"native_pin",   "(Ljava/io/FileDescriptor;Z)V", (void*)android_os_MemoryFile_pin},
     {"native_get_size", "(Ljava/io/FileDescriptor;)I",
             (void*)android_os_MemoryFile_get_size}

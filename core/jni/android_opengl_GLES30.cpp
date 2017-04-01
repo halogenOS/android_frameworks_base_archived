@@ -5215,8 +5215,8 @@ static const JNINativeMethod methods[] = {
 {"glGetQueryObjectuiv", "(IILjava/nio/IntBuffer;)V", (void *) android_glGetQueryObjectuiv__IILjava_nio_IntBuffer_2 },
 {"glUnmapBuffer", "(I)Z", (void *) android_glUnmapBuffer__I },
 {"glGetBufferPointerv", "(II)Ljava/nio/Buffer;", (void *) android_glGetBufferPointerv__II },
-{"glDrawBuffers", "(I[II)V", (void *) android_glDrawBuffers__I_3II },
-{"glDrawBuffers", "(ILjava/nio/IntBuffer;)V", (void *) android_glDrawBuffers__ILjava_nio_IntBuffer_2 },
+{"glDrawBuffers", "!(I[II)V", (void *) android_glDrawBuffers__I_3II },
+{"glDrawBuffers", "!(ILjava/nio/IntBuffer;)V", (void *) android_glDrawBuffers__ILjava_nio_IntBuffer_2 },
 {"glUniformMatrix2x3fv", "(IIZ[FI)V", (void *) android_glUniformMatrix2x3fv__IIZ_3FI },
 {"glUniformMatrix2x3fv", "(IIZLjava/nio/FloatBuffer;)V", (void *) android_glUniformMatrix2x3fv__IIZLjava_nio_FloatBuffer_2 },
 {"glUniformMatrix3x2fv", "(IIZ[FI)V", (void *) android_glUniformMatrix3x2fv__IIZ_3FI },
@@ -5352,7 +5352,7 @@ static const JNINativeMethod methods[] = {
 {"glTexStorage3D", "(IIIIII)V", (void *) android_glTexStorage3D__IIIIII },
 {"glGetInternalformativ", "(IIII[II)V", (void *) android_glGetInternalformativ__IIII_3II },
 {"glGetInternalformativ", "(IIIILjava/nio/IntBuffer;)V", (void *) android_glGetInternalformativ__IIIILjava_nio_IntBuffer_2 },
-{"glReadPixels", "(IIIIIII)V", (void *) android_glReadPixels__IIIIIII },
+{"glReadPixels", "!(IIIIIII)V", (void *) android_glReadPixels__IIIIIII },
 };
 
 int register_android_opengl_jni_GLES30(JNIEnv *_env)
