@@ -31,7 +31,7 @@ namespace android {
 // Number of events to read at a time from the DisplayEventDispatcher pipe.
 // The value should be large enough that we can quickly drain the pipe
 // using just a few large reads.
-static const size_t EVENT_BUFFER_SIZE = 100;
+static const size_t EVENT_BUFFER_SIZE = 110;
 
 DisplayEventDispatcher::DisplayEventDispatcher(const sp<Looper>& looper) :
         mLooper(looper), mWaitingForVsync(false) {

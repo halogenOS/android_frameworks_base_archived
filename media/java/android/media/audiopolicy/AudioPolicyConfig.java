@@ -219,9 +219,8 @@ public class AudioPolicyConfig implements Parcelable {
     }
 
     private static String mixTypeId(int type) {
-        if (type == AudioMix.MIX_TYPE_PLAYERS) return "p";
-        else if (type == AudioMix.MIX_TYPE_RECORDERS) return "r";
-        else return "i";
+        return type == AudioMix.MIX_TYPE_PLAYERS    ? "p" :
+               type == AudioMix.MIX_TYPE_RECORDERS  ? "r" : "i";
     }
 
     protected String getRegistration() {

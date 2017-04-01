@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2006 The Android Open Source Project
- * Copyright (C) 2016 halogenOS
+ * Copyright (C) 2016-2017 halogenOS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -145,8 +145,7 @@ public class RuntimeInit {
         /*
          * Sets the default HTTP User-Agent used by HttpURLConnection.
          */
-        String userAgent = getDefaultUserAgent();
-        System.setProperty("http.agent", userAgent);
+        System.setProperty("http.agent", getDefaultUserAgent());
 
         /*
          * Wire socket tagging to traffic stats.
@@ -160,7 +159,7 @@ public class RuntimeInit {
          * consequences, so it's not something you want to do always.
          */
         String trace = SystemProperties.get("ro.kernel.android.tracing");
-        if (trace.equals("1")) {
+        if ("1".equals(trace)) {
             Slog.i(TAG, "NOTE: emulator trace profiling enabled");
             Debug.enableEmulatorTraceOutput();
         }
@@ -170,35 +169,31 @@ public class RuntimeInit {
 
     /**
      * Returns an HTTP user agent of the form
-     * "Dalvik/1.1.0 (Linux; U; Android Eclair Build/MASTER)".
+     * "Dalvik/2.1.0 (Linux; U; Android 7.1.1 Build/NOF27C; halogenOS 20170402; Pixel XL;)".
      */
     private static String getDefaultUserAgent() {
         StringBuilder result = new StringBuilder(64);
         result.append("Dalvik/");
-        result.append(System.getProperty("java.vm.version")); // such as 1.1.0
+        result.append(System.getProperty("java.vm.version")); // such as 2.1.0
         result.append(" (Linux; U; Android ");
 
-        String version = Build.VERSION.RELEASE; // "1.0" or "3.4b5"
-        result.append(version.length() > 0 ? version : "1.0");
-
-        // add the model for the release build
-        if ("REL".equals(Build.VERSION.CODENAME)) {
-            String model = Build.MODEL;
-            if (model.length() > 0) {
-                result.append("; ");
-                result.append(model);
-            }
-        }
-        
-        result
-            .append(" halogenOS ").append(System.getProperty("ro.xos.version"))
-            .append(";");
-
+        result.append(Build.VERSION.RELEASE); // e. g. 7.1.1
 
         String id = Build.ID; // "MASTER" or "M4-rc20"
         if (id.length() > 0) {
             result.append(" Build/");
             result.append(id);
+        }
+
+        result
+            .append(" halogenOS ").append(System.getProperty("ro.xos.version"))
+            .append(";");
+
+        String model = Build.MODEL;
+        if (model.length() > 0) {
+            result.append(" ");
+            result.append(model);
+            result.append(";");
         }
         result.append(")");
         return result.toString();

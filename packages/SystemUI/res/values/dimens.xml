@@ -545,8 +545,8 @@
     <!-- Volume dialog root view bottom margin, at rest -->
     <dimen name="volume_dialog_margin_bottom">4dp</dimen>
     <dimen name="volume_dialog_collapsed_padding_top">8dp</dimen>
-    <dimen name="volume_dialog_expanded_spacer">14dp</dimen>
-    <dimen name="volume_dialog_padding_end">40dp</dimen>
+    <dimen name="volume_dialog_expanded_spacer">12dp</dimen>
+    <dimen name="volume_dialog_padding_end">36dp</dimen>
 
     <dimen name="volume_row_padding_bottom">9.4dp</dimen>
     <dimen name="volume_row_padding_start">4dp</dimen>
@@ -646,8 +646,8 @@
 
     <!-- The radius of the rounded corners on a task view and its shadow (which can be larger
          to create a softer corner effect. -->
-    <dimen name="recents_task_view_rounded_corners_radius">2dp</dimen>
-    <dimen name="recents_task_view_shadow_rounded_corners_radius">6dp</dimen>
+    <dimen name="recents_task_view_rounded_corners_radius">4dp</dimen>
+    <dimen name="recents_task_view_shadow_rounded_corners_radius">8dp</dimen>
 
     <!-- The amount of highlight to make on each task view. -->
     <dimen name="recents_task_view_highlight">1dp</dimen>

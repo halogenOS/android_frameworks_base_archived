@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
- * Copyright (C) 2016 halogenOS
+ * Copyright (C) 2016-2017 halogenOS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -366,13 +366,8 @@ public class BootReceiver extends BroadcastReceiver {
             } catch (FileNotFoundException e) {
                 Slog.i(TAG, "No existing last log timestamp file " + sFile.getBaseFile() +
                         "; starting empty");
-            } catch (IOException e) {
-                Slog.w(TAG, "Failed parsing " + e);
-            } catch (IllegalStateException e) {
-                Slog.w(TAG, "Failed parsing " + e);
-            } catch (NullPointerException e) {
-                Slog.w(TAG, "Failed parsing " + e);
-            } catch (XmlPullParserException e) {
+            } catch (IOException | IllegalStateException
+                   | NullPointerException | XmlPullParserException e) {
                 Slog.w(TAG, "Failed parsing " + e);
             } finally {
                 if (!success) {

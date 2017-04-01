@@ -37,6 +37,7 @@ import org.halogenos.hardware.buttons.KeyDisablerUtils;
 class HardwareControlService extends SystemService {
     
     private static final String TAG = HardwareControlService.class.getSimpleName();
+    private static final boolean DEBUG = false;
     
     private SettingsObserver mSettingsObserver;
     private Context mContext;
@@ -49,7 +50,7 @@ class HardwareControlService extends SystemService {
 
     public HardwareControlService(Context context) {
         super(context);
-        Log.d(TAG, "Hey, my name is " + TAG + "!");
+        if(DEBUG) Log.d(TAG, "Hey, my name is " + TAG + "!");
         mContext = context;
         mSettingsObserver = new SettingsObserver(new Handler());
         
@@ -60,11 +61,11 @@ class HardwareControlService extends SystemService {
 
     @Override
     public void onStart() {
-        Log.d(TAG, "Getting ready...");
+        if(DEBUG) Log.d(TAG, "Getting ready...");
         mSettingsObserver.prepare();
         mSettingsObserver.observe();
         mSettingsObserver.onChange(true);
-        Log.d(TAG, "Ready.");
+        if(DEBUG) Log.d(TAG, "Ready.");
     }
 
     @Override

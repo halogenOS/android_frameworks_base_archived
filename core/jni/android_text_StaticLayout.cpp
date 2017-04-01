@@ -183,7 +183,6 @@ static void nGetWidths(JNIEnv* env, jclass, jlong nativePtr, jfloatArray widths)
 }
 
 static const JNINativeMethod gMethods[] = {
-    // TODO performance: many of these are candidates for fast jni, awaiting guidance
     {"nNewBuilder", "()J", (void*) nNewBuilder},
     {"nFreeBuilder", "(J)V", (void*) nFreeBuilder},
     {"nFinishBuilder", "(J)V", (void*) nFinishBuilder},
@@ -191,11 +190,11 @@ static const JNINativeMethod gMethods[] = {
     {"nSetLocale", "(JLjava/lang/String;J)V", (void*) nSetLocale},
     {"nSetupParagraph", "(J[CIFIF[IIII)V", (void*) nSetupParagraph},
     {"nSetIndents", "(J[I)V", (void*) nSetIndents},
-    {"nAddStyleRun", "(JJJIIZ)F", (void*) nAddStyleRun},
+    {"nAddStyleRun", "!(JJJIIZ)F", (void*) nAddStyleRun},
     {"nAddMeasuredRun", "(JII[F)V", (void*) nAddMeasuredRun},
     {"nAddReplacementRun", "(JIIF)V", (void*) nAddReplacementRun},
     {"nGetWidths", "(J[F)V", (void*) nGetWidths},
-    {"nComputeLineBreaks", "(JLandroid/text/StaticLayout$LineBreaks;[I[F[II)I",
+    {"nComputeLineBreaks", "!(JLandroid/text/StaticLayout$LineBreaks;[I[F[II)I",
         (void*) nComputeLineBreaks}
 };
 

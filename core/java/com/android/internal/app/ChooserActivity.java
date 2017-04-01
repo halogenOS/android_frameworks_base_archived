@@ -84,7 +84,7 @@ public class ChooserActivity extends ResolverActivity {
     private static final boolean DEBUG = false;
 
     private static final int QUERY_TARGET_SERVICE_LIMIT = 5;
-    private static final int WATCHDOG_TIMEOUT_MILLIS = 5000;
+    private static final int WATCHDOG_TIMEOUT_MILLIS = 4500;
 
     private Bundle mReplacementExtras;
     private IntentSender mChosenComponentSender;
@@ -1059,7 +1059,7 @@ public class ChooserActivity extends ResolverActivity {
     }
 
     static class RowScale {
-        private static final int DURATION = 400;
+        private static final int DURATION = 380;
 
         float mScale;
         ChooserRowAdapter mAdapter;

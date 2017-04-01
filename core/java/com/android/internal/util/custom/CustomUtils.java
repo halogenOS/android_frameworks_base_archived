@@ -26,4 +26,5 @@ public class CustomUtils {
        return Resources.getSystem().getConfiguration().locale.getLanguage().startsWith(
                Locale.CHINESE.getLanguage());
     }
+
 }

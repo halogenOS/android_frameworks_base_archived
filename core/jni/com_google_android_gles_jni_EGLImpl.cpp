@@ -535,7 +535,7 @@ static const char *classPathName = "com/google/android/gles_jni/EGLImpl";
 static const JNINativeMethod methods[] = {
 {"_nativeClassInit","()V", (void*)nativeClassInit },
 {"eglWaitGL",       "()Z", (void*)jni_eglWaitGL },
-{"eglInitialize",   "(" DISPLAY "[I)Z", (void*)jni_eglInitialize },
+{"eglInitialize",   "!(" DISPLAY "[I)Z", (void*)jni_eglInitialize },
 {"eglQueryContext", "(" DISPLAY CONTEXT "I[I)Z", (void*)jni_eglQueryContext },
 {"eglQuerySurface", "(" DISPLAY SURFACE "I[I)Z", (void*)jni_eglQuerySurface },
 {"eglReleaseThread","()Z", (void*)jni_eglReleaseThread },
@@ -544,7 +544,7 @@ static const JNINativeMethod methods[] = {
 {"_eglCreateContext","(" DISPLAY CONFIG CONTEXT "[I)J", (void*)jni_eglCreateContext },
 {"eglGetConfigs",   "(" DISPLAY "[" CONFIG "I[I)Z", (void*)jni_eglGetConfigs },
 {"eglTerminate",    "(" DISPLAY ")Z", (void*)jni_eglTerminate },
-{"eglCopyBuffers",  "(" DISPLAY SURFACE OBJECT ")Z", (void*)jni_eglCopyBuffers },
+{"eglCopyBuffers",  "!(" DISPLAY SURFACE OBJECT ")Z", (void*)jni_eglCopyBuffers },
 {"eglWaitNative",   "(I" OBJECT ")Z", (void*)jni_eglWaitNative },
 {"eglGetError",     "()I", (void*)jni_eglGetError },
 {"eglGetConfigAttrib", "(" DISPLAY CONFIG "I[I)Z", (void*)jni_eglGetConfigAttrib },
@@ -552,15 +552,15 @@ static const JNINativeMethod methods[] = {
 {"_eglGetCurrentContext",  "()J", (void*)jni_eglGetCurrentContext },
 {"_eglGetCurrentDisplay",  "()J", (void*)jni_eglGetCurrentDisplay },
 {"_eglGetCurrentSurface",  "(I)J", (void*)jni_eglGetCurrentSurface },
-{"_eglCreatePbufferSurface","(" DISPLAY CONFIG "[I)J", (void*)jni_eglCreatePbufferSurface },
-{"_eglCreatePixmapSurface", "(" SURFACE DISPLAY CONFIG OBJECT "[I)V", (void*)jni_eglCreatePixmapSurface },
-{"_eglCreateWindowSurface", "(" DISPLAY CONFIG OBJECT "[I)J", (void*)jni_eglCreateWindowSurface },
-{"_eglCreateWindowSurfaceTexture", "(" DISPLAY CONFIG OBJECT "[I)J", (void*)jni_eglCreateWindowSurfaceTexture },
+{"_eglCreatePbufferSurface","!(" DISPLAY CONFIG "[I)J", (void*)jni_eglCreatePbufferSurface },
+{"_eglCreatePixmapSurface", "!(" SURFACE DISPLAY CONFIG OBJECT "[I)V", (void*)jni_eglCreatePixmapSurface },
+{"_eglCreateWindowSurface", "!(" DISPLAY CONFIG OBJECT "[I)J", (void*)jni_eglCreateWindowSurface },
+{"_eglCreateWindowSurfaceTexture", "!(" DISPLAY CONFIG OBJECT "[I)J", (void*)jni_eglCreateWindowSurfaceTexture },
 {"eglDestroyContext",      "(" DISPLAY CONTEXT ")Z", (void*)jni_eglDestroyContext },
 {"eglDestroySurface",      "(" DISPLAY SURFACE ")Z", (void*)jni_eglDestroySurface },
 {"eglMakeCurrent",         "(" DISPLAY SURFACE SURFACE CONTEXT")Z", (void*)jni_eglMakeCurrent },
 {"eglQueryString",         "(" DISPLAY "I)" STRING, (void*)jni_eglQueryString },
-{"eglSwapBuffers",         "(" DISPLAY SURFACE ")Z", (void*)jni_eglSwapBuffers },
+{"eglSwapBuffers",         "!(" DISPLAY SURFACE ")Z", (void*)jni_eglSwapBuffers },
 };
 
 } // namespace android

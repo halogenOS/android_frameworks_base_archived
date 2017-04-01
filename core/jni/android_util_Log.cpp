@@ -127,7 +127,7 @@ static jint android_util_Log_logger_entry_max_payload_native(JNIEnv* env ATTRIBU
 static const JNINativeMethod gMethods[] = {
     /* name, signature, funcPtr */
     { "isLoggable",      "(Ljava/lang/String;I)Z", (void*) android_util_Log_isLoggable },
-    { "println_native",  "(IILjava/lang/String;Ljava/lang/String;)I", (void*) android_util_Log_println_native },
+    { "println_native",  "!(IILjava/lang/String;Ljava/lang/String;)I", (void*) android_util_Log_println_native },
     { "logger_entry_max_payload_native",  "()I", (void*) android_util_Log_logger_entry_max_payload_native },
 };
 

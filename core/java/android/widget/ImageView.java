@@ -849,11 +849,7 @@ public class ImageView extends View {
     }
 
     private void resolveUri() {
-        if (mDrawable != null) {
-            return;
-        }
-
-        if (getResources() == null) {
+        if (mDrawable != null || getResources() == null) {
             return;
         }
 
@@ -1286,12 +1282,8 @@ public class ImageView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        if (mDrawable == null) {
-            return; // couldn't resolve the URI
-        }
-
-        if (mDrawableWidth == 0 || mDrawableHeight == 0) {
-            return;     // nothing to draw (empty bounds)
+        if (mDrawable == null || mDrawableWidth == 0 || mDrawableHeight == 0) {
+            return; // couldn't resolve the URI or nothing to draw (empty bounds)
         }
 
         if (mDrawMatrix == null && mPaddingTop == 0 && mPaddingLeft == 0) {
