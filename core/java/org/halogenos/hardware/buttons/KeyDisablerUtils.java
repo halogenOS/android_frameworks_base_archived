@@ -30,14 +30,14 @@ public class KeyDisablerUtils {
     private static final String TAG = KeyDisablerUtils.class.getSimpleName();
     
     /** @hide **/
-    public static void setHwKeysEnabled(boolean enabled) {
+    public static void setHwKeysEnabled(boolean disabled) {
         try {
             Class keyDisabler = Class.forName("org.cyanogenmod.hardware.KeyDisabler");
     	    Method setActiveMethod = 
     	        keyDisabler.getDeclaredMethod("setActive", boolean.class);
-            setActiveMethod.invoke(null, enabled);
+            setActiveMethod.invoke(null, !disabled);
         } catch(Exception ex) {
-            Log.e(TAG, "Could not " + (enabled ? "enable" : "disable") +
+            Log.e(TAG, "Could not " + (disabled ? "disable" : "enable") +
                         "HW keys!");
             ex.printStackTrace();
         }
