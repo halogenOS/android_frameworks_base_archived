@@ -50,4 +50,11 @@
     <!-- Reboot to Recovery for factory reset. -->
     <string name="reboot_to_recovery_title">Riavvia in Recovery</string>
     <string name="reboot_to_recovery_message">Riavvio in corso\u2026</string>
+    
+    <string name="singlehandmode_click_hint_message">Tocca al di fuori dello schermo per uscire dalla modalità a schermo ridotto</string>
+
+    <!-- LuckyPatcher carnt dialog -->
+    <string name="lucky_patcher_installed_title">Trovato LuckyPatcher!!!</string>
+    <string name="lucky_patcher_installed_message">Con la presente ammetto volontariamente di essere un ladro e un pirata. Amo rubare agli sviluppatori che lavorano sodo e me ne vanto.</string>
+    <string name="lucky_patcher_admit">Lo ammetto</string>
 </resources>
