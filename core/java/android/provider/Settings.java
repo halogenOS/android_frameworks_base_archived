@@ -3816,14 +3816,6 @@ public final class Settings {
         public static final int SHOW_LOCKSCREEN_VISUALIZER_DEFAULT = 1;
 
         /**
-         * Modern Services
-         *
-         * @hide
-         */
-        public static final String ENABLE_MODERN_SERVICES =
-                                "enable_modern_services";
-
-        /**
          * Whether the proximity sensor should be used to check whether to
          * wake the device or not (e. g. for preventing pocket touches)
          *
@@ -4003,7 +3995,6 @@ public final class Settings {
             PUBLIC_SETTINGS.add(BUTTON_BACKLIGHT_BRIGHTNESS);
             PUBLIC_SETTINGS.add(BUTTON_BACKLIGHT_TIMEOUT);
             PUBLIC_SETTINGS.add(SHOW_LOCKSCREEN_VISUALIZER);
-            PUBLIC_SETTINGS.add(ENABLE_MODERN_SERVICES);
             PUBLIC_SETTINGS.add(NAVIGATION_BAR_ENABLED);
         }
 

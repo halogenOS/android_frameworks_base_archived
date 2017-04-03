@@ -1594,11 +1594,6 @@ public final class SystemServer {
             // the name everywhere lol.
             i.setAction("cyanogenmod.intent.action.INITIALIZE_CM_HARDWARE");
             context.sendBroadcastAsUser(i, UserHandle.CURRENT);
-            
-            Slog.d(TAG, "Getting Modern Services ready...");
-            SystemProperties.set("sf.enable_modern_services",
-                String.valueOf(Settings.System.getInt(context.getContentResolver(),
-                    Settings.System.ENABLE_MODERN_SERVICES, 1)));
         } catch(Exception ex) {
             Slog.e(TAG, "Failed to start afterboot components!");
             ex.printStackTrace();
