@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2017 The OmniROM Project
+ * Copyright (C) 2017 The halogenOS Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,11 +35,12 @@ public class ImageTile extends QSTile<QSTile.State> {
     private int mListeningCount;
     private int mRandomDelta;
     private Random mRandom;
+    private boolean mDave = true;
     public ImageTile(Host host) {
         super(host);
         mRandom = new Random();
         mRandomDelta = mRandom.nextInt(10);
-        Log.d("maxwen", "mRandomDelta = " + mRandomDelta);
+        Log.d("FuckySnatcher", "mRandomDelta = " + mRandomDelta);
 
     }
 
@@ -64,6 +66,7 @@ public class ImageTile extends QSTile<QSTile.State> {
     public void handleClick() {
         refreshState();
         makeNoise();
+        mDave = !mDave
     }
 
     @Override
@@ -88,8 +91,9 @@ public class ImageTile extends QSTile<QSTile.State> {
     }
 
     private void makeNoise() {
+        String sound_file = (mDave ? "dave_pirate_rant" : "pirate_hell");
         NotificationPlayer player = new NotificationPlayer("ImageTile");
-        Uri uri=Uri.parse("android.resource://"+mContext.getPackageName()+"/raw/pirate_hell");
+        Uri uri=Uri.parse("android.resource://"+mContext.getPackageName()+"/raw/"+sound_file);
         player.play(mContext, uri, false, AudioManager.STREAM_NOTIFICATION);
     }
 }
