@@ -335,15 +335,8 @@ public class MobileSignalController extends SignalController<
         final boolean dataDisabled = mCurrentState.iconGroup == TelephonyIcons.DATA_DISABLED
                 && mCurrentState.userSetup;
 
-        // Show icon in QS when we are connected or need to show roaming or data is disabled.
-        boolean showDataIcon = false;
-        if (mContext.getResources().getBoolean(R.bool.show_roaming_and_network_icons)) {
-            showDataIcon = mCurrentState.dataConnected;
-        } else {
-            showDataIcon = mCurrentState.dataConnected
-                || mCurrentState.iconGroup == TelephonyIcons.ROAMING
-                || isRoaming() || dataDisabled;
-        }
+        // Show icon in QS when we are connected or data is disabled.
+        boolean showDataIcon = mCurrentState.dataConnected || dataDisabled;
         IconState statusIcon = new IconState(mCurrentState.enabled && !mCurrentState.airplaneMode,
                 getCurrentIconId(), contentDescription);
 
@@ -716,12 +709,11 @@ public class MobileSignalController extends SignalController<
         mCurrentState.dataConnected = mCurrentState.connected
                 && mDataState == TelephonyManager.DATA_CONNECTED;
 
+        mCurrentState.roaming = isRoaming();
         if (isCarrierNetworkChangeActive()) {
             mCurrentState.iconGroup = TelephonyIcons.CARRIER_NETWORK_CHANGE;
         } else if (isRoaming()) {
-            if (!mContext.getResources().getBoolean(R.bool.show_roaming_and_network_icons)) {
-                mCurrentState.iconGroup = TelephonyIcons.ROAMING;
-            }
+            mCurrentState.iconGroup = TelephonyIcons.ROAMING;
         } else if (isDataDisabled()) {
             mCurrentState.iconGroup = TelephonyIcons.DATA_DISABLED;
         }
@@ -1223,6 +1215,7 @@ public class MobileSignalController extends SignalController<
             builder.append("networkName=").append(networkName).append(',');
             builder.append("networkNameData=").append(networkNameData).append(',');
             builder.append("dataConnected=").append(dataConnected).append(',');
+            builder.append("roaming=").append(roaming).append(',');
             builder.append("isDefault=").append(isDefault).append(',');
             builder.append("isEmergency=").append(isEmergency).append(',');
             builder.append("isForbidden= ").append(isForbidden).append(',');
