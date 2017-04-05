@@ -35,7 +35,7 @@ public class KeyDisablerUtils {
             Class keyDisabler = Class.forName("org.cyanogenmod.hardware.KeyDisabler");
     	    Method setActiveMethod = 
     	        keyDisabler.getDeclaredMethod("setActive", boolean.class);
-            setActiveMethod.invoke(null, !disabled);
+            setActiveMethod.invoke(null, disabled);
         } catch(Exception ex) {
             Log.e(TAG, "Could not " + (disabled ? "disable" : "enable") +
                         "HW keys!");
