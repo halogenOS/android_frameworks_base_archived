@@ -129,12 +129,6 @@
       <item quantity="other">ডিভাইস <xliff:g id="NUMBER_1">%d</xliff:g> ঘন্টার জন্য আনলক করা হয়নি। পাসওয়ার্ড নিশ্চিত করুন৷</item>
     </plurals>
     <string name="fingerprint_not_recognized" msgid="2690661881608146617">"স্বীকৃত নয়"</string>
-    <!-- Instructions telling the user that they entered the wrong SIM PIN while trying
-         to unlock the keyguard.  Displayed in a dialog box.  -->
-    <plurals name="kg_password_wrong_pin_code">
-        <item quantity="one">"ভুল SIM <xliff:g id="slotid">%d</xliff:g>পিন কোড, আপনার কাছে আর <xliff:g id="NUMBER_1">%d</xliff:g>টি প্রচেষ্টা বাকি রয়েছে৷"</item>
-        <item quantity="other">"ভুল SIM <xliff:g id="slotid">%d</xliff:g>পিন কোড, আপনার কাছে আর <xliff:g id="NUMBER_1">%d</xliff:g>টি প্রচেষ্টা বাকি রয়েছে৷"</item>
-    </plurals>
 
     <!-- Instructions telling the user remaining times when enter SIM PIN view.  -->
     <plurals name="kg_password_default_pin_message">
