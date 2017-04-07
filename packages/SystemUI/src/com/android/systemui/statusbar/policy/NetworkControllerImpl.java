@@ -845,9 +845,6 @@ public class NetworkControllerImpl extends BroadcastReceiver
                             datatype.equals("lte+") ? TelephonyIcons.LTE_PLUS :
                             TelephonyIcons.UNKNOWN;
                 }
-                if (args.containsKey("roam")) {
-                    controller.getState().roaming = "show".equals(args.getString("roam"));
-                }
                 int[][] icons = TelephonyIcons.TELEPHONY_SIGNAL_STRENGTH;
                 String level = args.getString("level");
                 if (level != null) {
