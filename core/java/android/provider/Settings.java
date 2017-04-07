@@ -3996,6 +3996,12 @@ public final class Settings {
         };
 
         /**
+         * Whether to show the notification ticker when a music track changes
+         * @hide
+         */
+        public static final String STATUS_BAR_TRACK_TICKER = "status_bar_track_ticker";
+
+        /**
          * Settings to backup. This is here so that it's in the same place as the settings
          * keys and easy to update.
          *

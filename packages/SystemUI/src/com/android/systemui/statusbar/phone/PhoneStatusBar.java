@@ -450,6 +450,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
     // status bar notification ticker
     private boolean mTickerEnabled;
+    private boolean mTrackTickerEnabled;
     private Ticker mTicker;
     private View mTickerView;
     private boolean mTicking;
@@ -492,7 +493,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             return false;
         }
     };
-
 
     // ensure quick settings is disabled until the current user makes it through the setup wizard
     private boolean mUserSetup = false;
@@ -630,7 +630,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             if (DEBUG_MEDIA) Log.v(TAG, "DEBUG_MEDIA: onMetadataChanged: " + metadata);
             mMediaMetadata = metadata;
             updateMediaMetaData(true, true);
-            tickTrackInfo();
+            if (mTrackTickerEnabled) {
+                tickTrackInfo();
+            }
         }
     };
 
@@ -812,6 +814,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.STATUS_BAR_SHOW_TICKER),
                     false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_TRACK_TICKER),
+                    false, this, UserHandle.USER_ALL);
             update();
         }
 
@@ -843,6 +848,8 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
           mShowCarrierLabel = Settings.System.getIntForUser(resolver,
               Settings.System.STATUS_BAR_SHOW_CARRIER, 1, UserHandle.USER_CURRENT);
           if (PackageUtils.isImageTileInstalled(mContext)) mShowCarrierLabel = 3;
+          mTrackTickerEnabled = Settings.System.getIntForUser(resolver,
+               Settings.System.STATUS_BAR_TRACK_TICKER, 1, UserHandle.USER_CURRENT) == 1;
           }
 
     }
