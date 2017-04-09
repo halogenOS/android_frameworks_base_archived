@@ -29,7 +29,7 @@ import com.android.systemui.R;
 import com.android.systemui.statusbar.phone.ButtonDispatcher;
 import com.android.systemui.statusbar.policy.KeyButtonView;
 
-public class OpaLayout extends FrameLayout {
+public class OpaLayout extends FrameLayout implements ButtonDispatcher.ButtonInterface {
 
     private static final int ANIMATION_STATE_NONE = 0;
     private static final int ANIMATION_STATE_DIAMOND = 1;
@@ -678,5 +678,10 @@ public class OpaLayout extends FrameLayout {
                 viewToFade.setVisibility(View.INVISIBLE);
             }
         });
+    }
+
+    @Override
+    public void setVertical(boolean vertical) {
+        setLandscape(vertical);
     }
 }
