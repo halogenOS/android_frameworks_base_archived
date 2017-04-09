@@ -66,7 +66,7 @@ public class ImageTile extends QSTile<QSTile.State> {
     public void handleClick() {
         refreshState();
         makeNoise();
-        mDave = !mDave
+        mDave = !mDave;
     }
 
     @Override
