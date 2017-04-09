@@ -876,4 +876,10 @@
     <string name="screen_zoom_summary_smaller">Smaller</string>
     <!-- Description for the screen zoom level that makes interface elements smallest. [CHAR LIMIT=24] -->
     <string name="screen_zoom_summary_smallest">Smallest</string>
+    <!-- Label for carrier demo mode factory reset confirmation dialog. [CHAR LIMIT=40] -->
+    <string name="retail_demo_reset_message">Enter password to perform factory reset in demo mode</string>
+    <!-- Label for positive button on carrier demo  mode factory reset confirmation dialog [CHAR LIMIT=40] -->
+    <string name="retail_demo_reset_next">Next</string>
+    <!-- Title for carrier demo mode factory reset confirmation dialog. [CHAR LIMIT=40] -->
+    <string name="retail_demo_reset_title">Password required</string>
 </resources>

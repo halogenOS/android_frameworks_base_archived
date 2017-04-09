@@ -42,10 +42,10 @@ public class Build {
     public static final String DISPLAY = getString("ro.build.display.id");
 
     /** The name of the overall product. */
-    public static String PRODUCT = getString("ro.product.name");
+    public static final String PRODUCT = getString("ro.product.name");
 
     /** The name of the industrial design. */
-    public static String DEVICE = getString("ro.product.device");
+    public static final String DEVICE = getString("ro.product.device");
 
     /** The name of the underlying board, like "goldfish". */
     public static final String BOARD = getString("ro.product.board");
@@ -70,13 +70,13 @@ public class Build {
     public static final String CPU_ABI2;
 
     /** The manufacturer of the product/hardware. */
-    public static String MANUFACTURER = getString("ro.product.manufacturer");
+    public static final String MANUFACTURER = getString("ro.product.manufacturer");
 
     /** The consumer-visible brand with which the product/hardware will be associated, if any. */
-    public static String BRAND = getString("ro.product.brand");
+    public static final String BRAND = getString("ro.product.brand");
 
     /** The end-user-visible name for the end product. */
-    public static String MODEL = getString("ro.product.model");
+    public static final String MODEL = getString("ro.product.model");
 
     /** The system bootloader version number. */
     public static final String BOOTLOADER = getString("ro.bootloader");

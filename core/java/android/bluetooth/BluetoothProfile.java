@@ -141,6 +141,13 @@ public interface BluetoothProfile {
      * @hide
      */
     public static final int DUN = 21;
+    
+    /*
+     * Max profile ID. This value should be updated whenever a new profile is added to match
+     * the largest value assigned to a profile.
+     * @hide
+     */
+    public static final int MAX_PROFILE_ID = 22;
 
     /**
      * Default priority for devices that we try to auto-connect to and

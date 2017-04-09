@@ -20,8 +20,8 @@
     android:id="@+id/date_time_alarm_group"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_marginTop="8dp"
-    android:layout_marginStart="18dp"
+    android:layout_marginTop="2dp"
+    android:layout_marginStart="16dp"
     android:gravity="start"
     android:orientation="vertical">
     <LinearLayout
@@ -51,7 +51,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:singleLine="true"
-        android:layout_marginTop="2dp"
         android:textAppearance="@style/TextAppearance.StatusBar.Expanded.Clock"
         android:textSize="@dimen/qs_time_collapsed_size"
         android:gravity="top"

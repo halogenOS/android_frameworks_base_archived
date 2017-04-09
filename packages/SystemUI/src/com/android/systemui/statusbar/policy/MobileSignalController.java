@@ -335,15 +335,8 @@ public class MobileSignalController extends SignalController<
         final boolean dataDisabled = mCurrentState.iconGroup == TelephonyIcons.DATA_DISABLED
                 && mCurrentState.userSetup;
 
-        // Show icon in QS when we are connected or need to show roaming or data is disabled.
-        boolean showDataIcon = false;
-        if (mContext.getResources().getBoolean(R.bool.show_roaming_and_network_icons)) {
-            showDataIcon = mCurrentState.dataConnected;
-        } else {
-            showDataIcon = mCurrentState.dataConnected
-                || mCurrentState.iconGroup == TelephonyIcons.ROAMING
-                || isRoaming() || dataDisabled;
-        }
+        // Show icon in QS when we are connected or data is disabled.
+        boolean showDataIcon = mCurrentState.dataConnected || dataDisabled;
         IconState statusIcon = new IconState(mCurrentState.enabled && !mCurrentState.airplaneMode,
                 getCurrentIconId(), contentDescription);
 
@@ -365,7 +358,7 @@ public class MobileSignalController extends SignalController<
                         && mCurrentState.activityOut;
         if (!mContext.getResources().getBoolean(R.bool.show_roaming_and_network_icons)) {
               showDataIcon &= mCurrentState.isDefault
-                || (mCurrentState.iconGroup == TelephonyIcons.ROAMING || isRoaming())
+                || isRoaming()
                 || dataDisabled;
         }
         showDataIcon &= (mStyle == STATUS_BAR_STYLE_ANDROID_DEFAULT
@@ -718,10 +711,6 @@ public class MobileSignalController extends SignalController<
 
         if (isCarrierNetworkChangeActive()) {
             mCurrentState.iconGroup = TelephonyIcons.CARRIER_NETWORK_CHANGE;
-        } else if (isRoaming()) {
-            if (!mContext.getResources().getBoolean(R.bool.show_roaming_and_network_icons)) {
-                mCurrentState.iconGroup = TelephonyIcons.ROAMING;
-            }
         } else if (isDataDisabled()) {
             mCurrentState.iconGroup = TelephonyIcons.DATA_DISABLED;
         }
@@ -869,7 +858,7 @@ public class MobileSignalController extends SignalController<
                     && !mContext.getResources().getBoolean(
                     R.bool.config_always_hide_roaming_indicator)) {
             dataTypeIcon = TelephonyIcons.ROAMING_ICON;
-            qsDataTypeIcon = TelephonyIcons.QS_DATA_R;
+            qsDataTypeIcon = TelephonyIcons.ROAMING_ICON;
         }
         if (DEBUG) {
             Log.d(mTag, "updateDataNetType, dataTypeIcon=" + getResourceName(dataTypeIcon)
