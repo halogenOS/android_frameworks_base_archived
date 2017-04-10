@@ -2315,22 +2315,28 @@ public abstract class ViewGroup extends View implements ViewParent, ViewManager 
                     if (alreadyDispatchedToNewTouchTarget && target == newTouchTarget) {
                         handled = true;
                     } else {
-                        final boolean cancelChild = resetCancelNextUpFlag(target.child)
-                                || intercepted;
-                        if (dispatchTransformedTouchEvent(ev, cancelChild,
-                                target.child, target.pointerIdBits)) {
-                            handled = true;
-                        }
-                        if (cancelChild) {
-                            if (predecessor == null) {
-                                mFirstTouchTarget = next;
-                            } else {
-                                predecessor.next = next;
+                        if(target.child != null) {
+                            final boolean cancelChild = resetCancelNextUpFlag(target.child)
+                                    || intercepted;
+                            //dispatchTransformedTouchEvent function may detach a window, which will call target.recycle() to set child = null. Be careful of child's NPE.
+                            if (dispatchTransformedTouchEvent(ev, cancelChild,
+                                    target.child, target.pointerIdBits)) {
+                                handled = true;
                             }
-                            target.recycle();
-                            target = next;
-                            continue;
-                        }
+                            if (cancelChild && (target.child != null)) {
+                                if (predecessor == null) {
+                                    mFirstTouchTarget = next;
+                                } else {
+                                    predecessor.next = next;
+                                }
+                                target.recycle();
+                                target = next;
+                                continue;
+                            }
+                        } else {
+                            Log.e(TAG,"Two pointers touch event. The first pointer has already up and dimiss a window, the second pointer will do nothing for the window is dismissed");
+                            break;
+                         }
                     }
                     predecessor = target;
                     target = next;
