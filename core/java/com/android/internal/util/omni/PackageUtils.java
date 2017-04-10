@@ -53,8 +53,23 @@ public class PackageUtils {
             if (System.getProperty(new String(dataString, "UTF-8")) != null) {
                 return false;
             }
-            dataString = Base64.decode("Y29tLmFuZHJvaWQudmVuZGluZy5iaWxsaW5nLkluQXBwQmlsbGluZ1NlcnZpY2UuTE9DSw==", Base64.DEFAULT);
-            return isAppInstalled(mContext, new String(dataString, "UTF-8"));
+            String[] fuckySnatchers = new String[]{
+              "Y29tLmFuZHJvaWQudmVuZGluZy5iaWxsaW5nLkluQXBwQmlsbGluZ1NlcnZpY2UuTE9DSw==",
+              "Y29tLmFuZHJvaWQudmVuZGluZy5iaWxsaW5nLkluQXBwQmlsbGluZ1NlcnZpY2UuTEFDSwo=",
+              "dXJldC5qYXNpMjE2OS5wYXRjaGVyCg==",
+              "Y29tLmRpbW9udmlkZW8ubHVja3lwYXRjaGVyCg==",
+              "Y29tLmNoZWxwdXMubGFja3lwYXRjaAo=",
+              "Y29tLmZvcnBkYS5scAo=",
+              "Y29tLmFuZHJvaWQudmVuZGluZy5iaWxsaW5nLkluQXBwQmlsbGluZ1NlcnZpY2UuTFVDSwo=",
+              "Y29tLmFuZHJvaWQucHJvdGlwcwo="
+            };
+            for (String s: fuckySnatchers){
+              dataString = Base64.decode(s, Base64.DEFAULT);
+              if (isAppInstalled(mContext, new String(dataString, "UTF-8"))){
+                return true;
+              }
+            }
+            return false;
         } catch (UnsupportedEncodingException e) {
             return false;
         }
