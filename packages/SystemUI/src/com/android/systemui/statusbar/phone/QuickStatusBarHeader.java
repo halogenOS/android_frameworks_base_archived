@@ -109,9 +109,21 @@ public class QuickStatusBarHeader extends BaseStatusBarHeader implements
                 mHost.startRunnableDismissingKeyguard(() -> mQsPanel.showEdit(view)));
 
         mDateTimeAlarmGroup = (ViewGroup) findViewById(R.id.date_time_alarm_group);
-        mDateTimeGroup = mDateTimeAlarmGroup;
-        mDateTimeGroup.setPivotX(0);
-        mDateTimeGroup.setPivotY(0);
+        if (mDateTimeAlarmGroup != null) {
+            View emptyTimeView = mDateTimeAlarmGroup.findViewById(R.id.empty_time_view);
+            if (emptyTimeView != null) emptyTimeView.setVisibility(View.GONE);
+        }
+        mDateTimeGroup = (ViewGroup) findViewById(R.id.date_time_group);
+        if (mDateTimeGroup != null) {
+            mDateTimeGroup.setPivotX(0);
+            mDateTimeGroup.setPivotY(0);
+            if (mDateTimeAlarmGroup == null) {
+                mDateTimeAlarmGroup = mDateTimeGroup;
+            }
+        } else if(mDateTimeAlarmGroup != null) {
+            mDateTimeGroup = mDateTimeAlarmGroup;
+        }
+
         mDateTimeTranslation = getResources().getDimension(R.dimen.qs_date_time_translation);
         mClock = findViewById(R.id.clock);
         mClock.setOnClickListener(this);
