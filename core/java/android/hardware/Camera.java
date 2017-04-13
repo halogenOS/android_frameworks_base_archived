@@ -171,11 +171,15 @@ public class Camera {
     static {
        // Try getting the list from filesystem
        try {
-           mHal1FsPackageList = FileUtils.readTextFile(
-               new File("/system/etc/hal1-camerapackage-list.txt"), 0, null);
-           mHal1ListLoadedFromFs = true;
+           File hal1PkgListFile =
+                new File("/system/etc/hal1-camerapackage-list.txt");
+           if (hal1PkgListFile.exists()) {
+               mHal1FsPackageList = FileUtils.readTextFile(
+                   hal1PkgListFile, 0, null);
+               mHal1ListLoadedFromFs = true;
+           }
        } catch(IOException ioex) {
-           // File does not exist or something is weird
+           // Something is weird
        }
     }
 
