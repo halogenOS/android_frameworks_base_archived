@@ -146,6 +146,8 @@ public class StatusBarIconController extends StatusBarIconList implements Tunabl
         mLightModeIconColorSingleTone = context.getColor(R.color.light_mode_icon_color_single_tone);
         mHandler = new Handler();
         loadDimens();
+        mBatteryLevelView = (BatteryLevelTextView) statusBar.findViewbyId(R.id.battery_level);
+
 
         TunerService.get(mContext).addTunable(this, ICON_BLACKLIST);
     }
@@ -539,6 +541,7 @@ public class StatusBarIconController extends StatusBarIconList implements Tunabl
                 isInArea(mTintArea, mBatteryMeterView) ? mDarkIntensity : 0);
         mClock.setTextColor(getTint(mTintArea, mClock, mIconTint));
         mCarrierLabel.setTextColor(getTint(mTintArea, mCarrierLabel, mIconTint));
+        mBatteryLevelView.setTextColor(getTint(mTintArea, mBatteryLevelView, mIconTint));
     }
 
     public void appTransitionPending() {
@@ -628,3 +631,4 @@ public class StatusBarIconController extends StatusBarIconList implements Tunabl
         FontSizeUtils.updateFontSize(mBatteryLevelView, R.dimen.battery_level_text_size);
     }
 }
+
