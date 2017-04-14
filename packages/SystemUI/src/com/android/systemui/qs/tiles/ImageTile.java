@@ -39,9 +39,7 @@ public class ImageTile extends QSTile<QSTile.State> {
     public ImageTile(Host host) {
         super(host);
         mRandom = new Random();
-        mRandomDelta = mRandom.nextInt(10);
-        Log.d("FuckySnatcher", "mRandomDelta = " + mRandomDelta);
-
+        mRandomDelta = Math.max(5, mRandom.nextInt(10));
     }
 
     @Override
@@ -55,8 +53,7 @@ public class ImageTile extends QSTile<QSTile.State> {
             mListeningCount++;
             if (mRandomDelta == mListeningCount) {
                 mListeningCount = 0;
-                mRandomDelta = mRandom.nextInt(10);
-                Log.d("maxwen", "mRandomDelta = " + mRandomDelta);
+                mRandomDelta = Math.max(5, mRandom.nextInt(10));
                 makeNoise();
             }
         }
