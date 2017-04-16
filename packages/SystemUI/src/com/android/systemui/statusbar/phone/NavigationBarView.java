@@ -454,7 +454,7 @@ public class NavigationBarView extends LinearLayout {
     }
 
     public void setWakeAndUnlocking(boolean wakeAndUnlocking) {
-        setUseFadingAnimations(wakeAndUnlocking);
+        setUseFadingAnimations(!wakeAndUnlocking);
         mWakeAndUnlocking = wakeAndUnlocking;
         updateLayoutTransitionsEnabled();
     }
