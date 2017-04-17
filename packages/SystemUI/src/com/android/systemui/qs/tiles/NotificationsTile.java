@@ -80,7 +80,7 @@ public class NotificationsTile extends QSTile<QSTile.State> {
         switch (mNotif){
             case "":
                 state.label = mContext.getString(R.string.quick_settings_notifications_none_label);
-                state.icon = ResourceIcon.get(R.drawable.ic_qs_notifications_headsup_off);
+                state.icon = ResourceIcon.get(R.drawable.ic_qs_heads_up_off);
                 Settings.System.putInt(mContext.getContentResolver(),
                     Settings.System.KEY_ENABLE_HEADSUP_NOTIFICATIONS,0);
                 Settings.System.putInt(mContext.getContentResolver(),
@@ -96,7 +96,7 @@ public class NotificationsTile extends QSTile<QSTile.State> {
                 break;
             case Settings.System.KEY_ENABLE_HEADSUP_NOTIFICATIONS:
                 state.label = mContext.getString(R.string.quick_settings_notifications_headsup_label);
-                state.icon = ResourceIcon.get(R.drawable.ic_qs_notifications_headsup_on);
+                state.icon = ResourceIcon.get(R.drawable.ic_qs_heads_up_on);
                 Settings.System.putInt(mContext.getContentResolver(),
                     Settings.System.KEY_ENABLE_HEADSUP_NOTIFICATIONS,1);
                 Settings.System.putInt(mContext.getContentResolver(),
