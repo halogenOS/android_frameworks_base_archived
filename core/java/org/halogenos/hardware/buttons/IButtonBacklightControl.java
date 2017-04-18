@@ -60,7 +60,7 @@ public class IButtonBacklightControl {
             "/sys/class/leds/button-backlight1/",
         BUTTON_BACKLIGHT_PATHS[] = null,
         BRIGHTNESS_CONTROL = "brightness",
-        MAX_BRIGHTNESS_CONTORL = "max_brightness"
+        MAX_BRIGHTNESS_CONTROL = "max_brightness"
         ;
 
     /// Device-specific maximum brightness value
@@ -82,11 +82,12 @@ public class IButtonBacklightControl {
     private void setBrightnessDirect(int brightness) {
         if(currentBrightness == brightness) return;
         if(DEBUG) Log.d(TAG, "Setting brightness: " + brightness);
-        for (String path : BUTTON_BACKLIGHT_PATHS)
-            FileUtils.writeLine(
-                path + BRIGHTNESS_CONTROL,
-                String.valueOf(brightness)
-            );
+        for (String path : BUTTON_BACKLIGHT_PATHS) {
+            String finalPath = path + BRIGHTNESS_CONTROL;
+            if (FileUtils.isFileWritable(finalPath)) {
+                FileUtils.writeLine(finalPath, String.valueOf(brightness));
+            }
+        }
         currentBrightness = brightness;
     }
 
@@ -112,6 +113,13 @@ public class IButtonBacklightControl {
      * @hide
      */
     public int getBrightness() {
+        if (!FileUtils.isFileReadable(BRIGHTNESS_CONTROL) &&
+                BUTTON_BACKLIGHT_PATHS.length > 1) {
+            String altPath = BUTTON_BACKLIGHT_PATHS[1] + "/brightness";
+            if (FileUtils.isFileReadable(altPath)) {
+                BRIGHTNESS_CONTROL = altPath;
+            } else return 0;
+        }
         return Integer.parseInt(
             FileUtils.readOneLine(BRIGHTNESS_CONTROL)) / MAXIMUM_BRIGHTNESS * 1000;
     }
@@ -156,11 +164,18 @@ public class IButtonBacklightControl {
         else if(BUTTON_BACKLIGHT_PATHS == null)
             BUTTON_BACKLIGHT_PATHS = new String[]
                 {BUTTON_BACKLIGHT_PATH};
-        MAX_BRIGHTNESS_CONTORL = BUTTON_BACKLIGHT_PATHS[0] + MAX_BRIGHTNESS_CONTORL;
+        MAX_BRIGHTNESS_CONTROL = BUTTON_BACKLIGHT_PATHS[0] + "max_brightness";
         try {
-            if (MAXIMUM_BRIGHTNESS == -1)
+            if (!FileUtils.isFileReadable(MAX_BRIGHTNESS_CONTROL) &&
+                    BUTTON_BACKLIGHT_PATHS.length > 1) {
+                MAX_BRIGHTNESS_CONTROL = BUTTON_BACKLIGHT_PATHS[1] + "max_brightness";
+            }
+            if (!FileUtils.isFileReadable(MAX_BRIGHTNESS_CONTROL)) {
+                MAXIMUM_BRIGHTNESS = 100;
+            } else if (MAXIMUM_BRIGHTNESS == -1) {
                 MAXIMUM_BRIGHTNESS =
-                    Integer.parseInt(FileUtils.readOneLine(MAX_BRIGHTNESS_CONTORL));
+                    Integer.parseInt(FileUtils.readOneLine(MAX_BRIGHTNESS_CONTROL));
+            }
             currentBrightness = getBrightness();
         } catch(Exception e) {
             MAXIMUM_BRIGHTNESS = 100;
