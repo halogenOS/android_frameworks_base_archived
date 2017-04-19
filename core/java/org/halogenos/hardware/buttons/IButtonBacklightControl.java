@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 halogenOS
+ * Copyright (C) 2016-2017 The halogenOS Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,9 @@ import android.os.UserHandle;
 import android.provider.Settings;
 import android.util.Log;
 
-import org.cyanogenmod.internal.util.FileUtils;
+import java.io.File;
+
+import org.halogenos.io.FileUtils;
 
 /**
  * This class is supposed to control button backlight
@@ -34,42 +36,55 @@ import org.cyanogenmod.internal.util.FileUtils;
 public class IButtonBacklightControl {
 
     public static final String COMPONENT_NAME = "buttons.ButtonBacklightControl";
+
+    /**
+     * Brightness not supported or no buttons
+     */
+    public static final int CONTROL_TYPE_NONE = -1;
+
+    /**
+     * Brightness can be fully adjusted
+     */
+    public static final int CONTROL_TYPE_FULL = -2;
+
+    /**
+     * Brightness can be partially adjusted
+     * Off - Dim - On
+     */
+    public static final int CONTROL_TYPE_PARTIAL = -3;
+
+    /**
+     * Backlight can only be turned on and off
+     */
+    public static final int CONTROL_TYPE_SWITCH = -4;
+
     private static final boolean DEBUG = false;
     private static final String TAG = IButtonBacklightControl.class.getSimpleName();
 
-    public static final int
-            // Brightness not supported or no buttons
-            CONTROL_TYPE_NONE = -1,
-            // Brightness can be fully adjusted
-            CONTROL_TYPE_FULL = -2,
-            // Brightness can be partially adjusted
-            // Off - Dim - On
-            CONTROL_TYPE_PARTIAL = -3,
-            // Backlight can only be turned on and off
-            CONTROL_TYPE_SWITCH = -4
-            ;
+    private static final String BRIGHTNESS_CONTROL_FILE = "brightness";
+    private static final String MAX_BRIGHTNESS_FILE = "max_brightness";
 
     public int CONTROL_TYPE = CONTROL_TYPE_NONE;
 
+    @Deprecated
     public boolean HAVE_TWO_BACKLIGHT_PATHS = false;
 
-    public String
-        BUTTON_BACKLIGHT_PATH =
-            "/sys/class/leds/button-backlight/",
-        BUTTON_BACKLIGHT_PATH2 =
-            "/sys/class/leds/button-backlight1/",
-        BUTTON_BACKLIGHT_PATHS[] = null,
-        BRIGHTNESS_CONTROL = "brightness",
-        MAX_BRIGHTNESS_CONTROL = "max_brightness"
-        ;
+    @Deprecated
+    public String BUTTON_BACKLIGHT_PATH = "/sys/class/leds/button-backlight/";
+    @Deprecated
+    public String BUTTON_BACKLIGHT_PATH2 = null;
+
+    public String BUTTON_BACKLIGHT_PATHS[] = null;
 
     /// Device-specific maximum brightness value
-    public int MAXIMUM_BRIGHTNESS = -1;
+    public int MAXIMUM_BRIGHTNESS = 100;
 
-    public int currentBrightnessSetting = 1000, currentTimeout = 3,
-               currentBrightness = 0;
+    public int mCurrentBrightnessSetting = 1000, mCurrentTimeout = 3,
+               mCurrentBrightness = 0;
 
-    /** @hide **/
+    /** 
+     * @hide
+     **/
     public IButtonBacklightControl() {
 
     }
@@ -80,15 +95,17 @@ public class IButtonBacklightControl {
      * @hide
      **/
     private void setBrightnessDirect(int brightness) {
-        if(currentBrightness == brightness) return;
+        if(mCurrentBrightness == brightness) return;
         if(DEBUG) Log.d(TAG, "Setting brightness: " + brightness);
-        for (String path : BUTTON_BACKLIGHT_PATHS) {
-            String finalPath = path + BRIGHTNESS_CONTROL;
-            if (FileUtils.isFileWritable(finalPath)) {
-                FileUtils.writeLine(finalPath, String.valueOf(brightness));
+        for (int i = 0; i < BUTTON_BACKLIGHT_PATHS.length; i++) {
+            if (BUTTON_BACKLIGHT_PATHS[i] == null) continue;
+            File curFile = new File(
+                    BUTTON_BACKLIGHT_PATHS[i], BRIGHTNESS_CONTROL_FILE);
+            if (curFile.exists()) {
+                FileUtils.writeString(String.valueOf(brightness), curFile);
             }
         }
-        currentBrightness = brightness;
+        mCurrentBrightness = brightness;
     }
 
     /**
@@ -110,24 +127,31 @@ public class IButtonBacklightControl {
      *
      * See setBrightness(int brightness)
      *
+     * @return Current brightness. Also returns 0 if not able to retrieve it.
      * @hide
      */
     public int getBrightness() {
-        if (!FileUtils.isFileReadable(BRIGHTNESS_CONTROL) &&
-                BUTTON_BACKLIGHT_PATHS.length > 1) {
-            String altPath = BUTTON_BACKLIGHT_PATHS[1] + "/brightness";
-            if (FileUtils.isFileReadable(altPath)) {
-                BRIGHTNESS_CONTROL = altPath;
-            } else return 0;
+        for (int i = 0; i < BUTTON_BACKLIGHT_PATHS.length; i++) {
+            if (BUTTON_BACKLIGHT_PATHS[i] == null) continue;
+            File curFile = new File(
+                        BUTTON_BACKLIGHT_PATHS[i], BRIGHTNESS_CONTROL_FILE);
+            if (curFile.exists()) {
+                try {
+                    String b = FileUtils.readString(curFile);
+                    if (b == null || b.isEmpty()) continue;
+                    return Integer.parseInt(b) / MAXIMUM_BRIGHTNESS * 1000;
+                } catch(Exception e) {
+                    // What is happening?!
+                }
+            }
         }
-        return Integer.parseInt(
-            FileUtils.readOneLine(BRIGHTNESS_CONTROL)) / MAXIMUM_BRIGHTNESS * 1000;
+        return 0;
     }
 
     /**
      * Handle a brighthness change (this can also be used as a safer variant of setBrightness)
      *
-     * Auto-Conversion of brightness values, no unallowed values.
+     * Automatic conversion of brightness values, no unallowed values.
      *
      * @param newBrightness New brightness in a scale from 0-1000
      *
@@ -143,12 +167,12 @@ public class IButtonBacklightControl {
                                    (newBrightness == 1 ? 1 : 0));
                 break;
             case CONTROL_TYPE_FULL:
-                setBrightness(
-                    newBrightness > 1000 ? 1000 :
-                    (newBrightness < 0 ? 0 : newBrightness)
-                );
+                setBrightness(newBrightness > 1000 ? 1000 :
+                                (newBrightness < 0 ? 0 : newBrightness));
+                break;
             case CONTROL_TYPE_NONE:
-            default: break;
+            default:
+                break;
         }
     }
 
@@ -158,38 +182,42 @@ public class IButtonBacklightControl {
      * @hide
      **/
     public final void ready() {
-        if (HAVE_TWO_BACKLIGHT_PATHS && BUTTON_BACKLIGHT_PATHS == null)
-            BUTTON_BACKLIGHT_PATHS = new String[]
-                {BUTTON_BACKLIGHT_PATH,BUTTON_BACKLIGHT_PATH2};
-        else if(BUTTON_BACKLIGHT_PATHS == null)
-            BUTTON_BACKLIGHT_PATHS = new String[]
-                {BUTTON_BACKLIGHT_PATH};
-        MAX_BRIGHTNESS_CONTROL = BUTTON_BACKLIGHT_PATHS[0] + "max_brightness";
-        try {
-            if (!FileUtils.isFileReadable(MAX_BRIGHTNESS_CONTROL) &&
-                    BUTTON_BACKLIGHT_PATHS.length > 1) {
-                MAX_BRIGHTNESS_CONTROL = BUTTON_BACKLIGHT_PATHS[1] + "max_brightness";
-            }
-            if (!FileUtils.isFileReadable(MAX_BRIGHTNESS_CONTROL)) {
-                MAXIMUM_BRIGHTNESS = 100;
-            } else if (MAXIMUM_BRIGHTNESS == -1) {
-                MAXIMUM_BRIGHTNESS =
-                    Integer.parseInt(FileUtils.readOneLine(MAX_BRIGHTNESS_CONTROL));
-            }
-            currentBrightness = getBrightness();
-        } catch(Exception e) {
-            MAXIMUM_BRIGHTNESS = 100;
+        if (HAVE_TWO_BACKLIGHT_PATHS && BUTTON_BACKLIGHT_PATHS == null) {
+            /* This is deprecated but still handled for compatibility.
+             * Planning to remove support for old modules in next rebase */
+            BUTTON_BACKLIGHT_PATHS = new String[] {
+                BUTTON_BACKLIGHT_PATH, BUTTON_BACKLIGHT_PATH2
+            };
+        } else if (BUTTON_BACKLIGHT_PATHS == null &&
+                    BUTTON_BACKLIGHT_PATH2 == null) {
+            BUTTON_BACKLIGHT_PATHS = new String[] {
+                BUTTON_BACKLIGHT_PATH
+            };
         }
+        for (int i = 0; i < BUTTON_BACKLIGHT_PATHS.length; i++) {
+            if (new File(BUTTON_BACKLIGHT_PATHS[i], MAX_BRIGHTNESS_FILE).exists()) {
+                try {
+                    MAXIMUM_BRIGHTNESS = Integer.parseInt(
+                        FileUtils.readString(new File(
+                            BUTTON_BACKLIGHT_PATHS[i], MAX_BRIGHTNESS_FILE)));
+                    break;
+                } catch(NumberFormatException e) {
+                    // Bad content
+                }
+            }
+        }
+        mCurrentBrightness = getBrightness();
     }
 
     /**
      * Retrieve the current control type from settings
      *
      * @param resolver Content resolver
-     *
+     * @return Current control type
+     * 
      * @hide
      **/
-    public static int currentControlType(ContentResolver resolver) {
+    public static int getCurrentControlType(ContentResolver resolver) {
         return Settings.System.getIntForUser(resolver,
                 Settings.System.BUTTON_BACKLIGHT_CONTROL_TYPE, CONTROL_TYPE_NONE,
                 UserHandle.USER_CURRENT);
@@ -198,10 +226,11 @@ public class IButtonBacklightControl {
     /**
      * Get the current timeout
      *
+     * @return Current timeout
      * @hide
      **/
-    public final int currentTimeout() {
-        return currentTimeout;
+    public final int getCurrentTimeout() {
+        return mCurrentTimeout;
     }
 
     /**
@@ -211,10 +240,11 @@ public class IButtonBacklightControl {
      * not the brightness the user has chosen to be when the lights
      * are on.
      *
+     * @return Current brightness setting
      * @hide
      **/
-    public final int currentBrightnessSetting() {
-        return currentBrightnessSetting;
+    public final int getCurrentBrightnessSetting() {
+        return mCurrentBrightnessSetting;
     }
 
 }

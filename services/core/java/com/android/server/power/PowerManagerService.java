@@ -1283,13 +1283,6 @@ public final class PowerManagerService extends SystemService
             switch (mWakefulness) {
                 case WAKEFULNESS_ASLEEP:
                     Slog.i(TAG, "Waking up from sleep (uid " + reasonUid +")...");
-                    try {
-                        if(mButtonBacklightControl.currentTimeout == -1)
-                            mButtonBacklightControl.handleBrightnessChange(
-                                mButtonBacklightControl.currentBrightnessSetting);
-                    } catch(Exception e) {
-                        // Huh?
-                    }
                     break;
                 case WAKEFULNESS_DREAMING:
                     Slog.i(TAG, "Waking up from dream (uid " + reasonUid +")...");
@@ -1297,6 +1290,15 @@ public final class PowerManagerService extends SystemService
                 case WAKEFULNESS_DOZING:
                     Slog.i(TAG, "Waking up from dozing (uid " + reasonUid +")...");
                     break;
+            }
+
+            try {
+                if(mButtonBacklightControl.getCurrentTimeout() == -1) {
+                    mButtonBacklightControl.handleBrightnessChange(
+                        mButtonBacklightControl.getCurrentBrightnessSetting());
+                }
+            } catch(Exception e) {
+                // Huh?
             }
 
             mLastWakeTime = eventTime;
@@ -1381,6 +1383,15 @@ public final class PowerManagerService extends SystemService
                 }
             }
             EventLog.writeEvent(EventLogTags.POWER_SLEEP_REQUESTED, numWakeLocksCleared);
+
+            if(mButtonBacklightControl.getCurrentTimeout() != 0 &&
+                mButtonBacklightControl.getCurrentBrightnessSetting() != 0) {
+                try {
+                    mButtonBacklightControl.handleBrightnessChange(0);
+                } catch(Exception e) {
+                    // Hmmm...
+                }
+            }
 
             // Skip dozing if requested.
             if ((flags & PowerManager.GO_TO_SLEEP_FLAG_NO_DOZE) != 0) {
@@ -1791,8 +1802,7 @@ public final class PowerManagerService extends SystemService
                 final boolean userInactiveOverride = mUserInactiveOverrideFromWindowManager;
                 final int buttonBacklightTimeout = 
                     (mButtonBacklightControl != null
-                        ? mButtonBacklightControl.currentTimeout()
-                        : -2);
+                        ? mButtonBacklightControl.getCurrentTimeout() : -2);
 
                 mUserActivitySummary = 0;
                 if (mLastUserActivityTime >= mLastWakeTime) {
@@ -1800,14 +1810,14 @@ public final class PowerManagerService extends SystemService
                             + screenOffTimeout - screenDimDuration;
                     if (now < nextTimeout) {
                         if(buttonBacklightTimeout > 0 &&
-                            mButtonBacklightControl.currentBrightnessSetting() != 0) {
+                            mButtonBacklightControl.getCurrentBrightnessSetting() != 0) {
                             try {
                                 if (now > mLastUserActivityTime + buttonBacklightTimeout * 1000)
                                     mButtonBacklightControl.handleBrightnessChange(0);
                                 else if (!mProximityPositive) {
                                     mButtonBacklightControl
                                         .handleBrightnessChange(mButtonBacklightControl
-                                            .currentBrightnessSetting());
+                                            .getCurrentBrightnessSetting());
                                     nextTimeout = now + buttonBacklightTimeout * 1000;
                                 }
                             } catch(Exception e) {

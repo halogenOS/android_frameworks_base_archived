@@ -126,7 +126,7 @@ class HardwareControlService extends SystemService {
                 }
             }
 
-            if (IButtonBacklightControl.currentControlType(resolver) !=
+            if (IButtonBacklightControl.getCurrentControlType(resolver) !=
                 mButtonBacklightControl.CONTROL_TYPE) {
                 Settings.System.putIntForUser(resolver,
                     Settings.System.BUTTON_BACKLIGHT_CONTROL_TYPE,
@@ -164,8 +164,8 @@ class HardwareControlService extends SystemService {
                     0, UserHandle.USER_CURRENT
                 );
             mButtonBacklightControl.handleBrightnessChange(br);
-            mButtonBacklightControl.currentBrightnessSetting = br;
-            mButtonBacklightControl.currentTimeout = tm;
+            mButtonBacklightControl.mCurrentBrightnessSetting = br;
+            mButtonBacklightControl.mCurrentTimeout = tm;
             if(isKeyDisablerSupported)
                 KeyDisablerUtils.setHwKeysEnabled(
                     Settings.System.getIntForUser(resolver,
