@@ -25,7 +25,7 @@ import com.android.internal.logging.MetricsProto.MetricsEvent;
 
 public class NotificationsTile extends QSTile<QSTile.State> {
 
-    private String mNotif = "";
+    private String mNotif = getCurrentNotifier();
 
 
     public NotificationsTile(Host host) {
@@ -81,27 +81,37 @@ public class NotificationsTile extends QSTile<QSTile.State> {
             case "":
                 state.label = mContext.getString(R.string.quick_settings_notifications_none_label);
                 state.icon = ResourceIcon.get(R.drawable.ic_qs_heads_up_off);
-                Settings.System.putInt(mContext.getContentResolver(),
-                    Settings.System.KEY_ENABLE_HEADSUP_NOTIFICATIONS,0);
-                Settings.System.putInt(mContext.getContentResolver(),
-                    Settings.System.STATUS_BAR_SHOW_TICKER,0);
+                setValues(false, false);
                 break;
             case Settings.System.STATUS_BAR_SHOW_TICKER:
                 state.label = mContext.getString(R.string.quick_settings_notifications_ticker_label);
                 state.icon = ResourceIcon.get(R.drawable.ic_qs_notifications_ticker);
-                Settings.System.putInt(mContext.getContentResolver(),
-                    Settings.System.KEY_ENABLE_HEADSUP_NOTIFICATIONS,0);
-                Settings.System.putInt(mContext.getContentResolver(),
-                    Settings.System.STATUS_BAR_SHOW_TICKER,1);
+                setValues(true, false);
                 break;
             case Settings.System.KEY_ENABLE_HEADSUP_NOTIFICATIONS:
                 state.label = mContext.getString(R.string.quick_settings_notifications_headsup_label);
                 state.icon = ResourceIcon.get(R.drawable.ic_qs_heads_up_on);
-                Settings.System.putInt(mContext.getContentResolver(),
-                    Settings.System.KEY_ENABLE_HEADSUP_NOTIFICATIONS,1);
-                Settings.System.putInt(mContext.getContentResolver(),
-                    Settings.System.STATUS_BAR_SHOW_TICKER,0);
+                setValues(false, true);
                 break;
+        }
+    }
+
+    private void setValues(boolean mTickerEnable, boolean mHeadsupEnable) {
+        Settings.System.putInt(mContext.getContentResolver(),
+            Settings.System.KEY_ENABLE_HEADSUP_NOTIFICATIONS, mHeadsupEnable ? 1 : 0);
+        Settings.System.putInt(mContext.getContentResolver(),
+            Settings.System.STATUS_BAR_SHOW_TICKER, mTickerEnable ? 1 : 0);
+    }
+
+    private String getCurrentNotifier() {
+        if (Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.KEY_ENABLE_HEADSUP_NOTIFICATIONS, 0) != 0) {
+            return Settings.System.KEY_ENABLE_HEADSUP_NOTIFICATIONS;
+        } else if (Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.STATUS_BAR_SHOW_TICKER, 0) != 0) {
+            return Settings.System.STATUS_BAR_SHOW_TICKER;
+        } else {
+            return "";
         }
     }
 
