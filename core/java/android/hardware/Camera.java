@@ -26,7 +26,6 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.SurfaceTexture;
 import android.media.IAudioService;
-import android.os.FileUtils;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
@@ -45,7 +44,6 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.os.SystemProperties;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -164,20 +162,6 @@ public class Camera {
     private static final int CAMERA_MSG_STATS_DATA       = 0x1000;
     private static final int CAMERA_MSG_META_DATA        = 0x2000;
     /* ### QC ADD-ONS: END */
-
-    private static boolean mHal1ListLoadedFromFs = false;
-    private static String mHal1FsPackageList = "";
-
-    static {
-       // Try getting the list from filesystem
-       try {
-           mHal1FsPackageList = FileUtils.readTextFile(
-               new File("/system/etc/hal1-camerapackage-list.txt"), 0, null);
-           mHal1ListLoadedFromFs = true;
-       } catch(IOException ioex) {
-           // File does not exist or something is weird
-       }
-    }
 
     private long mNativeContext; // accessed by native methods
     private EventHandler mEventHandler;
@@ -547,14 +531,10 @@ public class Camera {
 
         String packageName = ActivityThread.currentOpPackageName();
 
-        // Force HAL1 if the package name falls in this bucket
+        //Force HAL1 if the package name falls in this bucket
         String packageList = SystemProperties.get("camera.hal1.packagelist", "");
-        if (packageList.isEmpty()) {
-            packageList = mHal1FsPackageList;
-        }
         if (packageList.length() > 0) {
-            TextUtils.StringSplitter splitter = new TextUtils.SimpleStringSplitter(
-                mHal1ListLoadedFromFs ? '\n' : ',');
+            TextUtils.StringSplitter splitter = new TextUtils.SimpleStringSplitter(',');
             splitter.setString(packageList);
             for (String str : splitter) {
                 if (packageName.equals(str)) {
