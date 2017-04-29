@@ -357,7 +357,7 @@ public class WifiTracker {
                         // If saved network not present in scan result then set its Rssi to MAX_VALUE
                         boolean apFound = false;
                         for (ScanResult result : results) {
-                            if (result.SSID.equals(accessPoint.getSsidStr())) {
+                            if (accessPoint.matches(result)) {
                                 apFound = true;
                                 break;
                             }

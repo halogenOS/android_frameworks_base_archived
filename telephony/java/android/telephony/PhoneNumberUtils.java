@@ -2373,9 +2373,8 @@ public class PhoneNumberUtils
                 if (useNanp) {
                     networkDialStr = extractNetworkPortion(tempDialStr);
                 } else  {
-                    Rlog.e("cdmaCheckAndProcessPlusCodeByNumberFormat:non-NANP not supported",
-                            dialStr);
-                    return dialStr;
+                    networkDialStr = extractNetworkPortionAlt(tempDialStr);
+
                 }
 
                 networkDialStr = processPlusCode(networkDialStr, useNanp);
