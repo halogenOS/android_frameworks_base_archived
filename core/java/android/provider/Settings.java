@@ -1930,6 +1930,8 @@ public final class Settings {
          * @param name to look up in the table
          * @param defaultValue to return if not found
          * @return the corresponding value, or defaultValue if not present
+         *
+         * @hide
          */
         public static String getString(
                 ContentResolver resolver, String name, String defaultValue) {
@@ -3813,6 +3815,7 @@ public final class Settings {
          */
         public static final String SHOW_LOCKSCREEN_VISUALIZER =
                                 "show_lockscreen_visualizer";
+        /** @hide */
         public static final int SHOW_LOCKSCREEN_VISUALIZER_DEFAULT = 1;
 
         /**
@@ -6905,7 +6908,7 @@ public final class Settings {
          */
         public static final String WEB_ACTION_ENABLED = "web_action_enabled";
 
-        /*
+        /**
          * Whether to include options in power menu for rebooting into recovery or bootloader
          * @hide
          */
@@ -8880,6 +8883,9 @@ public final class Settings {
          */
         public static final String ALARM_MANAGER_CONSTANTS = "alarm_manager_constants";
 
+        /**
+         * @hide
+         */
         public static final String SINGLE_HAND_MODE = "single_hand_mode";
 
         /**

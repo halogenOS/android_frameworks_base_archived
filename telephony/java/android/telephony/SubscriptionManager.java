@@ -1073,7 +1073,10 @@ public class SubscriptionManager {
         if (VDBG) logd("getDefaultDataSubscriptionId, sub id = " + subId);
         return subId;
     }
-    
+
+    /**
+     * @hide
+     */
     public static int getDefaultDataSubId() {
         return getDefaultDataSubscriptionId();
     }

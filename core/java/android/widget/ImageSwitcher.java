@@ -56,6 +56,9 @@ public class ImageSwitcher extends ViewSwitcher
         showNext();
     }
 
+    /**
+     * @hide
+     */
     public void setColoredImageDrawable(Drawable drawable, ColorStateList tint)
     {
         ImageView image = (ImageView)this.getNextView();
