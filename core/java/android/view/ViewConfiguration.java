@@ -476,6 +476,9 @@ public class ViewConfiguration {
 
     }
 
+    /**
+     * @hide
+     */
     public static boolean isNumeric(String string) {
         try {
             Integer.parseInt(string);
