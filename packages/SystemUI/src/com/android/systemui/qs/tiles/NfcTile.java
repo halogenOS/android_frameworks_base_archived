@@ -115,7 +115,7 @@ public class NfcTile extends QSTile<QSTile.BooleanState> {
 
     @Override
     public int getMetricsCategory() {
-        return MetricsEvent.QS_NFC;
+        return MetricsEvent.QUICK_SETTINGS;
     }
 
     @Override
