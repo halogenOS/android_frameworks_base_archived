@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2014 The Android Open Source Project
- * Copyright (C) 2016 halogenOS
+ * Copyright (C) 2016-2017 The halogenOS Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,14 @@
 
 package com.android.internal.os;
 
-
+import android.os.Build;
 import android.os.Trace;
 import dalvik.system.ZygoteHooks;
 import android.system.ErrnoException;
 import android.system.Os;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 
 /** @hide */
 public final class Zygote {
@@ -55,6 +58,12 @@ public final class Zygote {
     public static final int MOUNT_EXTERNAL_READ = 2;
     /** Read-write external storage should be mounted. */
     public static final int MOUNT_EXTERNAL_WRITE = 3;
+
+    /** @hide **/
+    private static final String[] MODERN_SERVICES = {
+        "com.google.android.apps.nexuslauncher",
+        "com.google.android.googlequicksearchbox"
+    };
 
     private static final ZygoteHooks VM_HOOKS = new ZygoteHooks();
 
@@ -102,9 +111,39 @@ public final class Zygote {
 
             // Note that this event ends at the end of handleChildProc,
             Trace.traceBegin(Trace.TRACE_TAG_ACTIVITY_MANAGER, "PostFork");
+
+            for (int i = 0; i < MODERN_SERVICES.length; i++) {
+                if (niceName.equals(MODERN_SERVICES[i])) {
+                    changeBuildValue("MODEL",   "Pixel XL");
+                    changeBuildValue("PRODUCT", "Pixel XL");
+                    changeBuildValue("DEVICE",  "Pixel XL");
+                    changeBuildValue("MANUFACTURER", "Google");
+                    changeBuildValue("BRAND",        "Google");
+                }
+            }
         }
         VM_HOOKS.postForkCommon();
         return pid;
+    }
+
+    /** @hide **/
+    private static void changeBuildValue(String name, String value) {
+        try {
+            Field field = Build.class.getField(name);
+
+            // Just in case
+            field.setAccessible(true);
+
+            // Get rid of final
+            Field modifiersField = Field.class.getDeclaredField("modifiers");
+            modifiersField.setAccessible(true);
+            modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+
+            // Set the value
+            field.set(null, value);
+        } catch(NoSuchFieldException | IllegalAccessException e) {
+            // Dafuq?
+        }
     }
 
     native private static int nativeForkAndSpecialize(int uid, int gid, int[] gids,int debugFlags,
