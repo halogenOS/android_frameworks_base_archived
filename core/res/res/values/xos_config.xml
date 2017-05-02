@@ -69,6 +69,6 @@
     <integer name="config_doubleTapOnCameraKeyBehavior">0</integer>
 
     <!-- Internal default to navigation bar value -->
-    <bool name="config_defaultToNavigationBar">true</bool>
+    <bool name="config_defaultToNavigationBar">false</bool>
 
 </resources>
