@@ -141,6 +141,7 @@ class BluetoothManagerService extends IBluetoothManager.Stub {
     // used inside handler thread
     private boolean mQuietEnable = false;
     private boolean mEnable;
+    private boolean mEnableBrEdr = false;
 
     /**
      * Used for tracking apps that enabled / disabled Bluetooth.
@@ -262,11 +263,13 @@ class BluetoothManagerService extends IBluetoothManager.Stub {
                             // disable without persisting the setting
                             Slog.d(TAG, "Calling disable");
                             sendDisableMsg("airplane mode");
+                            mEnableBrEdr = false;
                         }
                     } else if (mEnableExternal) {
                         // enable without persisting the setting
                         Slog.d(TAG, "Calling enable");
                         sendEnableMsg(mQuietEnableExternal, "airplane mode");
+                        mEnableBrEdr = true;
                     }
                 }
             }
@@ -308,6 +311,7 @@ class BluetoothManagerService extends IBluetoothManager.Stub {
         if (isBluetoothPersistedStateOn()) {
             if (DBG) Slog.d(TAG, "Startup: Bluetooth persisted state is ON.");
             mEnableExternal = true;
+            mEnableBrEdr = true;
         }
 
         int systemUiUid = -1;
@@ -639,7 +643,7 @@ class BluetoothManagerService extends IBluetoothManager.Stub {
                         BluetoothAdapter.nameForState(st));
                 return;
             }
-            if (isBluetoothPersistedStateOnBluetooth() || !isBleAppPresent()) {
+            if (isBluetoothPersistedStateOnBluetooth() || mEnableBrEdr) {
                 // This triggers transition to STATE_ON
                 mBluetooth.onLeServiceUp();
                 persistBluetoothSetting(BLUETOOTH_ON_BLUETOOTH);
@@ -729,7 +733,7 @@ class BluetoothManagerService extends IBluetoothManager.Stub {
         }
         mContext.enforceCallingOrSelfPermission(BLUETOOTH_ADMIN_PERM,
                                         "Need BLUETOOTH ADMIN permission");
-        
+
         AppOpsManager mAppOpsManager = mContext.getSystemService(AppOpsManager.class);
 
         if ((Binder.getCallingUid() > 10000)
@@ -741,6 +745,12 @@ class BluetoothManagerService extends IBluetoothManager.Stub {
                 return false;
             }
         }
+
+        if ((packageName == null || packageName.isEmpty()) && !isBleAppPresent()) {
+            Slog.w(TAG, "Set mEnableBrEdr for script enable request");
+            mEnableBrEdr = true;
+        }
+
         if (DBG) {
             Slog.d(TAG,"enable(" + packageName + "):  mBluetooth =" + mBluetooth +
                     " mBinding = " + mBinding + " mState = " +
@@ -1773,6 +1783,11 @@ class BluetoothManagerService extends IBluetoothManager.Stub {
             }
             mActiveLogs.add(new ActiveLog(packageName, enable, System.currentTimeMillis()));
         }
+    }
+
+
+    public void setBrEdrEnableStatus(boolean status) {
+        mEnableBrEdr = status;
     }
 
     private void recoverBluetoothServiceFromError(boolean clearBle) {
