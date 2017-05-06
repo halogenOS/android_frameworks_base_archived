@@ -17,7 +17,7 @@
 
 <resources>
 
-  <dimen name="status_bar_carrier_height">14dp</dimen>
+  <dimen name="status_bar_carrier_height">14sp</dimen>
 
   <!-- Status bar notification ticker -->
   <dimen name="ticker_start_padding">6dp</dimen>
