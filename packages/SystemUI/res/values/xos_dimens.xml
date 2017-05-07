@@ -17,31 +17,34 @@
 
 <resources>
 
-  <dimen name="status_bar_carrier_height">14sp</dimen>
+    <dimen name="status_bar_carrier_height">14sp</dimen>
 
-  <!-- Status bar notification ticker -->
-  <dimen name="ticker_start_padding">6dp</dimen>
-  <dimen name="ticker_icon_end_margin">4dp</dimen>
-  <dimen name="ticker_text_top_padding">2dp</dimen>
-  <dimen name="ticker_text_end_padding">10dp</dimen>
+    <!-- Status bar notification ticker -->
+    <dimen name="ticker_start_padding">6dp</dimen>
+    <dimen name="ticker_icon_end_margin">4dp</dimen>
+    <dimen name="ticker_text_top_padding">2dp</dimen>
+    <dimen name="ticker_text_end_padding">10dp</dimen>
 
-  <!-- OPA home dimens -->
-  <dimen name="halo_inner_radius">10.0dip</dimen>
-  <dimen name="halo_thickness">1.0dip</dimen>
-  <dimen name="halo_diameter">22.0dip</dimen>
-  <dimen name="opa_dot_diam">10.0dip</dimen>
-  <dimen name="opa_diamond_translation">16.0dip</dimen>
-  <dimen name="opa_line_y_translation">16.0dip</dimen>
-  <dimen name="opa_line_x_trans_ry">15.0dip</dimen>
-  <dimen name="opa_line_x_trans_bg">30.0dip</dimen>
-  <dimen name="opa_line_x_collapse_bg">46.0dip</dimen>
-  <dimen name="opa_line_x_collapse_ry">15.0dip</dimen>
-  <dimen name="opa_overshoot_translation">8.0dip</dimen>
-  <dimen name="opa_return_translation">-1.0dip</dimen>
-  <dimen name="opa_rest_to_collapse">7.0dip</dimen>
+    <!-- OPA home dimens -->
+    <dimen name="halo_inner_radius">10.0dip</dimen>
+    <dimen name="halo_thickness">1.0dip</dimen>
+    <dimen name="halo_diameter">22.0dip</dimen>
+    <dimen name="opa_dot_diam">10.0dip</dimen>
+    <dimen name="opa_diamond_translation">16.0dip</dimen>
+    <dimen name="opa_line_y_translation">16.0dip</dimen>
+    <dimen name="opa_line_x_trans_ry">15.0dip</dimen>
+    <dimen name="opa_line_x_trans_bg">30.0dip</dimen>
+    <dimen name="opa_line_x_collapse_bg">46.0dip</dimen>
+    <dimen name="opa_line_x_collapse_ry">15.0dip</dimen>
+    <dimen name="opa_overshoot_translation">8.0dip</dimen>
+    <dimen name="opa_return_translation">-1.0dip</dimen>
+    <dimen name="opa_rest_to_collapse">7.0dip</dimen>
 
-  <!-- One-Hand UI mode -->
-  <dimen name="navbar_single_hand_mode_horizontal_threshhold">90dp</dimen>
-  <dimen name="navbar_single_hand_mode_vertical_threshhold">48dp</dimen>
+    <!-- One-Hand UI mode -->
+    <dimen name="navbar_single_hand_mode_horizontal_threshhold">90dp</dimen>
+    <dimen name="navbar_single_hand_mode_vertical_threshhold">48dp</dimen>
 
+    <!-- Burn-in protection -->
+    <dimen name="horizontal_max_swift">3.0dp</dimen>
+    <dimen name="vertical_max_swift">1.0dp</dimen>
 </resources>

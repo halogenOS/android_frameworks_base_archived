@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-     Copyright (C) 2016 The Pure Nexus Project
+     Copyright (C) 2016-2017 The halogenOS Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -17,4 +17,14 @@
 <resources>
     <!-- Allow Opa (Pixel navbar) layout -->
     <bool name="config_allowOpaLayout">true</bool>
+    
+    <!-- Set to true to enable the classic notification ticker that scrolls
+         Notification.tickerText across the status bar for what seems like an
+         eternity. -->
+    <bool name="enable_ticker">true</bool>
+    
+    <!-- Burn in protection -->
+    <bool name="config_statusBarBurnInProtection">false</bool>
+    <integer name="config_shift_interval">60</integer>
+
 </resources>
