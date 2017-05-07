@@ -1555,16 +1555,6 @@
     <!-- Button to edit the tile ordering of quick settings [CHAR LIMIT=60] -->
     <string name="qs_edit">Edit</string>
 
-    <!-- SysUI Tuner: Options for how clock is displayed [CHAR LIMIT=NONE] -->
-    <string name="tuner_time">Time</string>
-
-    <!-- SysUI Tuner: Options for how clock is displayed [CHAR LIMIT=NONE] -->
-    <string-array name="clock_options">
-        <item>Show hours, minutes, and seconds</item>
-        <item>Show hours and minutes (default)</item>
-        <item>Don\'t show this icon</item>
-    </string-array>
-
     <!-- SysUI Tuner: Options for how battery is displayed [CHAR LIMIT=NONE] -->
     <string-array name="battery_options">
         <item>Always show percentage</item>
