@@ -112,6 +112,7 @@ public class HeadsUpManager implements ViewTreeObserver.OnComputeInternalInsetsL
     private boolean mWaitingOnCollapseWhenGoingAway;
     private boolean mIsObserving;
     private boolean mRemoteInputActive;
+    public boolean mIsForceDialerHeadsUp;
     protected boolean mHeadsUpEnabled;
     private VisualStabilityManager mVisualStabilityManager;
     private int mStatusBarState;
@@ -188,7 +189,7 @@ public class HeadsUpManager implements ViewTreeObserver.OnComputeInternalInsetsL
      * Called when posting a new notification to the heads up.
      */
     public void showNotification(NotificationData.Entry headsUp) {
-        if(!mHeadsUpEnabled) return;
+        if(!mHeadsUpEnabled && !mIsForceDialerHeadsUp) return;
         if (DEBUG) Log.v(TAG, "showNotification");
         addHeadsUpEntry(headsUp);
         updateNotification(headsUp, true);
@@ -199,7 +200,7 @@ public class HeadsUpManager implements ViewTreeObserver.OnComputeInternalInsetsL
      * Called when updating or posting a notification to the heads up.
      */
     public void updateNotification(NotificationData.Entry headsUp, boolean alert) {
-        if(!mHeadsUpEnabled) return;
+        if(!mHeadsUpEnabled && !mIsForceDialerHeadsUp) return;
         if (DEBUG) Log.v(TAG, "updateNotification");
 
         headsUp.row.sendAccessibilityEvent(AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED);

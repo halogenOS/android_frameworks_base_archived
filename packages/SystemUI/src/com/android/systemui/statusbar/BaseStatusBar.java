@@ -2568,8 +2568,32 @@ public abstract class BaseStatusBar extends SystemUI implements
         return shouldPeek(entry, entry.notification);
     }
 
+    /**
+    * Called to check whether the notification being posted should be forced
+    * as a headsup.
+    * @hide
+    */
+    public boolean forceDialerHeadsUp(StatusBarNotification sbn){
+        final ActivityManager am = (ActivityManager)
+            mContext.getSystemService(Context.ACTIVITY_SERVICE);
+        ActivityManager.RunningTaskInfo foregroundApp = null;
+        List<ActivityManager.RunningTaskInfo> tasks = am.getRunningTasks(1);
+        if (tasks != null && !tasks.isEmpty()) {
+            foregroundApp = tasks.get(0);
+        }
+        boolean isDialerForegroundApp = foregroundApp != null &&
+                foregroundApp.baseActivity.getPackageName().toLowerCase().contains("dialer");
+        boolean isNotificationFromDialer = sbn.getPackageName().toLowerCase().contains("dialer");
+
+        return !isDialerForegroundApp && isNotificationFromDialer;
+    }
+
     protected boolean shouldPeek(Entry entry, StatusBarNotification sbn) {
-        if (!mUseHeadsUp || isDeviceInVrMode()) {
+        boolean alwaysHeadsUpForThis = forceDialerHeadsUp(sbn);
+        if (mHeadsUpManager != null) {
+            mHeadsUpManager.mIsForceDialerHeadsUp = alwaysHeadsUpForThis;
+        }
+        if (!mUseHeadsUp && !alwaysHeadsUpForThis || isDeviceInVrMode()) {
             return false;
         }
 
