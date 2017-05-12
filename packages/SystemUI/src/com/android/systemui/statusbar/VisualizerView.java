@@ -75,7 +75,7 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
     
                     mValueAnimators[i].setFloatValues(mFFTPoints[i * 4 + 1],
                             mFFTPoints[3] - (dbValue * 16f));
-                    mValueAnimators[i].setDuration(108);
+                    mValueAnimators[i].setDuration(92);
                     mValueAnimators[i].start();
                 }
                 calculatorLock = false;
@@ -173,7 +173,7 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
         for (int i = 0; i < 32; i++) {
             final int j = i * 4 + 1;
             mValueAnimators[i] = new ValueAnimator();
-            mValueAnimators[i].setDuration(108);
+            mValueAnimators[i].setDuration(92);
             mValueAnimators[i].addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public void onAnimationUpdate(ValueAnimator animation) {
@@ -330,7 +330,7 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
             color = Color.WHITE;
         }
 
-        color = Color.argb(138, Color.red(color), Color.green(color), Color.blue(color));
+        color = Color.argb(136, Color.red(color), Color.green(color), Color.blue(color));
 
         if (mState.mColor != color) {
             mState.mColor = color;
@@ -341,8 +341,8 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
 
                 mVisualizerColorAnimator = ObjectAnimator.ofArgb(mPaint, "color",
                         mPaint.getColor(), mState.mColor);
-                mVisualizerColorAnimator.setStartDelay(120);
-                mVisualizerColorAnimator.setDuration(1080);
+                mVisualizerColorAnimator.setStartDelay(100);
+                mVisualizerColorAnimator.setDuration(1000);
                 mVisualizerColorAnimator.start();
             } else {
                 mPaint.setColor(mState.mColor);
