@@ -32,7 +32,9 @@ public class PackageUtils {
               "Y29tLmNoZWxwdXMubGFja3lwYXRjaAo=",
               "Y29tLmZvcnBkYS5scAo=",
               "Y29tLmFuZHJvaWQudmVuZGluZy5iaWxsaW5nLkluQXBwQmlsbGluZ1NlcnZpY2UuTFVDSwo=",
-              "Y29tLmFuZHJvaWQucHJvdGlwcwo="
+              "Y29tLmFuZHJvaWQucHJvdGlwcwo=",
+              "Y2MubWFka2l0ZS5mcmVlZG9tCg==",
+              "em9uZS5qYXNpMjE2OS51cmV0cGF0Y2hlcgo="
     };
 
     public static boolean isAppInstalled(Context context, String appUri) {
