@@ -319,8 +319,7 @@ public class SignalClusterView
             int qsType, boolean activityIn, boolean activityOut, int dataActivityId,
             int mobileActivityId, int stackedDataId, int stackedVoiceId,
             String typeContentDescription, String description, boolean isWide, int subId,
-            int dataNetworkTypeId, int embmsIconId, boolean isMobileIms, boolean isImsOverWifi,
-            boolean roaming) {
+            int dataNetworkTypeId, int embmsIconId, boolean isMobileIms, boolean isImsOverWifi) {
         PhoneState state = getState(subId);
         if (state == null) {
             return;
@@ -331,7 +330,7 @@ public class SignalClusterView
         mMobileIms = isMobileIms;
         this.setMobileDataIndicators(statusIcon, qsIcon, statusType, qsType, activityIn,
                 activityOut, dataActivityId, mobileActivityId, stackedDataId,
-                stackedVoiceId, typeContentDescription, description, isWide, subId, roaming);
+                stackedVoiceId, typeContentDescription, description, isWide, subId);
     }
 
     @Override
@@ -800,6 +799,21 @@ public class SignalClusterView
                     mMobileStackedGroup.setVisibility(View.GONE);
                 }
 
+                if (mContext.getResources().getBoolean(R.bool.show_roaming_and_network_icons)
+                        &&(mTelephonyManager != null
+                        && mTelephonyManager.isNetworkRoaming(mSubId))) {
+                    if (!(mContext.getResources().getBoolean(R.bool.config_data_signal_control))) {
+                         mRoaming.setImageDrawable(getContext().getResources().getDrawable(
+                                R.drawable.stat_sys_data_fully_connected_roam));
+                    } else {
+                       mRoaming.setImageDrawable(null);
+                    }
+
+                    mRoaming.setImageDrawable(getContext().getResources().getDrawable(
+                            R.drawable.stat_sys_data_fully_connected_roam));
+                } else {
+                    mRoaming.setImageDrawable(null);
+                }
                 mMobileGroup.setContentDescription(mMobileTypeDescription
                         + " " + mMobileDescription);
                 mMobileGroup.setVisibility(View.VISIBLE);

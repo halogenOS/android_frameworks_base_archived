@@ -196,7 +196,6 @@ public class CellularTile extends QSTile<QSTile.SignalState> {
         boolean noSim;
         boolean isDataTypeIconWide;
         int subId;
-
     }
 
     private final class CellSignalCallback extends SignalCallbackAdapter {

@@ -65,7 +65,7 @@ public interface NetworkController {
                 int mobileActivityId, int stackedDataIcon, int stackedVoiceIcon,
                 String typeContentDescription, String description, boolean isWide,
                 int subId, int dataNetworkTypeId, int embmsIconId,
-                boolean isMobileIms, boolean isImsOverWifi, boolean roaming);
+                boolean isMobileIms, boolean isImsOverWifi);
     }
 
     public interface EmergencyListener {

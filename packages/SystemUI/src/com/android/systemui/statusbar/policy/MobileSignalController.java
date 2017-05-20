@@ -382,13 +382,13 @@ public class MobileSignalController extends SignalController<
                     icons.mStackedDataIcon, icons.mStackedVoiceIcon,
                     dataContentDescription, description, icons.mIsWide,
                     mSubscriptionInfo.getSubscriptionId(), dataNetworkTypeId,
-                    getEmbmsIconId(), isMobileIms(), isImsRegisteredInWifi(), mCurrentState.roaming);
+                    getEmbmsIconId(), isMobileIms(), isImsRegisteredInWifi());
         } else {
             callback.setMobileDataIndicators(statusIcon, qsIcon, typeIcon, qsTypeIcon,
                     activityIn, activityOut, dataActivityId, mobileActivityId,
                     icons.mStackedDataIcon, icons.mStackedVoiceIcon,
                     dataContentDescription, description, icons.mIsWide,
-                    mSubscriptionInfo.getSubscriptionId(), mCurrentState.roaming);
+                    mSubscriptionInfo.getSubscriptionId());
         }
         mCallbackHandler.post(new Runnable() {
             @Override
@@ -1239,8 +1239,7 @@ public class MobileSignalController extends SignalController<
                     && ((MobileState) o).voiceLevel == voiceLevel
                     && ((MobileState) o).isDefault == isDefault
                     && ((MobileState) o).imsRadioTechnology == imsRadioTechnology
-                    && ((MobileState) o).dataNetType == dataNetType
-                    && ((MobileState) o).roaming == roaming;
+                    && ((MobileState) o).dataNetType == dataNetType;
         }
     }
 
