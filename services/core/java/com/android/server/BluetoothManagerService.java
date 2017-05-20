@@ -1094,7 +1094,6 @@ class BluetoothManagerService extends IBluetoothManager.Stub {
                             if (state == BluetoothAdapter.STATE_BLE_ON) {
                                 Slog.w(TAG, "BT Enable in BLE_ON State, going to ON");
                                 mBluetooth.onLeServiceUp();
-                                persistBluetoothSetting(BLUETOOTH_ON_BLUETOOTH);
 
                                 long callingIdentity = Binder.clearCallingIdentity();
                                 Binder.restoreCallingIdentity(callingIdentity);
@@ -1642,7 +1641,7 @@ class BluetoothManagerService extends IBluetoothManager.Stub {
                     }
                 }
             } else if (newState == BluetoothAdapter.STATE_ON) {
-                boolean isUp = (newState==BluetoothAdapter.STATE_ON);
+                boolean isUp = (newState == BluetoothAdapter.STATE_ON);
                 sendBluetoothStateCallback(isUp);
                 sendBleStateChanged(prevState, newState);
 

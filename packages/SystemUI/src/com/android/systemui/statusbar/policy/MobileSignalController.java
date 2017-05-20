@@ -358,8 +358,7 @@ public class MobileSignalController extends SignalController<
                         && mCurrentState.activityOut;
         if (!mContext.getResources().getBoolean(R.bool.show_roaming_and_network_icons)) {
               showDataIcon &= mCurrentState.isDefault
-                || isRoaming()
-                || dataDisabled;
+                || isRoaming() || dataDisabled;
         }
         showDataIcon &= (mStyle == STATUS_BAR_STYLE_ANDROID_DEFAULT
                 || mStyle == STATUS_BAR_STYLE_EXTENDED);
@@ -383,13 +382,13 @@ public class MobileSignalController extends SignalController<
                     icons.mStackedDataIcon, icons.mStackedVoiceIcon,
                     dataContentDescription, description, icons.mIsWide,
                     mSubscriptionInfo.getSubscriptionId(), dataNetworkTypeId,
-                    getEmbmsIconId(), isMobileIms(), isImsRegisteredInWifi());
+                    getEmbmsIconId(), isMobileIms(), isImsRegisteredInWifi(), mCurrentState.roaming);
         } else {
             callback.setMobileDataIndicators(statusIcon, qsIcon, typeIcon, qsTypeIcon,
                     activityIn, activityOut, dataActivityId, mobileActivityId,
                     icons.mStackedDataIcon, icons.mStackedVoiceIcon,
                     dataContentDescription, description, icons.mIsWide,
-                    mSubscriptionInfo.getSubscriptionId());
+                    mSubscriptionInfo.getSubscriptionId(), mCurrentState.roaming);
         }
         mCallbackHandler.post(new Runnable() {
             @Override
@@ -1240,7 +1239,8 @@ public class MobileSignalController extends SignalController<
                     && ((MobileState) o).voiceLevel == voiceLevel
                     && ((MobileState) o).isDefault == isDefault
                     && ((MobileState) o).imsRadioTechnology == imsRadioTechnology
-                    && ((MobileState) o).dataNetType == dataNetType;
+                    && ((MobileState) o).dataNetType == dataNetType
+                    && ((MobileState) o).roaming == roaming;
         }
     }
 

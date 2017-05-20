@@ -223,7 +223,9 @@ public final class SystemServer {
     private ContentResolver mContentResolver;
     private EntropyMixer mEntropyMixer;
 
-    private boolean mOnlyCore, mFirstBoot, mIsAlarmBoot;
+    private boolean mOnlyCore;
+    private boolean mFirstBoot;
+    private boolean mIsAlarmBoot;
     private final boolean mRuntimeRestart;
 
     /**
