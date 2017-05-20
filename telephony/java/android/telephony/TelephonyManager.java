@@ -990,6 +990,13 @@ public class TelephonyManager {
     }
 
     /**
+     * @hide
+     */
+    public CellLocation getCellLocationBySubId(int subId) {
+        return getCellLocation();
+    }
+
+    /**
      * Enables location update notifications.  {@link PhoneStateListener#onCellLocationChanged
      * PhoneStateListener.onCellLocationChanged} will be called on location updates.
      *
@@ -1403,6 +1410,13 @@ public class TelephonyManager {
     public String getNetworkOperatorForPhone(int phoneId) {
         return getTelephonyProperty(phoneId, TelephonyProperties.PROPERTY_OPERATOR_NUMERIC, "");
      }
+
+    /**
+     * @hide
+     */
+    public String getNetworkOperatorForSubscription(int subId) {
+        return getNetworkOperatorForPhone(subId);
+    }
 
     /**
      * Returns true if the device is considered roaming on the current
