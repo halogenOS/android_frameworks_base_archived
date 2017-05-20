@@ -3934,6 +3934,9 @@ org.ccil.cowan.tagsoup.Parser$1
 org.ccil.cowan.tagsoup.ScanHandler
 org.ccil.cowan.tagsoup.Scanner
 org.ccil.cowan.tagsoup.Schema
+org.halogenos.hardware.buttons.IButtonBacklightControl
+org.halogenos.hardware.buttons.KeyDisablerUtils
+org.halogenos.io.FileUtils
 org.json.JSON
 org.json.JSONArray
 org.json.JSONException
