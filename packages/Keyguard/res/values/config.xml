@@ -40,4 +40,11 @@
 
     <!-- Whether to show no sim on CarrierText for India RJIL -->
     <bool name="config_carrier_display_no_sim">false</bool>
+
+    <!-- string that specifies the package name of SLC[Subsidy Lock Client] -->
+    <string name="config_slc_package_name" translatable="false"> </string>
+    <!-- maximum attempt allowed for an user to enter code -->
+    <integer name="config_max_enter_code_attempt">5</integer>
+    <!-- timeout allowed for an user to enter code -->
+    <integer name="config_timeout_after_max_attempt_milli">3600000</integer>
 </resources>

@@ -140,6 +140,8 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener {
     private static final int MSG_DREAMING_STATE_CHANGED = 333;
     private static final int MSG_USER_UNLOCKED = 334;
 
+    private static final int MSG_SUBSIDY_LOCK_STATE_CHANGED = 600;
+
     /** Fingerprint state: Not listening to fingerprint. */
     private static final int FINGERPRINT_STATE_STOPPED = 0;
 
@@ -202,6 +204,7 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener {
     private ContentObserver mDeviceProvisionedObserver;
 
     private boolean mSwitchingUser;
+    private SubsidyController mSubsidyController;
 
     private boolean mDeviceInteractive;
     private boolean mScreenOn;
@@ -298,6 +301,10 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener {
                     break;
                 case MSG_USER_UNLOCKED:
                     handleUserUnlocked();
+                    break;
+                case MSG_SUBSIDY_LOCK_STATE_CHANGED:
+                    boolean isLocked = msg.arg1 == 1;
+                    handleSubsidyLockStateChanged(isLocked);
                     break;
             }
         }
@@ -585,7 +592,9 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener {
         // mainly because there's no other way to prompt the user to enter their SIM PIN
         // once they get past the keyguard screen.
         final boolean disabledBySimPin = isSimPinSecure();
-        return disabledBySimPin;
+        final boolean disabledBySubsidyLock
+                = SubsidyUtility.shouldShowSubsidyLock(mContext);
+        return disabledBySimPin || disabledBySubsidyLock;
     }
 
     private boolean isFingerprintDisabled(int userId) {
@@ -593,7 +602,8 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener {
                 (DevicePolicyManager) mContext.getSystemService(Context.DEVICE_POLICY_SERVICE);
         return dpm != null && (dpm.getKeyguardDisabledFeatures(null, userId)
                     & DevicePolicyManager.KEYGUARD_DISABLE_FINGERPRINT) != 0
-                || isSimPinSecure();
+                || isSimPinSecure()
+                || SubsidyUtility.shouldShowSubsidyLock(mContext);
     }
 
     public boolean getUserCanSkipBouncer(int userId) {
@@ -1110,6 +1120,10 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener {
         filter.addAction(AudioManager.RINGER_MODE_CHANGED_ACTION);
         context.registerReceiver(mBroadcastReceiver, filter);
 
+        if (SubsidyUtility.isSubsidyLockFeatureEnabled(context)) {
+            mSubsidyController = SubsidyController.getInstance(context);
+        }
+
         final IntentFilter bootCompleteFilter = new IntentFilter();
         bootCompleteFilter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
         bootCompleteFilter.addAction(Intent.ACTION_BOOT_COMPLETED);
@@ -1469,6 +1483,28 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener {
         }
     }
 
+    public void dispatchSubsidyLockStateChanged(boolean isLocked){
+        Message msg =
+            mHandler
+            .obtainMessage(MSG_SUBSIDY_LOCK_STATE_CHANGED);
+        msg.arg1 = isLocked ? 1 : 0;
+        if (DEBUG)
+            Log.d(TAG, "subsidy lock state changed");
+        mHandler.sendMessage(msg);
+    }
+
+    /**
+     * Handle {@link #MSG_SUBSIDY_LOCK_STATE_CHANGED}
+     */
+    private void handleSubsidyLockStateChanged(boolean isLocked) {
+        for (int j = 0; j < mCallbacks.size(); j++) {
+            KeyguardUpdateMonitorCallback cb = mCallbacks.get(j).get();
+            if (cb != null) {
+                cb.onSubsidyLockStateChanged(isLocked);
+            }
+        }
+    }
+
     /**
      * Handle {@link #MSG_LOCALE_CHANGED}
      */
@@ -1655,6 +1691,10 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener {
         for (Entry<Integer, SimData> data : mSimDatas.entrySet()) {
             final SimData state = data.getValue();
             callback.onSimStateChanged(state.subId, state.slotId, state.simState);
+        }
+        if (SubsidyUtility.isSubsidyLockFeatureEnabled(mContext)) {
+            callback.onSubsidyLockStateChanged(
+                SubsidyUtility.shouldShowSubsidyLock(mContext));
         }
     }
 

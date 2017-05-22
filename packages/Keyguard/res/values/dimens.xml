@@ -57,4 +57,7 @@
 
     <!-- The translation for disappearing security views after having solved them. -->
     <dimen name="disappear_y_translation">-32dp</dimen>
+
+    <!-- Setup wifi layout margin in subsidy lock screen. -->
+    <dimen name="setup_wifi_margin">40dp</dimen>
 </resources>
