@@ -144,4 +144,6 @@
     <string name="quick_settings_compass_W">W</string>
     <string name="quick_settings_compass_NW">NW</string>
 
+    <!-- SystemUI Tuner dashboard summary -->
+    <string name="sysui_tuner_dashboard_summary">The Tuner is waiting for you...</string>
 </resources>

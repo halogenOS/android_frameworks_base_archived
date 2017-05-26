@@ -242,6 +242,8 @@
             </intent-filter>
             <meta-data android:name="com.android.settings.category"
                     android:value="com.android.settings.category.system" />
+            <meta-data android:name="com.android.settings.summary"
+                    android:resource="@string/sysui_tuner_dashboard_summary" />
         </activity>
 
         <activity-alias android:name=".DemoMode"
