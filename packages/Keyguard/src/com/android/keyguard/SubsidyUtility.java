@@ -170,6 +170,7 @@ public class SubsidyUtility {
 
             isSIMWhiteListed = extTelephony
                     .isPrimaryCarrierSlotId(slotId);
+            Log.d(TAG, "Is Subsidy restricted sim is white listed = "+isSIMWhiteListed);
         } catch (RemoteException e) {
                Log.e(TAG,
                    "Exception for isPrimaryCarrierSlotId(slotid):", e);

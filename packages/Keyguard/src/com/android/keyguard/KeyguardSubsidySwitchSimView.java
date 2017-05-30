@@ -58,7 +58,6 @@ import com.android.keyguard.SubsidyController.SwitchSimScreenState;
 public class KeyguardSubsidySwitchSimView extends KeyguardSubsidyStateView  {
     KeyguardSecurityCallback mCallBack;
     private static final String TAG = "KeyguardSubsidySwitchSimView";
-    private static final boolean DEBUG = SubsidyUtility.DEBUG;
     private View mContentView;
     private View mProgressView;
     private View mEmergencyView;
@@ -114,9 +113,8 @@ public class KeyguardSubsidySwitchSimView extends KeyguardSubsidyStateView  {
         mSwitchSimBtn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (DEBUG) {
-                    Log.d(TAG, " Switch Sim Button Pressed ");
-                }
+                Log.d(TAG, " Switch Sim Button Pressed ");
+
                 int newSlotId =
                         ((SwitchSimScreenState) mController
                                 .getCurrentSubsidyState())
@@ -184,6 +182,7 @@ public class KeyguardSubsidySwitchSimView extends KeyguardSubsidyStateView  {
             }
                 public void onSimStateChanged(int subId, int slotId,
                         IccCardConstants.State simState) {
+                    Log.d(TAG, "onSimStateChanged event occured");
                     setEnableDataButtonVisibility();
                 }
         };
@@ -218,6 +217,7 @@ public class KeyguardSubsidySwitchSimView extends KeyguardSubsidyStateView  {
                         } else {
                            Log.d(TAG, "receiver primaryCardChange failed");
                         }
+                        setEnableDataButtonVisibility();
                         setProgressViewVisible(false);
                         resetSubsidySetupView();
                     }
