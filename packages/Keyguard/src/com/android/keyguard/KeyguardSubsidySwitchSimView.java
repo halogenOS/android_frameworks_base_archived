@@ -175,6 +175,12 @@ public class KeyguardSubsidySwitchSimView extends KeyguardSubsidyStateView  {
         new KeyguardUpdateMonitorCallback() {
             @Override
             public void onSubsidyLockStateChanged(boolean isLocked) {
+                Log.d(TAG, "SubsidyLock state changed isLocked ="+isLocked);
+                if (!isLocked && null != mLockPatternUtils) {
+                    Log.d(TAG, "Reset the lockout deadline");
+                    mLockPatternUtils.setLockoutAttemptDeadline(
+                                KeyguardUpdateMonitor.getCurrentUser(), 0);
+                }
                 if (mProgressView.getVisibility() == View.VISIBLE) {
                     setProgressViewVisible(false);
                 }
