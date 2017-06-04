@@ -1525,18 +1525,16 @@ public final class PowerManagerService extends SystemService
             // Loop because the wake lock and user activity computations are influenced
             // by changes in wakefulness.
             final long now = SystemClock.uptimeMillis();
+            int dirtyPhase1;
             int dirtyPhase2 = 0;
-            for (;;) {
-                int dirtyPhase1 = mDirty;
+            do {
+                dirtyPhase1 = mDirty;
                 dirtyPhase2 |= dirtyPhase1;
                 mDirty = 0;
 
                 updateWakeLockSummaryLocked(dirtyPhase1);
                 updateUserActivitySummaryLocked(now, dirtyPhase1);
-                if (!updateWakefulnessLocked(dirtyPhase1)) {
-                    break;
-                }
-            }
+            } while (updateWakefulnessLocked(dirtyPhase1));
 
             // Phase 2: Update display power state.
             boolean displayBecameReady = updateDisplayPowerStateLocked(dirtyPhase2);
