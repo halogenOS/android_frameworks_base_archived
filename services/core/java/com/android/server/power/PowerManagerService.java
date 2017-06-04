@@ -1298,6 +1298,9 @@ public final class PowerManagerService extends SystemService
                     break;
             }
 
+            mLastWakeTime = eventTime;
+            setWakefulnessLocked(WAKEFULNESS_AWAKE, 0);
+
             try {
                 if(mButtonBacklightControl.getCurrentTimeout() == -1) {
                     mButtonBacklightControl.handleBrightnessChange(
@@ -1306,9 +1309,6 @@ public final class PowerManagerService extends SystemService
             } catch(Exception e) {
                 // Huh?
             }
-
-            mLastWakeTime = eventTime;
-            setWakefulnessLocked(WAKEFULNESS_AWAKE, 0);
 
             mNotifier.onWakeUp(reason, reasonUid, opPackageName, opUid);
             userActivityNoUpdateLocked(
@@ -1341,6 +1341,15 @@ public final class PowerManagerService extends SystemService
                 || mWakefulness == WAKEFULNESS_DOZING
                 || !mBootCompleted || !mSystemReady) {
             return false;
+        }
+
+        if(mButtonBacklightControl.getCurrentTimeout() != 0 &&
+            mButtonBacklightControl.getCurrentBrightnessSetting() != 0) {
+            try {
+                mButtonBacklightControl.handleBrightnessChange(0);
+            } catch(Exception e) {
+                // Hmmm...
+            }
         }
 
         Trace.traceBegin(Trace.TRACE_TAG_POWER, "goToSleep");
@@ -1389,15 +1398,6 @@ public final class PowerManagerService extends SystemService
                 }
             }
             EventLog.writeEvent(EventLogTags.POWER_SLEEP_REQUESTED, numWakeLocksCleared);
-
-            if(mButtonBacklightControl.getCurrentTimeout() != 0 &&
-                mButtonBacklightControl.getCurrentBrightnessSetting() != 0) {
-                try {
-                    mButtonBacklightControl.handleBrightnessChange(0);
-                } catch(Exception e) {
-                    // Hmmm...
-                }
-            }
 
             // Skip dozing if requested.
             if ((flags & PowerManager.GO_TO_SLEEP_FLAG_NO_DOZE) != 0) {
