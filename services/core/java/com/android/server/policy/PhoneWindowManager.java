@@ -965,9 +965,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     Settings.Global.POLICY_CONTROL), false, this,
                     UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.LONG_PRESS_HOME_BUTTON_BEHAVIOR),
-                false, this);
-            resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.NAVIGATION_BAR_ENABLED), false, this,
                     UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System.getUriFor(
@@ -2225,7 +2222,12 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         final ContentResolver resolver = mContext.getContentResolver();
         final Resources res = mContext.getResources();
 
-        updateLongPressOnHomeBehavior();
+        mLongPressOnHomeBehavior = res.getInteger(
+                com.android.internal.R.integer.config_longPressOnHomeBehavior);
+        if (mLongPressOnHomeBehavior < LONG_PRESS_HOME_NOTHING ||
+                mLongPressOnHomeBehavior > LAST_LONG_PRESS_HOME_BEHAVIOR) {
+            mLongPressOnHomeBehavior = LONG_PRESS_HOME_NOTHING;
+        }
 
         mDoubleTapOnHomeBehavior = res.getInteger(
                 com.android.internal.R.integer.config_doubleTapOnHomeBehavior);
@@ -2451,27 +2453,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         }
     }
 
-    protected void updateLongPressOnHomeBehavior() {
-        updateLongPressOnHomeBehavior(mContext.getContentResolver());
-    }
-
-    protected void updateLongPressOnHomeBehavior(ContentResolver resolver) {
-        int defaultLongPressOnHomeBehavior = mContext.getResources().getInteger(
-                    com.android.internal.R.integer.config_longPressOnHomeBehavior);
-        mLongPressOnHomeBehavior = Settings.System.getInt(resolver,
-            Settings.System.LONG_PRESS_HOME_BUTTON_BEHAVIOR, -1);
-        if(mLongPressOnHomeBehavior == -1) {
-            mLongPressOnHomeBehavior = defaultLongPressOnHomeBehavior;
-            Settings.System.putInt(resolver,
-                Settings.System.LONG_PRESS_HOME_BUTTON_BEHAVIOR,
-                    defaultLongPressOnHomeBehavior);
-        }
-        if (mLongPressOnHomeBehavior < LONG_PRESS_HOME_NOTHING ||
-                mLongPressOnHomeBehavior > LAST_LONG_PRESS_HOME_BEHAVIOR) {
-            mLongPressOnHomeBehavior = LONG_PRESS_HOME_NOTHING;
-        }
-    }
-
     /** @hide */
     protected void updateCustomSettings() {
         if(DEBUG_CUSTOM_SETTINGS) Log.d(TAG, "Updating custom settings...");
@@ -2557,8 +2538,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             if (mImmersiveModeConfirmation != null) {
                 mImmersiveModeConfirmation.loadSetting(mCurrentUserId);
             }
-
-            updateLongPressOnHomeBehavior(resolver);
         }
         synchronized (mWindowManagerFuncs.getWindowManagerLock()) {
             WindowManagerPolicyControl.reloadFromSetting(mContext);

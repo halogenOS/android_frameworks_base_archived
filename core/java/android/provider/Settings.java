@@ -3754,14 +3754,6 @@ public final class Settings {
                                 "device_specific_settings";
 
         /**
-         * Long press on home button behavior
-         *
-         * @hide
-         */
-        public static final String LONG_PRESS_HOME_BUTTON_BEHAVIOR =
-                                "long_press_home_button_behavior";
-
-        /**
          * Button backlight brightness
          *
          * @hide
@@ -4170,7 +4162,6 @@ public final class Settings {
             PUBLIC_SETTINGS.add(TOUCHSCREEN_GESTURE_HAPTIC_FEEDBACK);
             PUBLIC_SETTINGS.add(PROXIMITY_ON_WAKE);
             PUBLIC_SETTINGS.add(DEVICE_SPECIFIC_SETTINGS);
-            PUBLIC_SETTINGS.add(LONG_PRESS_HOME_BUTTON_BEHAVIOR);
             PUBLIC_SETTINGS.add(HARDWARE_BUTTONS_ENABLED);
             PUBLIC_SETTINGS.add(BUTTON_BACKLIGHT_BRIGHTNESS);
             PUBLIC_SETTINGS.add(BUTTON_BACKLIGHT_TIMEOUT);
