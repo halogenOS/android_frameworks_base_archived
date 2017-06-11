@@ -134,15 +134,6 @@ public class KeyguardSubsidyPinView extends KeyguardPinBasedInputView {
     public void showUsabilityHint() {
     }
 
-    @Override
-    public void onPause() {
-        // dismiss the dialog.
-        if (mUnlockProgressDialog != null) {
-            mUnlockProgressDialog.dismiss();
-            mUnlockProgressDialog = null;
-        }
-    }
-
     private Dialog getUnlockProgressDialog() {
         if (mUnlockProgressDialog == null) {
             mUnlockProgressDialog = new ProgressDialog(mContext);
@@ -399,6 +390,11 @@ public class KeyguardSubsidyPinView extends KeyguardPinBasedInputView {
                     setEnableDataButtonVisibility();
                     setNoDataTextVisibility();
                     setSubsidySetupContainerVisibility(View.VISIBLE);
+                    // dismiss the dialog.
+                    if (mUnlockProgressDialog != null) {
+                        mUnlockProgressDialog.dismiss();
+                        mUnlockProgressDialog = null;
+                    }
                 }
                 public void onSimStateChanged(int subId, int slotId,
                         IccCardConstants.State simState) {
