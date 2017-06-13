@@ -19,15 +19,19 @@ package com.android.systemui.statusbar.phone;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.LinearLayout;
 
+import com.android.systemui.statusbar.policy.Clock;
 import com.android.systemui.R;
 
 public class IconMerger extends LinearLayout {
     private static final String TAG = "IconMerger";
     private static final boolean DEBUG = false;
+
+    protected Clock mClock;
 
     private int mIconSize;
     private int mIconHPadding;
@@ -73,7 +77,19 @@ public class IconMerger extends LinearLayout {
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         super.onLayout(changed, l, t, r, b);
-        checkOverflow(r - l);
+        if (mClock != null && mClock.isCentered()) {
+            Rect bounds = new Rect();
+            mClock.getPaint().getTextBounds(
+                mClock.getText().toString(), 0, mClock.getText().length(),
+                bounds);
+            int wfc = ((View)mClock.getParent()).getWidth() / 2 -
+                            bounds.width() / 2 - getFullIconWidth();
+            checkOverflow(wfc);
+            getLayoutParams().width = wfc;
+        } else {
+            getLayoutParams().width = LinearLayout.LayoutParams.WRAP_CONTENT;
+            checkOverflow(r - l);
+        }
     }
 
     private void checkOverflow(int width) {
@@ -86,7 +102,7 @@ public class IconMerger extends LinearLayout {
         }
         final boolean overflowShown = (mMoreView.getVisibility() == View.VISIBLE);
         // let's assume we have one more slot if the more icon is already showing
-        if (overflowShown) visibleChildren --;
+        if (overflowShown && !mClock.isCentered()) visibleChildren --;
         final boolean moreRequired = visibleChildren * getFullIconWidth() > width;
         if (moreRequired != overflowShown) {
             post(new Runnable() {

@@ -16,6 +16,7 @@ import com.android.systemui.R;
 import com.android.systemui.statusbar.NotificationData;
 import com.android.systemui.statusbar.StatusBarIconView;
 import com.android.systemui.statusbar.notification.NotificationUtils;
+import com.android.systemui.statusbar.policy.Clock;
 
 import java.util.ArrayList;
 
@@ -64,6 +65,10 @@ public class NotificationIconAreaController {
             mMoreIcon.setImageTintList(ColorStateList.valueOf(mIconTint));
             mNotificationIcons.setOverflowIndicator(mMoreIcon);
         }
+    }
+
+    protected void setClockForIconMerger(Clock clock) {
+        mNotificationIcons.mClock = clock;
     }
 
     public void onDensityOrFontScaleChanged(Context context) {

@@ -190,6 +190,7 @@ import com.android.systemui.statusbar.policy.BluetoothControllerImpl;
 import com.android.systemui.statusbar.policy.BrightnessMirrorController;
 import com.android.systemui.statusbar.policy.BurnInProtectionController;
 import com.android.systemui.statusbar.policy.CastControllerImpl;
+import com.android.systemui.statusbar.policy.Clock;
 import com.android.systemui.statusbar.policy.EncryptionHelper;
 import com.android.systemui.statusbar.policy.FlashlightController;
 import com.android.systemui.statusbar.policy.HeadsUpManager;
@@ -401,7 +402,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
     // viewgroup containing the normal contents of the statusbar
     LinearLayout mStatusBarContents;
-    View mCenterClock;
 
     // expanded notifications
     protected NotificationPanelView mNotificationPanel; // the sliding/resizing panel within the notification window
@@ -3683,6 +3683,10 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         }
     }
 
+    protected Clock getClock() {
+        return mIconController.getClock();
+    }
+
     private class MyTicker extends Ticker {
         MyTicker(Context context, View sb) {
             super(context, sb);
@@ -3695,6 +3699,11 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         public void tickerStarting() {
             if (!mTickerEnabled) return;
             mTicking = true;
+            if (mIconController != null && mIconController.getClock() != null
+                    && mIconController.getClock().isClockEnabled()) {
+                mIconController.getClock().setVisibility(View.INVISIBLE);
+                mIconController.getClock().startAnimation(loadAnim(true, null));
+            }
             mStatusBarContents.setVisibility(View.GONE);
             mStatusBarContents.startAnimation(loadAnim(true, null));
             mTickerView.setVisibility(View.VISIBLE);
@@ -3703,15 +3712,22 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
         @Override
         public void tickerDone() {
-            if (!mTickerEnabled) return;
+            if (!mTickerEnabled || mStatusBarContents == null
+                                || mTickerView == null) return;
             mStatusBarContents.setVisibility(View.VISIBLE);
             mStatusBarContents.startAnimation(loadAnim(false, null));
             mTickerView.setVisibility(View.GONE);
             mTickerView.startAnimation(loadAnim(true, mTickingDoneListener));
+            if (mIconController != null && mIconController.getClock() != null
+                    && mIconController.getClock().isClockEnabled()) {
+                mIconController.getClock().setVisibility(View.VISIBLE);
+                mIconController.getClock().startAnimation(loadAnim(false, null));
+            }
         }
 
         public void tickerHalting() {
-            if (!mTickerEnabled) return;
+            if (!mTickerEnabled || mStatusBarContents == null
+                                || mTickerView == null) return;
             if (mStatusBarContents.getVisibility() != View.VISIBLE) {
                 mStatusBarContents.setVisibility(View.VISIBLE);
                 mStatusBarContents

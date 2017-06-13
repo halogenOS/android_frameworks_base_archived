@@ -48,6 +48,7 @@ import com.android.systemui.SystemUIFactory;
 import com.android.systemui.statusbar.NotificationData;
 import com.android.systemui.statusbar.SignalClusterView;
 import com.android.systemui.statusbar.StatusBarIconView;
+import com.android.systemui.statusbar.policy.Clock;
 import com.android.systemui.tuner.TunerService;
 import com.android.systemui.tuner.TunerService.Tunable;
 
@@ -79,7 +80,7 @@ public class StatusBarIconController extends StatusBarIconList implements Tunabl
 
     private BatteryMeterView mBatteryMeterView;
     private BatteryMeterView mBatteryMeterViewKeyguard;
-    private TextView mClock;
+    private Clock mClock;
     private TextView mCarrierLabel;
 
     private int mIconSize;
@@ -140,12 +141,14 @@ public class StatusBarIconController extends StatusBarIconList implements Tunabl
         mBatteryMeterViewKeyguard = (BatteryMeterView) keyguardStatusBar.findViewById(R.id.battery);
         scaleBatteryMeterViews(context);
 
-        mClock = (TextView) statusBar.findViewById(R.id.clock);
+        mClock = (Clock) statusBar.findViewById(R.id.clock);
         mCarrierLabel = (TextView) statusBar.findViewById(R.id.statusbar_carrier_text);
         mDarkModeIconColorSingleTone = context.getColor(R.color.dark_mode_icon_color_single_tone);
         mLightModeIconColorSingleTone = context.getColor(R.color.light_mode_icon_color_single_tone);
         mHandler = new Handler();
         loadDimens();
+
+        mNotificationIconAreaController.setClockForIconMerger(mClock);
 
         TunerService.get(mContext).addTunable(this, ICON_BLACKLIST);
     }
@@ -332,10 +335,18 @@ public class StatusBarIconController extends StatusBarIconList implements Tunabl
     }
 
     public void hideNotificationIconArea(boolean animate) {
+        if (mClock.isClockEnabled()) {
+            mClock.isSupposedToShow = false;
+            mClock.setVisibility(View.INVISIBLE);
+        }
         animateHide(mNotificationIconAreaInner, animate);
     }
 
     public void showNotificationIconArea(boolean animate) {
+        if (mClock.isClockEnabled()) {
+            mClock.isSupposedToShow = true;
+            mClock.setVisibility(View.VISIBLE);
+        }
         animateShow(mNotificationIconAreaInner, animate);
     }
 
@@ -381,6 +392,20 @@ public class StatusBarIconController extends StatusBarIconList implements Tunabl
                         v.setVisibility(View.INVISIBLE);
                     }
                 });
+
+        if (mClock.isClockEnabled() && mClock.isCentered()) {
+            mClock.animate()
+                    .alpha(0f)
+                    .setDuration(160)
+                    .setStartDelay(0)
+                    .setInterpolator(Interpolators.ALPHA_OUT)
+                    .withEndAction(new Runnable() {
+                        @Override
+                        public void run() {
+                            mClock.setVisibility(View.INVISIBLE);
+                        }
+                    });
+        }
     }
 
     /**
@@ -389,6 +414,9 @@ public class StatusBarIconController extends StatusBarIconList implements Tunabl
     private void animateShow(View v, boolean animate) {
         v.animate().cancel();
         v.setVisibility(View.VISIBLE);
+        if (mClock.isClockEnabled()) {
+            mClock.setVisibility(View.VISIBLE);
+        }
         if (!animate) {
             v.setAlpha(1f);
             return;
@@ -404,6 +432,19 @@ public class StatusBarIconController extends StatusBarIconList implements Tunabl
                 // cancel() doesn't really remove the end action.
                 .withEndAction(null);
 
+        if (mClock.isClockEnabled() && mClock.isCentered()) {
+            mClock.animate()
+                    .alpha(1f)
+                    .setDuration(320)
+                    .setInterpolator(Interpolators.ALPHA_IN)
+                    .setStartDelay(50)
+
+                    // We need to clean up any pending end action from animateHide if we call
+                    // both hide and show in the same frame before the animation actually gets started.
+                    // cancel() doesn't really remove the end action.
+                    .withEndAction(null);
+        }
+
         // Synchronize the motion with the Keyguard fading if necessary.
         if (mPhoneStatusBar.isKeyguardFadingAway()) {
             v.animate()
@@ -412,6 +453,10 @@ public class StatusBarIconController extends StatusBarIconList implements Tunabl
                     .setStartDelay(mPhoneStatusBar.getKeyguardFadingAwayDelay())
                     .start();
         }
+    }
+
+    public Clock getClock() {
+        return mClock;
     }
 
     /**
