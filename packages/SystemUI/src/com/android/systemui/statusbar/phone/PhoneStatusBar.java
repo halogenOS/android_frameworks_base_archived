@@ -401,8 +401,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
     // viewgroup containing the normal contents of the statusbar
     LinearLayout mStatusBarContents;
-    private TextView mCenterClock;
-    private int mClockLocation;
+    View mCenterClock;
 
     // expanded notifications
     protected NotificationPanelView mNotificationPanel; // the sliding/resizing panel within the notification window
@@ -818,9 +817,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.STATUS_BAR_TRACK_TICKER),
                     false, this, UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.STATUSBAR_CLOCK_STYLE),
-                    false, this, UserHandle.USER_ALL);
             update();
         }
 
@@ -848,15 +844,12 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
        }
 
         public void update() {
-            ContentResolver resolver = mContext.getContentResolver();
-            mShowCarrierLabel = Settings.System.getIntForUser(resolver,
-                Settings.System.STATUS_BAR_SHOW_CARRIER, 1, UserHandle.USER_CURRENT);
-            if (PackageUtils.isImageTileInstalled(mContext)) mShowCarrierLabel = 3;
-            mTrackTickerEnabled = Settings.System.getIntForUser(resolver,
-                Settings.System.STATUS_BAR_TRACK_TICKER, 1, UserHandle.USER_CURRENT) == 1;
-            mClockLocation = Settings.System.getIntForUser(resolver,
-                Settings.System.STATUSBAR_CLOCK_STYLE, 0, UserHandle.USER_CURRENT);
-
+          ContentResolver resolver = mContext.getContentResolver();
+          mShowCarrierLabel = Settings.System.getIntForUser(resolver,
+              Settings.System.STATUS_BAR_SHOW_CARRIER, 1, UserHandle.USER_CURRENT);
+          if (PackageUtils.isImageTileInstalled(mContext)) mShowCarrierLabel = 3;
+          mTrackTickerEnabled = Settings.System.getIntForUser(resolver,
+               Settings.System.STATUS_BAR_TRACK_TICKER, 1, UserHandle.USER_CURRENT) == 1;
           }
 
     }
@@ -1074,8 +1067,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                 mKeyguardBottomArea.getLockIcon());
         mKeyguardBottomArea.setKeyguardIndicationController(mKeyguardIndicationController);
         mKeyguardBottomArea.onLockscreenVisualizerChange();
-
-        mCenterClock = (TextView) mStatusBarWindow.findViewById(R.id.center_clock);
 
         mTickerEnabled = Settings.System.getIntForUser(mContext.getContentResolver(),
                 Settings.System.STATUS_BAR_SHOW_TICKER,
@@ -3705,85 +3696,18 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             if (!mTickerEnabled) return;
             mTicking = true;
             mStatusBarContents.setVisibility(View.GONE);
-            mStatusBarContents.startAnimation(loadAnim(com.android.internal.R.anim.push_up_out,
-                null));
+            mStatusBarContents.startAnimation(loadAnim(true, null));
             mTickerView.setVisibility(View.VISIBLE);
-            if (mClockLocation == 1) {
-                mCenterClock.setVisibility(View.VISIBLE);
-                mCenterClock
-                        .animate()
-                        .setDuration(320)
-                        .alpha(0f)
-                        .translationY(-getStatusBarHeight())
-                        .setListener(new Animator.AnimatorListener() {
-                                @Override
-                                public void onAnimationStart(Animator animator) {
-                                    // Not needed
-                                }
-
-                                @Override
-                                public void onAnimationEnd(Animator animator) {
-                                    mCenterClock.setVisibility(View.GONE);
-                                }
-
-                                @Override
-                                public void onAnimationCancel(Animator animator) {
-                                    // Not needed
-                                }
-
-                                @Override
-                                public void onAnimationRepeat(Animator animator) {
-                                    // Not needed
-                                }
-                            })
-                        .start();
-            }
-            mTickerView.startAnimation(loadAnim(com.android.internal.R.anim.push_up_in,
-                null));
+            mTickerView.startAnimation(loadAnim(false, null));
         }
 
         @Override
         public void tickerDone() {
             if (!mTickerEnabled) return;
             mStatusBarContents.setVisibility(View.VISIBLE);
-            mStatusBarContents.startAnimation(loadAnim(com.android.internal.R.anim.push_down_in,
-                null));
+            mStatusBarContents.startAnimation(loadAnim(false, null));
             mTickerView.setVisibility(View.GONE);
-            mTickerView.startAnimation(loadAnim(com.android.internal.R.anim.push_down_out,
-                mTickingDoneListener));
-            if (mClockLocation == 1) {
-                mCenterClock.setVisibility(View.VISIBLE);
-                mCenterClock
-                    .animate()
-                    .setDuration(320)
-                    .alpha(1f)
-                    .translationY(0)
-                    .setListener(new Animator.AnimatorListener() {
-                            @Override
-                            public void onAnimationStart(Animator animator) {
-                                // Not needed
-                            }
-
-                            @Override
-                            public void onAnimationEnd(Animator animator) {
-                                mCenterClock.setVisibility(View.VISIBLE);
-                                mCenterClock.bringToFront();
-                                mCenterClock.setAlpha(1f);
-                                mCenterClock.invalidate();
-                            }
-
-                            @Override
-                            public void onAnimationCancel(Animator animator) {
-                                // Not needed
-                            }
-
-                            @Override
-                            public void onAnimationRepeat(Animator animator) {
-                                // Not needed
-                            }
-                        })
-                    .start();
-            }
+            mTickerView.startAnimation(loadAnim(true, mTickingDoneListener));
         }
 
         public void tickerHalting() {
@@ -3791,7 +3715,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             if (mStatusBarContents.getVisibility() != View.VISIBLE) {
                 mStatusBarContents.setVisibility(View.VISIBLE);
                 mStatusBarContents
-                        .startAnimation(loadAnim(com.android.internal.R.anim.fade_in, null));
+                        .startAnimation(loadAnim(false, null));
             }
             mTickerView.setVisibility(View.GONE);
             // we do not animate the ticker away at this point, just get rid of it (b/6992707)
@@ -3808,12 +3732,18 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         }
     };
 
-    private Animation loadAnim(int id, Animation.AnimationListener listener) {
-        Animation anim = AnimationUtils.loadAnimation(mContext, id);
+    private Animation loadAnim(boolean outAnim, Animation.AnimationListener listener) {
+        AlphaAnimation animation = new AlphaAnimation((outAnim ? 1.0f : 0.0f), (outAnim ? 0.0f : 1.0f));
+        Interpolator interpolator = AnimationUtils.loadInterpolator(mContext,
+                (outAnim ? android.R.interpolator.accelerate_quad : android.R.interpolator.decelerate_quad));
+        animation.setInterpolator(interpolator);
+        animation.setDuration(350);
+
         if (listener != null) {
-            anim.setAnimationListener(listener);
+            animation.setAnimationListener(listener);
         }
-        return anim;
+
+        return animation;
     }
 
     public static String viewInfo(View v) {
