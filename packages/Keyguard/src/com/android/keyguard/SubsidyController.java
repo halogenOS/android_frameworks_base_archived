@@ -55,7 +55,6 @@ import org.codeaurora.internal.IExtTelephony;
 public class SubsidyController {
     private static SubsidyController sSubsidyController;
     private static String TAG = "SubsidyController";
-    private static final boolean DEBUG = SubsidyUtility.DEBUG;
     private SubsidyState mCurrentSubsidyState;
     private SubsidyState mPreviousSubsidyState;
     private Context mContext;
@@ -160,6 +159,7 @@ public class SubsidyController {
             boolean isPinVisible = intent.getBooleanExtra(
                                    SubsidyUtility.EXTRA_INTENT_KEY_SHOW_PIN,
                                    false);
+            Log.d(TAG, "Show keypad to enter pin = "+isPinVisible);
             if (!(mCurrentSubsidyState instanceof DeviceLockedState)) {
                 mCurrentSubsidyState = new DeviceLockedState();
             }
@@ -187,9 +187,6 @@ public class SubsidyController {
     public void setDeviceUnlocked() {
         mCurrentSubsidyState = new DeviceUnlockedState();
         mCurrentSubsidyState.init(mContext);
-        if (DEBUG) {
-            Log.d(TAG, " UnRegistered From  SLC");
-        }
         KeyguardUpdateMonitor.getInstance(mContext)
                    .dispatchSubsidyLockStateChanged(false);
     }
@@ -524,29 +521,39 @@ public class SubsidyController {
         }
     }
 
-    public int isEnableDataButtonVisible(Context context) {
+    public int getPrimaryCardSlotId() {
         try {
             IExtTelephony extTelephony =
                     IExtTelephony.Stub.asInterface(ServiceManager
-                        .getService("extphone"));
-
-            boolean mIsSIMWhiteListed = extTelephony
-                    .getPrimaryCarrierSlotId() != -1;
-            if (mIsSIMWhiteListed) {
-                return (isMobileDataEnabled() && !SubsidyUtility
-                    .isAirplaneMode(context)) ? View.GONE : View.VISIBLE;
-            }
+                            .getService("extphone"));
+            return extTelephony
+                    .getPrimaryCarrierSlotId();
         } catch (RemoteException e) {
-               Log.e(TAG,
-                   "Exception for getPrimaryCarrierSlotId:", e);
+            Log.e(TAG,
+                    "Exception for getPrimaryCarrierSlotId:", e);
+        }
+        return SubscriptionManager.INVALID_SIM_SLOT_INDEX;
+    }
+
+    public int isEnableDataButtonVisible(Context context) {
+        int primarySimSlot = getPrimaryCardSlotId();
+        if (primarySimSlot != -1 /* White listed sim */) {
+            Log.w(TAG, "Primary sim slot is white listed");
+            return (isMobileDataEnabled(primarySimSlot) && !SubsidyUtility
+                    .isAirplaneMode(context)) ? View.GONE : View.VISIBLE;
         }
         return View.GONE;
     }
 
-    public boolean isMobileDataEnabled() {
+    public boolean isMobileDataEnabled(int slotId) {
         if (mTelephonyManager != null) {
             Log.w(TAG, "Telephony Manager is not null");
-            return mTelephonyManager.getDataEnabled();
+            int[] subIds = SubscriptionManager.getSubId(slotId);
+            if (subIds != null && subIds.length > 0) {
+                return mTelephonyManager.getDataEnabled(subIds[0]);
+            } else {
+                Log.d(TAG, "isMobileDataEnabled: no valid subs");
+            }
         }
         return false;
     }
@@ -554,8 +561,17 @@ public class SubsidyController {
     public void enableMobileData() {
         // Enable default data subscription
         if (mTelephonyManager != null) {
-            Log.w(TAG, "Telephony Manager is not null");
-            mTelephonyManager.setDataEnabled(true);
+            int primarySimSlot = getPrimaryCardSlotId();
+            Log.w(TAG, "Telephony Manager not null and primaryslot = "+primarySimSlot);
+            if (primarySimSlot != -1 /* White listed sim */) {
+                Log.w(TAG, "Enable data primary sim is white listed");
+                int[] subIds = SubscriptionManager.getSubId(primarySimSlot);
+                if (subIds != null && subIds.length > 0) {
+                    mTelephonyManager.setDataEnabled(subIds[0], true);
+                } else {
+                    Log.d(TAG, "enableMobileData: no valid subs");
+                }
+            }
         }
     }
 }
