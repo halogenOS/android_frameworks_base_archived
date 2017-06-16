@@ -80,6 +80,10 @@ public abstract class KeyguardPinBasedInputView extends KeyguardAbsKeyInputView
         mOkButton.setEnabled(enabled);
     }
 
+    protected void setOkButtonEnabled(boolean enabled) {
+        mOkButton.setEnabled(enabled);
+    }
+
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (KeyEvent.isConfirmKey(keyCode)) {

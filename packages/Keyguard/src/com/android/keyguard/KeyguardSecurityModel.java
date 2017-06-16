@@ -35,7 +35,8 @@ public class KeyguardSecurityModel {
         Password, // Unlock by entering an alphanumeric password
         PIN, // Strictly numeric password
         SimPin, // Unlock by entering a sim pin.
-        SimPuk // Unlock by entering a sim puk
+        SimPuk, // Unlock by entering a sim puk
+        DeviceSubsidy // OEM specific subsidy lock
     }
 
     private final Context mContext;
@@ -65,6 +66,10 @@ public class KeyguardSecurityModel {
         if (SubscriptionManager.isValidSubscriptionId(
                 monitor.getNextSubIdForState(IccCardConstants.State.PIN_REQUIRED))) {
             return SecurityMode.SimPin;
+        }
+
+        if (SubsidyUtility.shouldShowSubsidyLock(mContext)) {
+            return SecurityMode.DeviceSubsidy;
         }
 
         final int security = mLockPatternUtils.getActivePasswordQuality(

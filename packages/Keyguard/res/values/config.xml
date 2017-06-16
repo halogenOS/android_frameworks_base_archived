@@ -46,4 +46,11 @@
          the sensor embedded in the power key and listening all the time
          causes a poor experience. -->
     <bool name="config_fingerprintWakeAndUnlock">true</bool>
+
+    <!-- string that specifies the package name of SLC[Subsidy Lock Client] -->
+    <string name="config_slc_package_name" translatable="false"> </string>
+    <!-- maximum attempt allowed for an user to enter code -->
+    <integer name="config_max_enter_code_attempt">5</integer>
+    <!-- timeout allowed for an user to enter code -->
+    <integer name="config_timeout_after_max_attempt_milli">3600000</integer>
 </resources>

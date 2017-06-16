@@ -29,6 +29,55 @@
     android:clipToPadding="false"
     android:importantForAccessibility="yes"> <!-- Needed because TYPE_WINDOW_STATE_CHANGED is sent
                                                   from this view when bouncer is shown -->
+<LinearLayout
+    android:id="@+id/subsidy_setup_container"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_gravity="top|center_horizontal"
+    android:layout_marginTop="@dimen/setup_wifi_margin"
+    android:visibility="gone"
+    >
+    <TextView
+        android:id="@+id/no_data_connection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:text="@string/kg_subsidy_no_data_connection"
+        android:textAppearance="?android:attr/textAppearance"
+        android:textSize="@dimen/kg_status_line_font_size"
+        android:textColor="?android:attr/textColorSecondary" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/setup_wifi_margin"
+        android:layout_marginRight="@dimen/setup_wifi_margin"
+        android:orientation="horizontal" >
+        <com.android.keyguard.KeyguardSubsidySetupButton
+            android:id="@+id/setup_wifi"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_weight=".5"
+            android:layout_height="wrap_content"
+            androidprv:layout_maxWidth="@dimen/keyguard_security_width"
+            android:background="@drawable/subsidy_wifi_button"
+            android:text="@string/kg_subsidy_setup_wifi"
+            android:textColor="?android:attr/textColorSecondary" />
+
+        <com.android.keyguard.KeyguardSubsidySetupButton
+            android:id="@+id/enable_data"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_weight=".5"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            androidprv:layout_maxWidth="@dimen/keyguard_security_width"
+            android:background="@drawable/subsidy_wifi_button"
+            android:text="@string/kg_subsidy_enable_data"
+            android:textColor="?android:attr/textColorSecondary"
+            android:visibility="gone" />
+    </LinearLayout>
+</LinearLayout>
 
     <com.android.keyguard.KeyguardSecurityContainer
         android:id="@+id/keyguard_security_container"
@@ -38,7 +87,7 @@
         android:clipChildren="false"
         android:clipToPadding="false"
         android:padding="0dp"
-        android:layout_gravity="center">
+        android:layout_gravity="bottom|center_horizontal">
         <com.android.keyguard.KeyguardSecurityViewFlipper
             android:id="@+id/view_flipper"
             android:layout_width="match_parent"

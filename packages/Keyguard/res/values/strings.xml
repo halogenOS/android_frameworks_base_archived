@@ -394,4 +394,30 @@ number">%d</xliff:g> remaining attempts before SIM becomes permanently unusable.
 
     <string name="button_lockscreen_emergency_call">Emergency call</string>
     <string name="carrier_text_separator">"  |  "</string>
+
+    <string name="kg_subsidy_title_locked">Device Locked</string>
+    <string name="kg_subsidy_title_unlock_progress_dialog">Unlocking device</string>
+    <string name="kg_subsidy_content_locked">
+        Please insert a valid SIM to unlock the device.\n\nTap to unlock after making sure that connection to data network(cellular or Wi-Fi) is active.</string>
+    <string name="kg_subsidy_content_progress_server">Please wait&#8230; \n\nchecking with server.</string>
+    <string name="kg_subsidy_content_pin_locked">Please call customer care to get the code to unlock or insert a valid SIM.</string>
+    <plurals name="kg_subsidy_wrong_pin">
+        <item quantity="one">Invalid code. \nYou have <xliff:g id="number">%d</xliff:g> attempt left.</item>
+        <item quantity="other">Invalid code. \nYou have <xliff:g id="number">%d</xliff:g> attempts left.</item>
+    </plurals>
+    <string name="kg_subsidy_too_many_failed_attempts_countdown">Maximum attempts reached. \nRetry after <xliff:g id="number">%d</xliff:g> minutes.</string>
+    <string name="kg_subsidy_too_many_failed_attempts_countdown_sec">Maximum attempts reached. \nRetry after <xliff:g id="number">%d</xliff:g> seconds.</string>
+    <string name="kg_button_unlock">Unlock</string>
+    <string name="unlock_toast">Device unlocked</string>
+    <string name="kg_pin_unlock_progress_dialog">Unlocking device\u2026</string>
+    <string name="kg_subsidy_setup_wifi">Setup Wi-Fi</string>
+    <string name="kg_dismiss_button_description">Dismiss lock screen</string>
+    <string name="kg_subsidy_title_progress_unknown">Configuring your phone</string>
+    <string name="kg_subsidy_content_progress_unknown">Please wait&#8230;</string>
+    <string name="kg_subsidy_enable_data">Enable Data</string>
+    <string name="kg_subsidy_no_data_connection">No Data connection, To enable data, use options below</string>
+    <string name="kg_button_switch_sim">Switch SIM</string>
+    <string name="kg_subsidy_content_switch_sim">
+        Your primary SIM card is invalid.\n\nPlease insert valid SIM or switch to other SIM card</string>
+    <string name="kg_subsidy_title_switch_sim_progress_dialog">Switching Primary SIM</string>
 </resources>

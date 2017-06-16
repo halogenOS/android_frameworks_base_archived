@@ -2728,8 +2728,11 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     }
 
     protected int adjustDisableFlags(int state) {
+        boolean isSubsidyEnabled = mStatusBarKeyguardViewManager != null
+                && mStatusBarKeyguardViewManager.isSubsidyLockEnabled();
         if (!mLaunchTransitionFadingAway && !mKeyguardFadingAway
-                && (mExpandedVisible || mBouncerShowing || mWaitingForKeyguardExit)) {
+                && (mExpandedVisible || (mBouncerShowing && !isSubsidyEnabled)
+                        || mWaitingForKeyguardExit)) {
             state |= StatusBarManager.DISABLE_NOTIFICATION_ICONS;
             state |= StatusBarManager.DISABLE_SYSTEM_INFO;
         }
@@ -3139,7 +3142,10 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     }
 
     boolean panelsEnabled() {
-        return (mDisabled1 & StatusBarManager.DISABLE_EXPAND) == 0 && !ONLY_CORE_APPS;
+        boolean isSubsidyEnabled = mStatusBarKeyguardViewManager != null
+                && mStatusBarKeyguardViewManager.isSubsidyLockEnabled();
+        return (mDisabled1 & StatusBarManager.DISABLE_EXPAND) == 0 && !ONLY_CORE_APPS
+                && !isSubsidyEnabled; // disallow status bar expand when subsidy locked
     }
 
     void makeExpandedVisible(boolean force) {
