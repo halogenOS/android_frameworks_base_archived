@@ -30,7 +30,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 
 import com.android.internal.widget.LockPatternUtils;
 import com.android.keyguard.KeyguardSecurityModel.SecurityMode;
@@ -207,7 +206,6 @@ public class KeyguardSecurityContainer extends FrameLayout implements KeyguardSe
             case None:
             case SimPin:
             case SimPuk:
-            case DeviceSubsidy:
                 break;
         }
 
@@ -412,7 +410,6 @@ public class KeyguardSecurityContainer extends FrameLayout implements KeyguardSe
 
                 case SimPin:
                 case SimPuk:
-                case DeviceSubsidy:
                     // Shortcut for SIM PIN/PUK to go to directly to user's security screen or home
                     SecurityMode securityMode = mSecurityModel.getSecurityMode();
                     if (securityMode != SecurityMode.None
@@ -445,10 +442,7 @@ public class KeyguardSecurityContainer extends FrameLayout implements KeyguardSe
     private void showSecurityScreen(SecurityMode securityMode) {
         if (DEBUG) Log.d(TAG, "showSecurityScreen(" + securityMode + ")");
 
-        // ignore check for subsidy lock as we have different layout
-        // for same state
-        if ((securityMode != SecurityMode.DeviceSubsidy)
-                && (securityMode == mCurrentSecuritySelection)) return;
+        if (securityMode == mCurrentSecuritySelection) return;
 
         KeyguardSecurityView oldView = getSecurityView(mCurrentSecuritySelection);
         KeyguardSecurityView newView = getSecurityView(securityMode);
@@ -477,15 +471,6 @@ public class KeyguardSecurityContainer extends FrameLayout implements KeyguardSe
         mCurrentSecuritySelection = securityMode;
         mSecurityCallback.onSecurityModeChanged(securityMode,
                 securityMode != SecurityMode.None && newView.needsInput());
-
-        if (SubsidyUtility.isSubsidyLockFeatureEnabled(getContext())) {
-            LinearLayout subsidySetupContainer =
-                    (LinearLayout) getRootView().findViewById(R.id.subsidy_setup_container);
-            if (subsidySetupContainer != null &&
-                    mCurrentSecuritySelection != SecurityMode.DeviceSubsidy) {
-                subsidySetupContainer.setVisibility(View.GONE);
-            }
-        }
     }
 
     private KeyguardSecurityViewFlipper getFlipper() {
@@ -551,8 +536,6 @@ public class KeyguardSecurityContainer extends FrameLayout implements KeyguardSe
             case Password: return R.id.keyguard_password_view;
             case SimPin: return R.id.keyguard_sim_pin_view;
             case SimPuk: return R.id.keyguard_sim_puk_view;
-            case DeviceSubsidy: return SubsidyController.getInstance(mContext)
-                                .getCurrentSubsidyViewId();
         }
         return 0;
     }
@@ -564,8 +547,6 @@ public class KeyguardSecurityContainer extends FrameLayout implements KeyguardSe
             case Password: return R.layout.keyguard_password_view;
             case SimPin: return R.layout.keyguard_sim_pin_view;
             case SimPuk: return R.layout.keyguard_sim_puk_view;
-            case DeviceSubsidy: return SubsidyController.getInstance(mContext)
-                                .getCurrentSubsidyLayoutId();
             default:
                 return 0;
         }

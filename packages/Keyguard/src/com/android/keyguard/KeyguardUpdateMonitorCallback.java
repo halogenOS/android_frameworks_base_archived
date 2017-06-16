@@ -264,10 +264,4 @@ public class KeyguardUpdateMonitorCallback {
      * @param dreaming true if the dream's window has been created and is visible
      */
     public void onDreamingStateChanged(boolean dreaming) { }
-
-    /**
-     * Called when the state of Subsidy lock changed.
-     * @param isLocked
-     */
-    public void onSubsidyLockStateChanged(boolean isLocked) { }
 }

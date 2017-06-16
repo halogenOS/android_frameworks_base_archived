@@ -177,11 +177,6 @@
     <uses-permission android:name="android.permission.REBOOT" />
     <uses-permission android:name="android.permission.RECOVERY" />
 
-    <!-- used for subsidy lock broadcasts. -->
-    <permission android:name="com.codeaurora.permission.SUBSIDYLOCK"
-        android:protectionLevel="signatureOrSystem"/>
-    <uses-permission android:name="com.codeaurora.permission.SUBSIDYLOCK" />
-
     <application
         android:name=".SystemUIApplication"
         android:persistent="true"

@@ -503,7 +503,6 @@ public class StatusBarKeyguardViewManager implements RemoteInputController.Callb
             mPhoneStatusBar.setBouncerShowing(bouncerShowing);
             mScrimController.setBouncerShowing(bouncerShowing);
         }
-        mScrimController.setSubsidyLockEnabled(isSubsidyLockEnabled());
 
         KeyguardUpdateMonitor updateMonitor = KeyguardUpdateMonitor.getInstance(mContext);
         if ((showing && !occluded) != (mLastShowing && !mLastOccluded) || mFirstUpdate) {
@@ -593,12 +592,6 @@ public class StatusBarKeyguardViewManager implements RemoteInputController.Callb
 
     public void showBouncerMessage(String message, int color) {
         mBouncer.showMessage(message, color);
-    }
-    /*
-     * Check whether subsidy lock is enabled or not
-     */
-    public boolean isSubsidyLockEnabled() {
-        return mBouncer.isSubsidyLockEnabled();
     }
 
     public ViewRootImpl getViewRootImpl() {

@@ -54,7 +54,6 @@ public class ScrimController implements ViewTreeObserver.OnPreDrawListener,
     protected static final float SCRIM_BEHIND_ALPHA_UNLOCKING = 0.2f;
     private static final float SCRIM_IN_FRONT_ALPHA = 0.75f;
     private static final float SCRIM_IN_FRONT_ALPHA_LOCKED = 0.85f;
-    private static final float SUBSIDY_SCRIM_BEHIND_ALPHA = 0.4f;
     private static final int TAG_KEY_ANIM = R.id.scrim;
     private static final int TAG_KEY_ANIM_TARGET = R.id.scrim_target;
     private static final int TAG_START_ALPHA = R.id.scrim_alpha_start;
@@ -98,7 +97,6 @@ public class ScrimController implements ViewTreeObserver.OnPreDrawListener,
     private boolean mDontAnimateBouncerChanges;
     private boolean mKeyguardFadingOutInProgress;
     private ValueAnimator mKeyguardFadeoutAnimation;
-    private boolean mIsSubsidyLocked;
 
     public ScrimController(ScrimView scrimBehind, ScrimView scrimInFront, View headsUpScrim) {
         mScrimBehind = scrimBehind;
@@ -289,10 +287,8 @@ public class ScrimController implements ViewTreeObserver.OnPreDrawListener,
             setScrimInFrontColor(fraction * getScrimInFrontAlpha());
             setScrimBehindColor(behindFraction * mScrimBehindAlphaKeyguard);
         } else if (mBouncerShowing) {
-            // Adjusted alpha of back scrim to make status bar visible
-            // when anyone of the subsidy lock view is in foreground.
             setScrimInFrontColor(getScrimInFrontAlpha());
-            setScrimBehindColor(mIsSubsidyLocked ? SUBSIDY_SCRIM_BEHIND_ALPHA : 0f);
+            setScrimBehindColor(0f);
         } else {
             float fraction = Math.max(0, Math.min(mFraction, 1));
             setScrimInFrontColor(0f);
@@ -589,12 +585,5 @@ public class ScrimController implements ViewTreeObserver.OnPreDrawListener,
 
     public void setCurrentUser(int currentUser) {
         // Don't care in the base class.
-    }
-
-    /*
-     * Set current state of security mode is subsidy or not
-     */
-    public void setSubsidyLockEnabled(boolean isSubsidyLocked) {
-        mIsSubsidyLocked = isSubsidyLocked;
     }
 }
