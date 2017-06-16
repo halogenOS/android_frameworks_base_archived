@@ -35,7 +35,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
-import android.os.Bundle;
 import android.os.RemoteException;
 import android.os.ServiceManager;
 import android.telephony.SubscriptionManager;
@@ -113,16 +112,7 @@ public class SubsidyController {
         new BroadcastReceiver() {
             public void onReceive(Context context, Intent intent) {
 
-                Log.d(TAG, "Received intent for SubsidyLock feature");
-
-                Bundle bundle = intent.getExtras();
-                if (null != bundle) {
-                    for (String key : bundle.keySet()) {
-                         Log.d(TAG, "Intent "+String.format("%s", key));
-                    }
-                } else {
-                    Log.d(TAG, "Received intent bundle is null");
-                }
+                Log.d(TAG, "Received intent for SubsidyLock feature " +  intent);
 
                 if (!mStopStateTransitions) {
                     boolean isValid = processIntent(intent);
