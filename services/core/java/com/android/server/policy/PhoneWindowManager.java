@@ -254,6 +254,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     private static final int KEY_ACTION_SCREENSHOT = 10;
     private static final int KEY_ACTION_ONEHAND_LEFT = 11;
     private static final int KEY_ACTION_ONEHAND_RIGHT = 12;
+    private static final int KEY_ACTION_PARTIAL_SCREENSHOT = 13;
 
     // Special values, used internal only.
     private static final int KEY_ACTION_HOME = 100;
@@ -3817,6 +3818,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 break;
             case KEY_ACTION_ONEHAND_RIGHT:
                 toggleSingleHand(mContext, false);
+                break;
+            case KEY_ACTION_PARTIAL_SCREENSHOT:
+                takeScreenshot(TAKE_SCREENSHOT_SELECTED_REGION);
                 break;
         }
     }
