@@ -491,7 +491,7 @@
     <integer translatable="false" name="config_wifi_framework_network_switch_rx_packet_threshold">20</integer>
 
     <!-- Integer indicating wpa_supplicant scan interval in milliseconds -->
-    <integer translatable="false" name="config_wifi_supplicant_scan_interval">25000</integer>
+    <integer translatable="false" name="config_wifi_supplicant_scan_interval">28000</integer>
 
     <!-- Integer indicating amount of time failed networks are blacklisted for the purpose
          of network switching in milliseconds -->
@@ -510,7 +510,7 @@
     <integer translatable="false" name="config_wifi_no_network_periodic_scan_interval">300000</integer>
 
     <!-- Integer indicating disconnect mode short scan interval in milliseconds -->
-    <integer translatable="false" name="config_wifi_disconnected_short_scan_interval">18000</integer>
+    <integer translatable="false" name="config_wifi_disconnected_short_scan_interval">20000</integer>
 
     <!-- Integer indicating associated partial scan short interval in milliseconds -->
     <integer translatable="false" name="config_wifi_associated_short_scan_interval">20000</integer>
