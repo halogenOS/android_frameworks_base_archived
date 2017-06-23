@@ -76,6 +76,8 @@ public class KeyguardSubsidyConfiguringStateView  extends KeyguardSubsidyStateVi
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
+        KeyguardUpdateMonitor.getInstance(mContext).registerCallback(
+                mInfoCallback);
         mSubsidySetupContainer =
                 (LinearLayout) getRootView().findViewById(R.id.subsidy_setup_container);
         setSubsidySetupContainerVisibility(View.GONE);
@@ -84,8 +86,23 @@ public class KeyguardSubsidyConfiguringStateView  extends KeyguardSubsidyStateVi
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
+        KeyguardUpdateMonitor.getInstance(mContext).removeCallback(
+                mInfoCallback);
         mSubsidySetupContainer = null;
     }
+
+    KeyguardUpdateMonitorCallback mInfoCallback =
+        new KeyguardUpdateMonitorCallback() {
+            @Override
+            public void onSubsidyLockStateChanged(boolean isLocked) {
+                Log.d(TAG, "SubsidyLock state changed isLocked ="+isLocked);
+                if (!isLocked && null != mLockPatternUtils) {
+                    Log.d(TAG, "Reset the lockout deadline");
+                    mLockPatternUtils.setLockoutAttemptDeadline(
+                            KeyguardUpdateMonitor.getCurrentUser(), 0);
+                }
+            }
+        };
 
     public void setSubsidySetupContainerVisibility(int isVisible) {
         if (mSubsidySetupContainer != null) {
