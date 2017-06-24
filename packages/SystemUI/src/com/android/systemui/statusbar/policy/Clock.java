@@ -588,13 +588,13 @@ public class Clock extends TextView implements DemoMode {
             }
 
             mDateStyle = Settings.System.getIntForUser(resolver,
-                    Settings.System.STATUSBAR_CLOCK_DATE_DISPLAY, 2,
+                    Settings.System.STATUSBAR_CLOCK_DATE_DISPLAY, 0,
                     UserHandle.USER_CURRENT); // *
             mDatePosition = Settings.System.getIntForUser(resolver,
                     Settings.System.STATUSBAR_CLOCK_DATE_POSITION, 0,
                     UserHandle.USER_CURRENT); // *
             mDateCase = Settings.System.getIntForUser(resolver,
-                    Settings.System.STATUSBAR_CLOCK_DATE_STYLE, DATE_LOWERCASE,
+                    Settings.System.STATUSBAR_CLOCK_DATE_STYLE, DATE_REGULAR,
                     UserHandle.USER_CURRENT);
             mDateFormat = Settings.System.getString(resolver,
                     Settings.System.STATUSBAR_CLOCK_DATE_FORMAT, "");
