@@ -47,17 +47,18 @@ public class PackageUtils {
         }
     }
 
-    public static boolean isAvailableApp(String packageName, Context context) {
-        Context mContext = context;
+    public static boolean isAvailableApp(Context mContext, String packageName) {
         final PackageManager pm = mContext.getPackageManager();
-        try {
-            pm.getPackageInfo(packageName, PackageManager.GET_ACTIVITIES);
-            int enabled = pm.getApplicationEnabledSetting(packageName);
-            return enabled != PackageManager.COMPONENT_ENABLED_STATE_DISABLED &&
-                enabled != PackageManager.COMPONENT_ENABLED_STATE_DISABLED_USER;
-        } catch (NameNotFoundException e) {
-            return false;
+        if (isAppInstalled(mContext, packageName)) {
+            try {
+                int enabled = pm.getApplicationEnabledSetting(packageName);
+                return enabled != PackageManager.COMPONENT_ENABLED_STATE_DISABLED &&
+                    enabled != PackageManager.COMPONENT_ENABLED_STATE_DISABLED_USER;
+            } catch (Exception e) {
+                return false;
+            }
         }
+        return false;
     }
 
     public static boolean isImageTileInstalled(Context mContext) {
