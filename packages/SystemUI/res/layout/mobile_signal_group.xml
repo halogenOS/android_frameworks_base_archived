@@ -55,22 +55,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         >
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-        >
-        <ImageView
-            android:id="@+id/mobile_roaming"
-            android:layout_width="wrap_content"
-            android:layout_height="17dp"
-            android:paddingStart="22dp"
-            android:paddingTop="1.5dp"
-            android:paddingBottom="3dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/stat_sys_roaming"
-            android:contentDescription="@string/accessibility_data_connection_roaming"
-            android:visibility="gone"
-            />
+
         <FrameLayout
             android:id="@+id/mobile_signal_single"
             android:layout_width="wrap_content"
@@ -121,6 +106,13 @@
                 android:layout_height="wrap_content"
                 />
         </LinearLayout>
-        </LinearLayout>
     </FrameLayout>
+    <ImageView
+        android:id="@+id/mobile_roaming"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/stat_sys_roaming"
+        android:contentDescription="@string/accessibility_data_connection_roaming"
+        android:visibility="gone"
+        />
 </LinearLayout>
