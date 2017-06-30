@@ -102,7 +102,7 @@ public class IButtonBacklightControl {
             File curFile = new File(
                     BUTTON_BACKLIGHT_PATHS[i], BRIGHTNESS_CONTROL_FILE);
             if (curFile.exists()) {
-                FileUtils.writeString(String.valueOf(brightness), curFile);
+                FileUtils.writeString(curFile, String.valueOf(brightness));
             }
         }
         mCurrentBrightness = brightness;

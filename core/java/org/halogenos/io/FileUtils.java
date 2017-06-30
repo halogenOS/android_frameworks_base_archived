@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2016 The CyanogenMod Project
  * Copyright (C) 2017 The halogenOS Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,10 +16,18 @@
  */
 package org.halogenos.io;
 
+import android.util.Log;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+
 
 /**
  * Utility class for managing files.
@@ -27,6 +36,12 @@ import java.nio.charset.StandardCharsets;
  * @hide
  **/
 public class FileUtils {
+
+    private static final String TAG = "FileUtils";
+
+    private FileUtils() {
+    // This class is not supposed to be instantiated
+    }
 
     /**
      * Write a string to a file. (Does not append)
@@ -37,7 +52,7 @@ public class FileUtils {
      *
      * @hide
      **/
-    public static boolean writeString(String string, File file) {
+    public static boolean writeString(File file, String string) {
         FileOutputStream outputStream = null;
         try {
             outputStream = new FileOutputStream(file, false /* no append */);
@@ -62,16 +77,70 @@ public class FileUtils {
      * Read a file to a string.
      *
      * @param file File to read
+     * @param oneLine boolean determining if the output should only be first line
      * @return The content of the file or null on failure
      *
      * @hide
      **/
-    public static String readString(File file) {
+    public static String readString(File file, boolean oneLine) {
+        String returnValue = null;
+        BufferedReader reader = null;
         try {
-            return android.os.FileUtils.readTextFile(file, 0, null);
-        } catch(IOException e) {
-            return null;
+            if (oneLine){
+                reader = new BufferedReader(new FileReader(file), 512);
+                returnValue = reader.readLine();
+            } else {
+                returnValue = android.os.FileUtils.readTextFile(file, 0, null);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (reader != null) reader.close();
+            } catch (IOException e) {
+                // Ignored, not much we can do anyway
+            }
         }
+        return returnValue;
+    }
+    
+    public static String readString(String filePath) {
+        return readString(new File(filePath), false);
+    }
+    
+    public static String readString(File file) {
+        return readString(file, false);
+    }
+    
+    public static boolean writeString(String filePath, String value) {
+        return writeString(new File(filePath), value);
+    }
+
+
+    /**
+     * Checks whether the given file is readable
+     *
+     * @param fileName File to test for readability
+     * @return true if readable, false if not
+     *
+     * @hide
+     **/
+    public static boolean isFileReadable(String fileName) {
+        final File file = new File(fileName);
+        return file.exists() && file.canRead();
+    }
+
+    /**
+     * Checks whether the given file is writable
+     *
+     * @param fileName File to test for write access
+     * @return true if writable, false if not
+     *
+     * @hide
+     **/
+    public static boolean isFileWritable(String fileName) {
+        final File file = new File(fileName);
+        return file.exists() && file.canWrite();
     }
 
     /**
@@ -97,5 +166,4 @@ public class FileUtils {
     public static String getFilePath(String path1, String path2) {
         return new File(path1, path2).getAbsolutePath();
     }
-
 }
