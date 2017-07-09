@@ -103,15 +103,15 @@ public class FileUtils {
         }
         return returnValue;
     }
-    
+
     public static String readString(String filePath) {
         return readString(new File(filePath), false);
     }
-    
+
     public static String readString(File file) {
         return readString(file, false);
     }
-    
+
     public static boolean writeString(String filePath, String value) {
         return writeString(new File(filePath), value);
     }
