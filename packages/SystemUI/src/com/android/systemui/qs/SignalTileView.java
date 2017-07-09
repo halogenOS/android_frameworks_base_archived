@@ -70,23 +70,19 @@ public final class SignalTileView extends QSIconView {
         mIconLayoutHeight = getContext().getResources().getDimensionPixelSize(
                 R.dimen.wide_type_icon_height_qs);
 
-        if (getContext().getResources().getBoolean(R.bool.show_roaming_and_network_icons)
-                || mStyle == STATUS_BAR_STYLE_EXTENDED) {
-            mRoaming = new ImageView(mContext);
-            mRoaming.setImageResource(R.drawable.stat_sys_roaming);
-            mRoaming.setVisibility(View.GONE);
-            LinearLayout iconLayout = new LinearLayout(mContext);
-            if (getContext().getResources().getBoolean(R.bool.show_roaming_and_network_icons)) {
-                iconLayout.addView(mRoaming, LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-                iconLayout.addView(mOverlay, LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-            } else {
-                iconLayout.addView(mOverlay, LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-                iconLayout.addView(mRoaming, LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-            }
-            mIconFrame.addView(iconLayout, LayoutParams.WRAP_CONTENT, mIconLayoutHeight);
-        } else {
-            mIconFrame.addView(mOverlay, LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-        }
+        mRoaming = new ImageView(mContext);
+        mRoaming.setPivotX(0);
+        mRoaming.setPivotY(0);
+        mRoaming.setScaleX(0.4f);
+        mRoaming.setScaleY(0.4f);
+        mRoaming.setVisibility(View.GONE);
+        LinearLayout iconLayout = new LinearLayout(mContext);
+
+        iconLayout.addView(mOverlay, LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+        iconLayout.addView(mRoaming, LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+
+        mIconFrame.addView(iconLayout, LayoutParams.WRAP_CONTENT, mIconLayoutHeight);
+
         return mIconFrame;
     }
 
@@ -150,14 +146,13 @@ public final class SignalTileView extends QSIconView {
         final boolean shown = isShown();
         setVisibility(mIn, shown, s.activityIn);
         setVisibility(mOut, shown, s.activityOut);
-        if ((mRoaming != null)
-                && getContext().getResources().getBoolean(R.bool.show_roaming_and_network_icons)
-                        || mStyle == STATUS_BAR_STYLE_EXTENDED) {
+        if(mRoaming != null) {
             TelephonyManager tm =
                     (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
+            mRoaming.setImageResource(R.drawable.stat_sys_roaming);
             mRoaming.setVisibility(
                     tm.isNetworkRoaming(s.subId) && s.isShowRoaming ? View.VISIBLE : View.GONE);
-         }
+        }
     }
 
     private void setVisibility(View view, boolean shown, boolean visible) {

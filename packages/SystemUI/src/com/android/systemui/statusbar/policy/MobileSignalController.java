@@ -335,14 +335,12 @@ public class MobileSignalController extends SignalController<
         final boolean dataDisabled = mCurrentState.iconGroup == TelephonyIcons.DATA_DISABLED
                 && mCurrentState.userSetup;
 
-        // Show icon in QS when we are connected or need to show roaming or data is disabled.
+        // Show icon in QS when we are connected or data is disabled.
         boolean showDataIcon = false;
-        if (mContext.getResources().getBoolean(R.bool.show_roaming_and_network_icons)) {
-            showDataIcon = mCurrentState.dataConnected;
-        } else {
-            showDataIcon = mCurrentState.dataConnected
-                || isRoaming() || dataDisabled;
-        }
+
+        showDataIcon = mCurrentState.dataConnected
+                || dataDisabled;
+
         IconState statusIcon = new IconState(mCurrentState.enabled && !mCurrentState.airplaneMode,
                 getCurrentIconId(), contentDescription);
 
@@ -362,10 +360,9 @@ public class MobileSignalController extends SignalController<
         boolean activityOut = mCurrentState.dataConnected
                         && !mCurrentState.carrierNetworkChangeMode
                         && mCurrentState.activityOut;
-        if (!mContext.getResources().getBoolean(R.bool.show_roaming_and_network_icons)) {
-              showDataIcon &= mCurrentState.isDefault
-                || isRoaming() || dataDisabled;
-        }
+        showDataIcon &= mCurrentState.isDefault
+                || dataDisabled;
+
         showDataIcon &= (mStyle == STATUS_BAR_STYLE_ANDROID_DEFAULT
                 || mStyle == STATUS_BAR_STYLE_EXTENDED);
         int typeIcon = showDataIcon ? icons.mDataType : 0;
@@ -373,14 +370,8 @@ public class MobileSignalController extends SignalController<
         int mobileActivityId = showMobileActivity() ? icons.mActivityId : 0;
         int dataNetworkTypeId = 0;
         if (mStyle == STATUS_BAR_STYLE_EXTENDED) {
-            if (isRoaming()) {
-                dataNetworkTypeId = mCurrentState.dataConnected ? icons.mDataType : 0;
-                typeIcon = TelephonyIcons.ROAMING_ICON;
-                qsTypeIcon = mCurrentState.dataConnected ? qsTypeIcon : 0;
-            } else {
-                dataNetworkTypeId = showDataIcon ? icons.mDataType : 0;
-                typeIcon = 0;
-            }
+            dataNetworkTypeId = showDataIcon ? icons.mDataType : 0;
+            typeIcon = 0;
         }
         if( callback instanceof SignalCallbackExtended ) {
             ((SignalCallbackExtended)callback).setMobileDataIndicators(statusIcon, qsIcon, typeIcon,
@@ -713,11 +704,9 @@ public class MobileSignalController extends SignalController<
         }
         mCurrentState.dataConnected = mCurrentState.connected
                 && mDataState == TelephonyManager.DATA_CONNECTED;
-        if (mContext.getResources().getBoolean(R.bool.show_roaming_and_network_icons)) {
-            mCurrentState.roaming = isRoaming();
-        } else {
-            mCurrentState.roaming = false;
-        }
+        
+        mCurrentState.roaming = isRoaming();
+
         if (isCarrierNetworkChangeActive()) {
             mCurrentState.iconGroup = TelephonyIcons.CARRIER_NETWORK_CHANGE;
         } else if (isDataDisabled()) {
@@ -861,21 +850,13 @@ public class MobileSignalController extends SignalController<
             dataContentDesc = TelephonyIcons.getDataTypeDesc(slotId);
             qsDataTypeIcon = TelephonyIcons.getQSDataTypeIcon(slotId);
         }
-        if (roaming && !mContext.getResources().getBoolean(
-                    R.bool.show_roaming_and_network_icons)
-                    && !(mStyle == STATUS_BAR_STYLE_EXTENDED)
-                    && !mContext.getResources().getBoolean(
-                    R.bool.config_always_hide_roaming_indicator)) {
-            dataTypeIcon = TelephonyIcons.ROAMING_ICON;
-            qsDataTypeIcon = R.drawable.stat_sys_roaming;
-        }
+
         if (DEBUG) {
             Log.d(mTag, "updateDataNetType, dataTypeIcon=" + getResourceName(dataTypeIcon)
                     + " qsDataTypeIcon=" + getResourceName(qsDataTypeIcon)
                     + " dataContentDesc=" + dataContentDesc);
         }
-        boolean isWide = roaming && (mContext.getResources().getBoolean(
-                R.bool.show_roaming_and_network_icons) || (mStyle == STATUS_BAR_STYLE_EXTENDED));
+        boolean isWide = roaming && mStyle == STATUS_BAR_STYLE_EXTENDED;
         mCurrentState.iconGroup = new MobileIconGroup(
                 TelephonyManager.getNetworkTypeName(dataType),
                 sbIcons, qsIcons, contentDesc, 0, 0, sbDiscState, qsDiscState, discContentDesc,
