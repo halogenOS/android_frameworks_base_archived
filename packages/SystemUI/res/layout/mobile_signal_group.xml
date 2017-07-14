@@ -114,13 +114,6 @@
                 android:layout_height="wrap_content"
                 />
         </LinearLayout>
+        </LinearLayout>
     </FrameLayout>
-    <ImageView
-        android:id="@+id/mobile_roaming"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/stat_sys_roaming"
-        android:contentDescription="@string/accessibility_data_connection_roaming"
-        android:visibility="gone"
-        />
 </LinearLayout>
