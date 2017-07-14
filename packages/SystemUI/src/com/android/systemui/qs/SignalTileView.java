@@ -150,14 +150,13 @@ public final class SignalTileView extends QSIconView {
         final boolean shown = isShown();
         setVisibility(mIn, shown, s.activityIn);
         setVisibility(mOut, shown, s.activityOut);
-        if ((mRoaming != null)
-                && getContext().getResources().getBoolean(R.bool.show_roaming_and_network_icons)
-                        || mStyle == STATUS_BAR_STYLE_EXTENDED) {
+        if(mRoaming != null) {
             TelephonyManager tm =
                     (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
+            mRoaming.setImageResource(R.drawable.stat_sys_roaming);
             mRoaming.setVisibility(
                     tm.isNetworkRoaming(s.subId) && s.isShowRoaming ? View.VISIBLE : View.GONE);
-         }
+        }
     }
 
     private void setVisibility(View view, boolean shown, boolean visible) {
