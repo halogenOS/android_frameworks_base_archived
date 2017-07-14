@@ -1,11 +1,11 @@
 /*
- * Copyright (C) 2016 halogenOS
+ * Copyright (C) 2016-2017 The halogenOS Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,68 +24,51 @@ import android.view.ViewGroup;
 import android.util.Log;
 
 public class VisualizerViewWrapper {
-    
+
     private static final boolean DEBUG = false;
-    
-    static final class StateHolder {
-        public boolean
-                mVisible            = false,
-                mPlayingIndependent = false,
-                mPlaying            = false,
-                mPowerSaveMode      = false,
-                mDisplaying         = false,
-                mOccluded           = false,
-                mScreenOn           = false,
-                mScreenOnInternal   = false,
-                mKeyguardVisible    = false,
-                mHaveInstance       = false;
-        
-        public int mColor = Color.TRANSPARENT;
-        
-        public Bitmap mCurrentBitmap;
-        
-        public StateHolder() {
-            
-        }
-    }
-    
+
     public VisualizerView visualizerView;
+
     private Context context;
     private ViewGroup parent;
     private StateHolder state = new StateHolder();
-    
+
     public VisualizerViewWrapper(Context context, ViewGroup parent) {
         this.context = context;
-        this.parent  = parent;
+        this.parent = parent;
     }
-    
+
     private static void log(String... msg) {
-        if (DEBUG) for(String s : msg) Log.d("VisualizerView", "[W] " + s);
+        if (DEBUG) for (String s : msg) Log.d("VisualizerView", s);
     }
-    
+
     public synchronized void vanish() {
         log("vanish");
-        if(!isNull()) {
+        if (!isNull()) {
             visualizerView.setVisible(false);
-            if(isAttachedToWindow())
-                ((ViewGroup)visualizerView.getParent()).removeView(visualizerView);
+            if (isAttachedToWindow()) {
+                ((ViewGroup)visualizerView.getParent())
+                        .removeView(visualizerView);
+            }
             visualizerView.destroy();
             visualizerView = null;
             state.mDisplaying = false;
             state.mHaveInstance = false;
         }
     }
-    
+
     private boolean isAttachedToWindow() {
         return visualizerView.getWindowToken() != null;
     }
-    
+
     private boolean isNull() {
-        if(DEBUG) log("visualizerView is " + 
-            (visualizerView != null ? "not " : "") + "null");
+        if (DEBUG) {
+            log("visualizerView is " + 
+                    (visualizerView != null ? "not " : "") + "null");
+        }
         return visualizerView == null;
     }
-    
+
     public synchronized void setPlaying(boolean playing) {
         log("setPlaying=" + playing);
         // Reset color when stopping, so that the next time when a song is played
@@ -94,97 +77,117 @@ public class VisualizerViewWrapper {
         // and e. g. unlocks his device and doesn't use it for some time. Later,
         // when he wants to listen to another song, it will just fade out from
         // transparent into the new color instead of using the old color.
-        if(state.mPlayingIndependent && !playing)
+        if (state.mPlayingIndependent && !playing) {
             state.mColor = Color.TRANSPARENT;
+        }
         state.mPlayingIndependent = playing;
         state.mPlaying = playing;
         checkState();
     }
-    
+
     private synchronized void setScreenOn(boolean screenOn) {
         log("setScreenOn=" + screenOn);
         state.mScreenOn = screenOn;
         state.mScreenOnInternal = screenOn;
     }
-    
+
     public final boolean isScreenOn() {
         return state.mScreenOnInternal;
     }
-    
+
     public synchronized void setKeyguardShowing(boolean showing) {
         log("setKeyguardShowing=" + showing);
         state.mKeyguardVisible = showing;
         checkState();
     }
-    
+
     private synchronized void setVisible(boolean visible) {
         log("setVisible=" + visible);
         state.mVisible = visible;
     }
-    
+
     public synchronized void setBitmap(Bitmap bitmap) {
         log("setBitmap=[not null: " + (bitmap != null) + "]");
-        if(!isNull()) visualizerView.setBitmap(bitmap);
-        else {
+        if (!isNull()) {
+            visualizerView.setBitmap(bitmap);
+        } else {
             state.mColor = Color.TRANSPARENT;
             state.mCurrentBitmap = bitmap;
         }
     }
-    
+
     private synchronized void ready() {
         log("Getting ready...");
-        if(isNull() && !state.mHaveInstance) {
+        if (isNull() && !state.mHaveInstance) {
             visualizerView = new VisualizerView(context);
             visualizerView.ready(state);
             state.mHaveInstance = true;
         }
         log("Ready.");
     }
-    
+
     private synchronized void prepare() {
         log("prepare");
         state.mScreenOn = state.mScreenOnInternal;
         state.mPlaying = state.mPlayingIndependent;
         ready();
     }
-    
+
     public synchronized void checkState() {
-        if(!state.mHaveInstance && state.mScreenOnInternal
-            && state.mKeyguardVisible && state.mPlaying) {
-            if(DEBUG) {
+        if (!state.mHaveInstance && state.mScreenOnInternal
+                && state.mKeyguardVisible && state.mPlaying) {
+            if (DEBUG) {
                 log("Current color: " + state.mColor);
                 log("Is bitmap null: " + (state.mCurrentBitmap == null));
             }
             prepare();
-            if(!isNull() && !isAttachedToWindow()) {
+            if (!isNull() && !isAttachedToWindow()) {
                 log("Adding to lockscreen");
                 parent.addView(visualizerView);
-                for(int i = 0; i < parent.getChildCount(); i++)
-                    if(parent.getChildAt(i) != visualizerView)
+                for (int i = 0; i < parent.getChildCount(); i++) {
+                    if (parent.getChildAt(i) != visualizerView) {
                         parent.getChildAt(i).bringToFront();
+                    }
+                }
                 visualizerView.setTranslationZ(-2);
             }
             state.mVisible = true;
             visualizerView.refreshColor();
             visualizerView.checkStateChanged();
-        } else if(state.mHaveInstance && (
-            !state.mScreenOnInternal ||
-            !state.mKeyguardVisible)) {
+        } else if (state.mHaveInstance &&
+                    (!state.mScreenOnInternal || !state.mKeyguardVisible)) {
             vanish();
-        } else if(state.mHaveInstance && state.mScreenOnInternal &&
+        } else if (state.mHaveInstance && state.mScreenOnInternal &&
                     state.mKeyguardVisible) {
             visualizerView.checkStateChanged();
         }
     }
-    
+
     public synchronized void onScreenOn() {
         setScreenOn(true);
         checkState();
     }
-    
+
     public synchronized void onScreenOff() {
         setScreenOn(false);
         checkState();
     }
-    
+
+    static final class StateHolder {
+        public boolean mVisible;
+        public boolean mPlayingIndependent;
+        public boolean mPlaying;
+        public boolean mPowerSaveMode;
+        public boolean mDisplaying;
+        public boolean mOccluded;
+        public boolean mScreenOn;
+        public boolean mScreenOnInternal;
+        public boolean mKeyguardVisible;
+        public boolean mHaveInstance;
+
+        public int mColor = Color.TRANSPARENT;
+
+        public Bitmap mCurrentBitmap;
+    }
+
 }
