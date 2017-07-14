@@ -103,7 +103,7 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
                     }
         
                     mVisualizer.setEnabled(false);
-                    mVisualizer.setCaptureSize(66);
+                    mVisualizer.setCaptureSize(60);
                     mVisualizer.setDataCaptureListener(mVisualizerListener, Visualizer.getMaxCaptureRate(),
                             false, true);
                     mVisualizer.setEnabled(true);
