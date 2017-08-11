@@ -17,7 +17,7 @@
 <set
     xmlns:android="http://schemas.android.com/apk/res/android" >
     <objectAnimator
-        android:duration="250"
+        android:duration="240"
         android:propertyXName="translateX"
         android:propertyYName="translateY"
         android:pathData="M 8.0,4.0 c 0.79167,0.0 3.95833,0.0 4.75,0.0"

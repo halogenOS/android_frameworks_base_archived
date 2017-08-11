@@ -116,17 +116,17 @@
     <bool name="config_sendAudioBecomingNoisy">true</bool>
 
     <!-- The duration (in milliseconds) of a short animation. -->
-    <integer name="config_shortAnimTime">180</integer>
+    <integer name="config_shortAnimTime">160</integer>
 
     <!-- The duration (in milliseconds) of a medium-length animation. -->
-    <integer name="config_mediumAnimTime">360</integer>
+    <integer name="config_mediumAnimTime">320</integer>
 
     <!-- The duration (in milliseconds) of a long animation. -->
     <integer name="config_longAnimTime">480</integer>
 
     <!-- The duration (in milliseconds) of the activity open/close and fragment open/close animations. -->
-    <integer name="config_activityShortDur">150</integer>
-    <integer name="config_activityDefaultDur">210</integer>
+    <integer name="config_activityShortDur">140</integer>
+    <integer name="config_activityDefaultDur">200</integer>
 
     <!-- Duration for the dim animation behind a dialog.  This may be either
          a percentage, which is relative to the duration of the enter/open
@@ -562,7 +562,7 @@
     <bool name="config_automatic_brightness_available">false</bool>
 
     <!-- Fast brightness animation ramp rate in brightness units per second-->
-    <integer translatable="false" name="config_brightness_ramp_rate_fast">200</integer>
+    <integer translatable="false" name="config_brightness_ramp_rate_fast">250</integer>
 
     <!-- Slow brightness animation ramp rate in brightness units per second-->
     <integer translatable="false" name="config_brightness_ramp_rate_slow">40</integer>

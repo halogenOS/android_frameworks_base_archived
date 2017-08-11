@@ -18,7 +18,7 @@
     <!-- Default alpha value for disabled elements. -->
     <item name="disabled_alpha_leanback_formwizard" format="float" type="dimen">0.2</item>
     <!-- The duration of most animations related to screen content transitions -->
-    <integer name="leanback_setup_base_animation_duration">500</integer>
+    <integer name="leanback_setup_base_animation_duration">450</integer>
     <item name="leanback_setup_alpha_animiation_max_opacity" format="float" type="dimen">1.0</item>
     <item name="leanback_setup_alpha_animiation_min_opacity" format="float" type="dimen">0.0</item>
     <!-- Where stable, on-screen content rests -->

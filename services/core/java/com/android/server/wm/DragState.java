@@ -68,7 +68,7 @@ import java.util.ArrayList;
  * Drag/drop state
  */
 class DragState {
-    private static final long ANIMATION_DURATION_MS = 500;
+    private static final long ANIMATION_DURATION_MS = 400;
 
     private static final int DRAG_FLAGS_URI_ACCESS = View.DRAG_FLAG_GLOBAL_URI_READ |
             View.DRAG_FLAG_GLOBAL_URI_WRITE;

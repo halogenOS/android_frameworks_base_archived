@@ -46,9 +46,9 @@ import com.android.systemui.statusbar.phone.KeyguardAffordanceHelper;
  */
 public class KeyguardAffordanceView extends ImageView {
 
-    private static final long CIRCLE_APPEAR_DURATION = 70;
-    private static final long CIRCLE_DISAPPEAR_MAX_DURATION = 180;
-    private static final long NORMAL_ANIMATION_DURATION = 180;
+    private static final long CIRCLE_APPEAR_DURATION = 60;
+    private static final long CIRCLE_DISAPPEAR_MAX_DURATION = 160;
+    private static final long NORMAL_ANIMATION_DURATION = 160;
     public static final float MAX_ICON_SCALE_AMOUNT = 1.5f;
     public static final float MIN_ICON_SCALE_AMOUNT = 0.8f;
 

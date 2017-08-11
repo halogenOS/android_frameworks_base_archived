@@ -81,7 +81,7 @@ import com.android.internal.R;
  * @attr ref android.R.styleable#Switch_track
  */
 public class Switch extends CompoundButton {
-    private static final int THUMB_ANIMATION_DURATION = 250;
+    private static final int THUMB_ANIMATION_DURATION = 220;
 
     private static final int TOUCH_MODE_IDLE = 0;
     private static final int TOUCH_MODE_DOWN = 1;

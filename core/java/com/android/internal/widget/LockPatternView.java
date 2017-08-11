@@ -87,7 +87,7 @@ public class LockPatternView extends View {
      * if the animating mode is set.  The entire animation should take this
      * constant * the length of the pattern to complete.
      */
-    private static final int MILLIS_PER_CIRCLE_ANIMATING = 700;
+    private static final int MILLIS_PER_CIRCLE_ANIMATING = 650;
 
     /**
      * This can be used to avoid updating the display for very small motions or noisy panels.

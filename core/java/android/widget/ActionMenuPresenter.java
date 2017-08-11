@@ -59,7 +59,7 @@ import java.util.List;
  */
 public class ActionMenuPresenter extends BaseMenuPresenter
         implements ActionProvider.SubUiVisibilityListener {
-    private static final int ITEM_ANIMATION_DURATION = 150;
+    private static final int ITEM_ANIMATION_DURATION = 140;
     private static final boolean ACTIONBAR_ANIMATIONS_ENABLED = false;
 
     private OverflowMenuButton mOverflowButton;

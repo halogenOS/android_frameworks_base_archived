@@ -200,7 +200,7 @@
     <integer name="recents_animate_task_stack_scroll_duration">100</integer>
 
     <!-- The animation duration for scrolling the stack to a particular item. -->
-    <integer name="recents_auto_advance_duration">450</integer>
+    <integer name="recents_auto_advance_duration">440</integer>
 
     <!-- The animation duration for subsequent scrolling the stack to a particular item. -->
     <integer name="recents_subsequent_auto_advance_duration">1000</integer>
@@ -310,7 +310,7 @@
     <integer name="carrier_network_change_anim_time">3000</integer>
 
     <!-- Duration of the expansion animation in the volume dialog -->
-    <item name="volume_expand_animation_duration" type="integer">300</item>
+    <item name="volume_expand_animation_duration" type="integer">260</item>
 
     <!-- Whether to show the full screen user switcher. -->
     <bool name="config_enableFullscreenUserSwitcher">false</bool>
