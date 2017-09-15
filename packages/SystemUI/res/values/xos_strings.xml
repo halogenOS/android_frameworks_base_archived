@@ -25,4 +25,6 @@
 
     <!-- Ambient display and lift gesture Tile -->
     <string name="quick_settings_doze_notifications_label">Ambient notifications</string>
+
+    <string name="recents_app_killed">App killed</string>
 </resources>

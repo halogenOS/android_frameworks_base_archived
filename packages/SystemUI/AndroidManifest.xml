@@ -194,6 +194,8 @@
     <!-- to access instant apps -->
     <uses-permission android:name="android.permission.ACCESS_INSTANT_APPS" />
 
+    <uses-permission android:name="android.permission.FORCE_STOP_PACKAGES" />
+
     <application
         android:name=".SystemUIApplication"
         android:persistent="true"
