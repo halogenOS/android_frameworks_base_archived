@@ -34,4 +34,6 @@
     <string name="navbar_tuner_activity">Navigation bar buttons</string>
     <string name="lockscreen_tuner_activity">Lockscreen shortcuts</string>
     <string name="powernotif_tuner_activity">Power notifications</string>
+    <string name="lockscreen_default">Default</string>
+    <string name="lockscreen_hidden">None</string>
 </resources>
