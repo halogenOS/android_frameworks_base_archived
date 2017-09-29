@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
     Copyright (C) 2016 The Android Open Source Project
-    Copyright (C) 2016 halogenOS
+    Copyright (C) 2016-2017 halogenOS
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@
         <item>Lollipop</item>
         <item>Marshmallow</item>
         <item>Nougat</item>
-        <item>Oatmeal Cookie</item>
+        <item>Oreo</item>
         <item>Pancake</item>
         <item>Quark</item>
         <item>Raspberry Pie</item>
