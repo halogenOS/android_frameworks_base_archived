@@ -4574,5 +4574,8 @@ message MetricsEvent {
 
     // GZOSP custom constants
     GZOSP = 1500;
+
+    // XOS custom constants
+    XOS = 1501;
   }
 }
