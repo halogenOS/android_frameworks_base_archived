@@ -24,6 +24,10 @@ LOCAL_JAVA_LIBRARIES := \
     android.hardware.tv.cec-V1.0-java \
     android.hidl.manager-V1.0-java
 
+ifneq ($(TARGET_KEYHANDLER_PACKAGE),)
+LOCAL_JAVA_LIBRARIES += $(TARGET_KEYHANDLER_PACKAGE)
+endif
+
 LOCAL_STATIC_JAVA_LIBRARIES := \
     tzdata_shared2 \
     tzdata_update2 \
