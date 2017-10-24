@@ -68,6 +68,6 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)material/ringtones/Summer_night.ogg:system/media/audio/ringtones/Summer_night.ogg \
     $(LOCAL_PATH)material/ringtones/Zen.ogg:system/media/audio/ringtones/Zen.ogg
 
-PRODUCT_PROPERTY_OVERRIDES := \
+PRODUCT_PROPERTY_OVERRIDES += \
    ro.config.ringtone=Zen.ogg \
    ro.config.notification_sound=Chime.ogg
