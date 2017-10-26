@@ -133,10 +133,10 @@
     <string name="roamingTextSearching" msgid="8360141885972279963">"Пошук службы"</string>
     <string name="wfcRegErrorTitle" msgid="2301376280632110664">"Wi-Fi-тэлефанія"</string>
   <string-array name="wfcOperatorErrorAlertMessages">
-    <item msgid="2254967670088539682">"Каб рабіць выклікі і адпраўляць паведамленні па Wi-Fi, спачатку папрасіце свайго аператара наладзіць гэту паслугу. Затым зноў уключыце Wi-Fi-тэлефанію ў меню Налады."</item>
+    <item msgid="3910386316304772394">"Каб рабіць выклікі і адпраўляць паведамленні па Wi-Fi, спачатку папрасіце свайго аператара наладзіць гэту паслугу. Затым зноў уключыце Wi-Fi-тэлефанію ў меню Налады. (Код памылкі: <xliff:g id="CODE">%1$s</xliff:g>)"</item>
   </string-array>
   <string-array name="wfcOperatorErrorNotificationMessages">
-    <item msgid="6177300162212449033">"Зарэгіструйцеся ў свайго аператара"</item>
+    <item msgid="7472393097168811593">"Зарэгіструйцеся ў свайго аператара (Код памылкі: <xliff:g id="CODE">%1$s</xliff:g>)"</item>
   </string-array>
   <string-array name="wfcSpnFormats">
     <item msgid="6830082633573257149">"%s"</item>
@@ -252,8 +252,7 @@
     <string name="global_action_voice_assist" msgid="7751191495200504480">"Галас. дапамога"</string>
     <string name="global_action_lockdown" msgid="8751542514724332873">"Заблакір. зараз"</string>
     <string name="status_bar_notification_info_overflow" msgid="5301981741705354993">"999+"</string>
-    <string name="notification_hidden_text" msgid="1135169301897151909">"Змесціва схавана"</string>
-    <string name="notification_hidden_by_policy_text" msgid="9004631276932584600">"Змесціва, схаванае ў адпаведнасці з палітыкай"</string>
+    <string name="notification_hidden_text" msgid="6351207030447943784">"Новае апавяшчэнне"</string>
     <string name="notification_channel_virtual_keyboard" msgid="6969925135507955575">"Віртуальная клавіятура"</string>
     <string name="notification_channel_physical_keyboard" msgid="7297661826966861459">"Фізічная клавіятура"</string>
     <string name="notification_channel_security" msgid="7345516133431326347">"Бяспека"</string>
@@ -1150,6 +1149,13 @@
       <item quantity="many">адкрытых сетак Wi-Fi даступна</item>
       <item quantity="other">адкрытай сеткі Wi-Fi даступна</item>
     </plurals>
+    <string name="wifi_available_title" msgid="3817100557900599505">"Падключыцеся да адкрытай сеткі Wi-Fi"</string>
+    <string name="wifi_available_title_connecting" msgid="1557292688310330032">"Ідзе падключэнне да адкрытай сеткі Wi‑Fi"</string>
+    <string name="wifi_available_title_connected" msgid="7542672851522241548">"Выканана падключэнне да адкрытай сеткі Wi‑Fi"</string>
+    <string name="wifi_available_title_failed_to_connect" msgid="6861772233582618132">"Не атрымалася падключыцца да адкрытай сеткі Wi‑Fi"</string>
+    <string name="wifi_available_content_failed_to_connect" msgid="3377406637062802645">"Дакраніцеся, каб убачыць усе сеткі"</string>
+    <string name="wifi_available_action_connect" msgid="2635699628459488788">"Падключыцца"</string>
+    <string name="wifi_available_action_all_networks" msgid="1100098935861622985">"Усе сеткі"</string>
     <string name="wifi_available_sign_in" msgid="9157196203958866662">"Уваход у сетку Wi-Fi"</string>
     <string name="network_available_sign_in" msgid="1848877297365446605">"Увайдзіце ў сетку"</string>
     <!-- no translation found for network_available_sign_in_detailed (8000081941447976118) -->
@@ -1229,6 +1235,8 @@
     <string name="usb_midi_notification_title" msgid="4850904915889144654">"USB для MIDI"</string>
     <string name="usb_accessory_notification_title" msgid="7848236974087653666">"Падключаны да USB-прылады"</string>
     <string name="usb_notification_message" msgid="3370903770828407960">"Дакраніцеся, каб атрымаць іншыя параметры."</string>
+    <string name="usb_unsupported_audio_accessory_title" msgid="3529881374464628084">"Выяўлены аксесуар аналагавага аўдыя"</string>
+    <string name="usb_unsupported_audio_accessory_message" msgid="6309553946441565215">"Далучаная прылада не сумяшчальная з гэтым тэлефонам. Націсніце, каб даведацца больш."</string>
     <string name="adb_active_notification_title" msgid="6729044778949189918">"Адладка па USB падключана"</string>
     <string name="adb_active_notification_message" msgid="4948470599328424059">"Дакраніцеся, каб адключыць адладку па USB."</string>
     <string name="adb_active_notification_message" product="tv" msgid="8470296818270110396">"Выберыце, каб адключыць адладку USB."</string>
@@ -1787,14 +1795,8 @@
     <string name="unpin_target" msgid="3556545602439143442">"Адмацаваць"</string>
     <string name="app_info" msgid="6856026610594615344">"Інфармацыя пра праграму"</string>
     <string name="negative_duration" msgid="5688706061127375131">"−<xliff:g id="TIME">%1$s</xliff:g>"</string>
-    <string name="reset_retail_demo_mode_title" msgid="2370249087943803584">"Скінуць налады прылады?"</string>
-    <string name="reset_retail_demo_mode_text" msgid="5481925817590883246">"Дакраніцеся, каб скінуць налады прылады"</string>
     <string name="demo_starting_message" msgid="5268556852031489931">"Ідзе запуск дэманстрацыі…"</string>
     <string name="demo_restarting_message" msgid="952118052531642451">"Ідзе скід налад прылады…"</string>
-    <string name="demo_user_inactivity_timeout_title" msgid="6596109959002331334">"Скінуць налады прылады?"</string>
-    <string name="demo_user_inactivity_timeout_countdown" msgid="5675588824402569506">"Усе змены будуць страчаны, і дэманстрацыя пачнецца зноў праз <xliff:g id="TIMEOUT">%1$s</xliff:g> с…"</string>
-    <string name="demo_user_inactivity_timeout_left_button" msgid="5314271347014802475">"Скасаваць"</string>
-    <string name="demo_user_inactivity_timeout_right_button" msgid="5019306703066964808">"Выканаць скід"</string>
     <string name="suspended_widget_accessibility" msgid="6712143096475264190">"Адключаны <xliff:g id="LABEL">%1$s</xliff:g>"</string>
     <string name="conference_call" msgid="3751093130790472426">"Канферэнц-выклік"</string>
     <string name="tooltip_popup_title" msgid="5253721848739260181">"Падказка"</string>
@@ -1840,6 +1842,7 @@
     <string name="etws_primary_default_message_tsunami" msgid="1887685943498368548">"Неадкладна эвакуіруйцеся з прыбярэжных раёнаў у больш бяспечнае месца, напрыклад на ўзвышша."</string>
     <string name="etws_primary_default_message_earthquake_and_tsunami" msgid="998797956848445862">"Заставайцеся спакойнымі і пашукайце прытулак паблізу."</string>
     <string name="etws_primary_default_message_test" msgid="2709597093560037455">"Праверка экстранных паведамленняў"</string>
+    <string name="notification_reply_button_accessibility" msgid="3621714652387814344">"Адказаць"</string>
     <string name="etws_primary_default_message_others" msgid="6293148756130398971"></string>
     <string name="mmcc_authentication_reject" msgid="7729819349669603406">"SIM-карта не дапускаецца"</string>
     <string name="mmcc_imsi_unknown_in_hlr" msgid="6321202257374418726">"SIM-карты няма"</string>

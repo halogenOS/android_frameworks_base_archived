@@ -72,8 +72,8 @@
     <item msgid="7065842274271279580">"Usar seleção do sistema (padrão)"</item>
     <item msgid="7539690996561263909">"SBC"</item>
     <item msgid="686685526567131661">"AAC"</item>
-    <item msgid="8910200421843557332">"aptX"</item>
-    <item msgid="8434403964359457768">"aptX HD"</item>
+    <item msgid="8910200421843557332">"<xliff:g id="APTX">Qualcomm(R) aptX(TM) audio</xliff:g>"</item>
+    <item msgid="8434403964359457768">"<xliff:g id="APTX_HD">Qualcomm(R) aptX(TM) HD audio</xliff:g>"</item>
     <item msgid="6751080638867012696">"LDAC"</item>
     <item msgid="723675059572222462">"Ativar codecs opcionais"</item>
     <item msgid="3304843301758635896">"Desativar codecs opcionais"</item>
@@ -82,8 +82,8 @@
     <item msgid="5062108632402595000">"Usar seleção do sistema (padrão)"</item>
     <item msgid="6898329690939802290">"SBC"</item>
     <item msgid="6839647709301342559">"AAC"</item>
-    <item msgid="2279916056363477395">"aptX"</item>
-    <item msgid="6641171061200063516">"aptX HD"</item>
+    <item msgid="2279916056363477395">"<xliff:g id="APTX">Qualcomm(R) aptX(TM) audio</xliff:g>"</item>
+    <item msgid="6641171061200063516">"<xliff:g id="APTX_HD">Qualcomm(R) aptX(TM) HD audio</xliff:g>"</item>
     <item msgid="7950781694447359344">"LDAC"</item>
     <item msgid="2209680154067241740">"Ativar codecs opcionais"</item>
     <item msgid="741805482892725657">"Desativar codecs opcionais"</item>
@@ -190,9 +190,9 @@
   </string-array>
   <string-array name="animator_duration_scale_entries">
     <item msgid="6039901060648228241">"Animação desativada"</item>
-    <item msgid="1138649021950863198">"Escala de animação 5x"</item>
+    <item msgid="1138649021950863198">"Escala de animação 0,5x"</item>
     <item msgid="4394388961370833040">"Escala de animação 1x"</item>
-    <item msgid="8125427921655194973">"Escala de animação 1.5 x"</item>
+    <item msgid="8125427921655194973">"Escala de animação 1,5x"</item>
     <item msgid="3334024790739189573">"Escala de animação 2x"</item>
     <item msgid="3170120558236848008">"Escala de animação 5x"</item>
     <item msgid="1069584980746680398">"Escala de animação 10x"</item>

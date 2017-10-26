@@ -201,7 +201,7 @@ public abstract class BatteryStats implements Parcelable {
      * New in version 22:
      *   - BLE scan result background count, BLE unoptimized scan time
      */
-    static final String CHECKIN_VERSION = "23";
+    static final String CHECKIN_VERSION = "24";
 
     /**
      * Old version, we hit 9 and ran out of room, need to remove.
@@ -1219,6 +1219,7 @@ public abstract class BatteryStats implements Parcelable {
 
         // Platform-level low power state stats
         public String statPlatformIdleState;
+        public String statSubsystemPowerState;
 
         public HistoryStepDetails() {
             clear();
@@ -1250,6 +1251,7 @@ public abstract class BatteryStats implements Parcelable {
             out.writeInt(statSoftIrqTime);
             out.writeInt(statIdlTime);
             out.writeString(statPlatformIdleState);
+            out.writeString(statSubsystemPowerState);
         }
 
         public void readFromParcel(Parcel in) {
@@ -1271,6 +1273,7 @@ public abstract class BatteryStats implements Parcelable {
             statSoftIrqTime = in.readInt();
             statIdlTime = in.readInt();
             statPlatformIdleState = in.readString();
+            statSubsystemPowerState = in.readString();
         }
     }
 
@@ -5564,6 +5567,10 @@ public abstract class BatteryStats implements Parcelable {
                         pw.print(", PlatformIdleStat ");
                         pw.print(rec.stepDetails.statPlatformIdleState);
                         pw.println();
+
+                        pw.print(", SubsystemPowerState ");
+                        pw.print(rec.stepDetails.statSubsystemPowerState);
+                        pw.println();
                     } else {
                         pw.print(BATTERY_STATS_CHECKIN_VERSION); pw.print(',');
                         pw.print(HISTORY_DATA); pw.print(",0,Dcpu=");
@@ -5599,6 +5606,13 @@ public abstract class BatteryStats implements Parcelable {
                         pw.print(',');
                         if (rec.stepDetails.statPlatformIdleState != null) {
                             pw.print(rec.stepDetails.statPlatformIdleState);
+                            if (rec.stepDetails.statSubsystemPowerState != null) {
+                                pw.print(',');
+                            }
+                        }
+
+                        if (rec.stepDetails.statSubsystemPowerState != null) {
+                            pw.print(rec.stepDetails.statSubsystemPowerState);
                         }
                         pw.println();
                     }

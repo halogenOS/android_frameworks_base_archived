@@ -32,6 +32,7 @@ import android.util.SparseArray;
 
 import java.util.concurrent.CountDownLatch;
 
+import com.android.internal.annotations.VisibleForTesting;
 import com.android.internal.util.AsyncChannel;
 import com.android.internal.util.Protocol;
 
@@ -268,6 +269,14 @@ public final class NsdManager {
     }
 
     /**
+     * @hide
+     */
+    @VisibleForTesting
+    public void disconnect() {
+        mAsyncChannel.disconnect();
+    }
+
+    /**
      * Failures are passed with {@link RegistrationListener#onRegistrationFailed},
      * {@link RegistrationListener#onUnregistrationFailed},
      * {@link DiscoveryListener#onStartDiscoveryFailed},
@@ -325,7 +334,8 @@ public final class NsdManager {
         public void onServiceResolved(NsdServiceInfo serviceInfo);
     }
 
-    private class ServiceHandler extends Handler {
+    @VisibleForTesting
+    class ServiceHandler extends Handler {
         ServiceHandler(Looper looper) {
             super(looper);
         }
@@ -369,6 +379,8 @@ public final class NsdManager {
                     ((DiscoveryListener) listener).onServiceLost((NsdServiceInfo) message.obj);
                     break;
                 case STOP_DISCOVERY_FAILED:
+                    // TODO: failure to stop discovery should be internal and retried internally, as
+                    // the effect for the client is indistinguishable from STOP_DISCOVERY_SUCCEEDED
                     removeListener(message.arg2);
                     ((DiscoveryListener) listener).onStopDiscoveryFailed(getNsdServiceInfoType(ns),
                             message.arg1);
@@ -390,6 +402,8 @@ public final class NsdManager {
                     ((RegistrationListener) listener).onUnregistrationFailed(ns, message.arg1);
                     break;
                 case UNREGISTER_SERVICE_SUCCEEDED:
+                    // TODO: do not unregister listener until service is unregistered, or provide
+                    // alternative way for unregistering ?
                     removeListener(message.arg2);
                     ((RegistrationListener) listener).onServiceUnregistered(ns);
                     break;

@@ -193,6 +193,11 @@ class AppWindowToken extends WindowToken implements WindowManagerService.AppFree
 
     Task mLastParent;
 
+    /**
+     * See {@link #canTurnScreenOn()}
+     */
+    private boolean mCanTurnScreenOn = true;
+
     AppWindowToken(WindowManagerService service, IApplicationToken token, boolean voiceInteraction,
             DisplayContent dc, long inputDispatchingTimeoutNanos, boolean fullscreen,
             boolean showForAllUsers, int targetSdk, int orientation, int rotationAnimationHint,
@@ -290,7 +295,7 @@ class AppWindowToken extends WindowToken implements WindowManagerService.AppFree
         boolean nowGone = mReportedVisibilityResults.nowGone;
 
         boolean nowDrawn = numInteresting > 0 && numDrawn >= numInteresting;
-        boolean nowVisible = numInteresting > 0 && numVisible >= numInteresting;
+        boolean nowVisible = numInteresting > 0 && numVisible >= numInteresting && !hidden;
         if (!nowGone) {
             // If the app is not yet gone, then it can only become visible/drawn.
             if (!nowDrawn) {
@@ -431,11 +436,18 @@ class AppWindowToken extends WindowToken implements WindowManagerService.AppFree
                 mEnteringAnimation = true;
                 mService.mActivityManagerAppTransitionNotifier.onAppTransitionFinishedLocked(token);
             }
+
             // If we are hidden but there is no delay needed we immediately
             // apply the Surface transaction so that the ActivityManager
-            // can have some guarantee on the Surface state
-            // following setting the visibility.
-            if (hidden && !delayed) {
+            // can have some guarantee on the Surface state following
+            // setting the visibility. This captures cases like dismissing
+            // the docked or pinned stack where there is no app transition.
+            //
+            // In the case of a "Null" animation, there will be
+            // no animation but there will still be a transition set.
+            // We still need to delay hiding the surface such that it
+            // can be synchronized with showing the next surface in the transition.
+            if (hidden && !delayed && !mService.mAppTransition.isTransitionSet()) {
                 SurfaceControl.openTransaction();
                 for (int i = mChildren.size() - 1; i >= 0; i--) {
                     mChildren.get(i).mWinAnimator.hide("immediately hidden");
@@ -637,6 +649,8 @@ class AppWindowToken extends WindowToken implements WindowManagerService.AppFree
         if (DEBUG_ADD_REMOVE) Slog.v(TAG, "notifyAppResumed: wasStopped=" + wasStopped
                 + " " + this);
         mAppStopped = false;
+        // Allow the window to turn the screen on once the app is resumed again.
+        setCanTurnScreenOn(true);
         if (!wasStopped) {
             destroySurfaces(true /*cleanupOnResume*/);
         }
@@ -937,8 +951,6 @@ class AppWindowToken extends WindowToken implements WindowManagerService.AppFree
             // Update keyguard flags upon finishing relaunch.
             checkKeyguardFlagsChanged();
         }
-
-        updateAllDrawn();
     }
 
     void clearRelaunching() {
@@ -1301,7 +1313,7 @@ class AppWindowToken extends WindowToken implements WindowManagerService.AppFree
         // going to the bottom. Allowing closing {@link AppWindowToken} to participate can lead to
         // an Activity in another task being started in the wrong orientation during the transition.
         if (!(sendingToBottom || mService.mClosingApps.contains(this))
-                && (isVisible() || mService.mOpeningApps.contains(this))) {
+                && (isVisible() || mService.mOpeningApps.contains(this) || isOnTop())) {
             return mOrientation;
         }
 
@@ -1344,12 +1356,41 @@ class AppWindowToken extends WindowToken implements WindowManagerService.AppFree
         }
     }
 
+    /**
+     * Returns whether the drawn window states of this {@link AppWindowToken} has considered every
+     * child {@link WindowState}. A child is considered if it has been passed into
+     * {@link #updateDrawnWindowStates(WindowState)} after being added. This is used to determine
+     * whether states, such as {@code allDrawn}, can be set, which relies on state variables such as
+     * {@code mNumInterestingWindows}, which depend on all {@link WindowState}s being considered.
+     *
+     * @return {@code true} If all children have been considered, {@code false}.
+     */
+    private boolean allDrawnStatesConsidered() {
+        for (int i = mChildren.size() - 1; i >= 0; --i) {
+            final WindowState child = mChildren.get(i);
+            if (child.mightAffectAllDrawn(false /*visibleOnly*/ )
+                    && !child.getDrawnStateEvaluated()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     *  Determines if the token has finished drawing. This should only be called from
+     *  {@link DisplayContent#applySurfaceChangesTransaction}
+     */
     void updateAllDrawn() {
         if (!allDrawn) {
             // Number of drawn windows can be less when a window is being relaunched, wait for
-            // all windows to be launched and drawn for this token be considered all drawn
+            // all windows to be launched and drawn for this token be considered all drawn.
             final int numInteresting = mNumInterestingWindows;
-            if (numInteresting > 0 && mNumDrawnWindows >= numInteresting && !isRelaunching()) {
+
+            // We must make sure that all present children have been considered (determined by
+            // {@link #allDrawnStatesConsidered}) before evaluating whether everything has been
+            // drawn.
+            if (numInteresting > 0 && allDrawnStatesConsidered()
+                    && mNumDrawnWindows >= numInteresting && !isRelaunching()) {
                 if (DEBUG_VISIBILITY) Slog.v(TAG, "allDrawn: " + this
                         + " interesting=" + numInteresting + " drawn=" + mNumDrawnWindows);
                 allDrawn = true;
@@ -1394,6 +1435,8 @@ class AppWindowToken extends WindowToken implements WindowManagerService.AppFree
      *         windows in this app token where not considered drawn as of the last pass.
      */
     boolean updateDrawnWindowStates(WindowState w) {
+        w.setDrawnStateEvaluated(true /*evaluated*/);
+
         if (DEBUG_STARTING_WINDOW_VERBOSE && w == startingWindow) {
             Slog.d(TAG, "updateWindows: starting " + w + " isOnScreen=" + w.isOnScreen()
                     + " allDrawn=" + allDrawn + " freezingScreen=" + mAppAnimator.freezingScreen);
@@ -1571,6 +1614,17 @@ class AppWindowToken extends WindowToken implements WindowManagerService.AppFree
         return null;
     }
 
+    int getLowestAnimLayer() {
+        for (int i = 0; i < mChildren.size(); i++) {
+            final WindowState w = mChildren.get(i);
+            if (w.mRemoved) {
+                continue;
+            }
+            return w.mWinAnimator.mAnimLayer;
+        }
+        return Integer.MAX_VALUE;
+    }
+
     WindowState getHighestAnimLayerWindow(WindowState currentTarget) {
         WindowState candidate = null;
         for (int i = mChildren.indexOf(currentTarget); i >= 0; i--) {
@@ -1591,6 +1645,24 @@ class AppWindowToken extends WindowToken implements WindowManagerService.AppFree
      */
     void setDisablePreviewScreenshots(boolean disable) {
         mDisablePreviewScreenshots = disable;
+    }
+
+    /**
+     * Sets whether the current launch can turn the screen on. See {@link #canTurnScreenOn()}
+     */
+    void setCanTurnScreenOn(boolean canTurnScreenOn) {
+        mCanTurnScreenOn = canTurnScreenOn;
+    }
+
+    /**
+     * Indicates whether the current launch can turn the screen on. This is to prevent multiple
+     * relayouts from turning the screen back on. The screen should only turn on at most
+     * once per activity resume.
+     *
+     * @return true if the screen can be turned on.
+     */
+    boolean canTurnScreenOn() {
+        return mCanTurnScreenOn;
     }
 
     /**

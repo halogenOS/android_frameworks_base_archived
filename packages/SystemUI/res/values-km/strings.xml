@@ -310,6 +310,7 @@
     <string name="quick_settings_more_settings" msgid="326112621462813682">"ការ​កំណត់​ច្រើន​ទៀត"</string>
     <string name="quick_settings_done" msgid="3402999958839153376">"រួចរាល់"</string>
     <string name="quick_settings_connected" msgid="1722253542984847487">"បាន​ភ្ជាប់"</string>
+    <string name="quick_settings_connected_battery_level" msgid="4136051440381328892">"បានភ្ជាប់ ហើយថ្មមានកម្រិត <xliff:g id="BATTERY_LEVEL_AS_PERCENTAGE">%1$s</xliff:g>"</string>
     <string name="quick_settings_connecting" msgid="47623027419264404">"កំពុង​តភ្ជាប់..."</string>
     <string name="quick_settings_tethering_label" msgid="7153452060448575549">"ការ​ភ្ជាប់"</string>
     <string name="quick_settings_hotspot_label" msgid="6046917934974004879">"ហតស្ប៉ត"</string>
@@ -467,6 +468,8 @@
     <string name="branded_monitoring_description_app_personal" msgid="2669518213949202599">"អ្នកត្រូវបានភ្ជាប់ទៅ <xliff:g id="APPLICATION">%1$s</xliff:g> ដែលអាចឃ្លាំមើលសកម្មភាពបណ្តាញរបស់អ្នក រាប់បញ្ចូលទាំងអ៊ីមែល កម្មវិធី និងគេហទំព័រ។"</string>
     <string name="monitoring_description_app_work" msgid="4612997849787922906">"កម្រង​ព័ត៌មាន​ការងារ​របស់អ្នក​ស្ថិត​ក្រោម​ការ​គ្រប់គ្រង​របស់ <xliff:g id="ORGANIZATION">%1$s</xliff:g> ។ កម្រងព័ត៌មាន​នេះត្រូវ​បាន​ភ្ជាប់ទៅ <xliff:g id="APPLICATION">%2$s</xliff:g> ដែលអាច​តាមដាន​សកម្មភាព​បណ្តាញ​របស់អ្នក រួមទាំង​អ៊ីមែល កម្មវិធី និង​គេហទំព័រ​ផងដែរ។\n\nសម្រាប់​ព័ត៌មាន​បន្ថែម សូម​ទាក់ទង​ទៅអ្នក​គ្រប់គ្រង​របស់​អ្នក។"</string>
     <string name="monitoring_description_app_personal_work" msgid="5664165460056859391">"កម្រងព័ត៌មាន​ការងារ​របស់អ្នក​ស្ថិតក្រោម​គ្រប់គ្រង​របស់ <xliff:g id="ORGANIZATION">%1$s</xliff:g> ។ កម្រង​ព័ត៌មាននេះ​ត្រូវបាន​ភ្ជាប់​ទៅ <xliff:g id="APPLICATION_WORK">%2$s</xliff:g> ដែលអាច​តាមដាន​សកម្មភាព​បណ្តាញ​របស់អ្នក រួមទាំង​អ៊ីមែល កម្មវិធី និង​គេហទំព័រ​ផងដែរ។\n\nអ្នកក៏ត្រូវបាន​ភ្ជាប់​ទៅ <xliff:g id="APPLICATION_PERSONAL">%3$s</xliff:g> ដែលអាច​តាមដាន​សកម្មភាព​បណ្តាញ​ផ្ទាល់ខ្លួន​របស់​អ្នក។"</string>
+    <string name="keyguard_indication_trust_granted" msgid="4985003749105182372">"បាន​ដោះសោ​សម្រាប់ <xliff:g id="USER_NAME">%1$s</xliff:g>"</string>
+    <string name="keyguard_indication_trust_managed" msgid="8319646760022357585">"<xliff:g id="TRUST_AGENT">%1$s</xliff:g> កំពុង​ដំណើរការ"</string>
     <string name="keyguard_indication_trust_disabled" msgid="7412534203633528135">"ឧបករណ៍​នឹង​ចាក់​សោ​រហូត​ដល់​អ្នក​ដោះ​សោ​ដោយ​ដៃ"</string>
     <string name="hidden_notifications_title" msgid="7139628534207443290">"ទទួល​បាន​ការ​ជូន​ដំណឹង​កាន់តែ​លឿន"</string>
     <string name="hidden_notifications_text" msgid="2326409389088668981">"ឃើញ​ពួកវា​មុន​ពេល​ដោះ​សោ"</string>
@@ -548,9 +551,10 @@
     <string name="tuner_full_importance_settings_off" msgid="8208165412614935229">"បិទ"</string>
     <string name="power_notification_controls_description" msgid="4372459941671353358">"ជាមួយអង្គគ្រប់គ្រងការជូនដំណឹងថាមពល អ្នកអាចកំណត់កម្រិតសំខាន់ពី 0 ទៅ 5 សម្រាប់ការជូនដំណឹងរបស់កម្មវិធី។ \n\n"<b>"កម្រិត 5"</b>" \n- បង្ហាញនៅផ្នែកខាងលើបញ្ជីជូនដំណឹង \n- អនុញ្ញាតការរំខានលើអេក្រង់ពេញ \n- លោតឡើងជានិច្ច \n\n"<b>"កម្រិត 4"</b>" \n- រារាំងការរំខានលើអេក្រង់ពេញ \n- លោតឡើងជានិច្ច \n\n"<b>"កម្រិត 3"</b>" \n- រារាំងការរំខានលើអេក្រង់ពេញ \n- លោតឡើងជានិច្ច \n\n"<b>"កម្រិត 2"</b>" \n- រារាំងការរំខានលើអេក្រង់ពេញ \n- លោតឡើងជានិច្ច \n- មិនបន្លឺសំឡេង ឬញ័រ \n\n"<b>"កម្រិត 1"</b>" \n- រារាំងការរំខានលើអេក្រង់ពេញ \n- លោតឡើងជានិច្ច \n- មិនបន្លឺសំឡេង ឬញ័រ \n- លាក់ពីអេក្រង់ចាក់សោ និងរបារស្ថានភាព \n- បង្ហាញនៅផ្នែកខាងក្រោមបញ្ជីជូនដំណឹង \n\n"<b>"កម្រិត 0"</b>" \n- រារាំងការជូនដំណឹងទាំងអស់ពីកម្មវិធី"</string>
     <string name="notification_header_default_channel" msgid="7506845022070889909">"ការ​ជូនដំណឹង"</string>
-    <string name="notification_channel_disabled" msgid="5805874247999578073">"អ្នក​នឹង​មិន​ទទួល​បាន​ការ​ជូនដំណឹង​ទាំងនេះ​ទៀត​ទេ។"</string>
+    <string name="notification_channel_disabled" msgid="2139193533791840539">"អ្នក​នឹង​មិន​ទទួល​បានការ​ជូនដំណឹង​ទាំងនេះ​ទៀត​ទេ"</string>
     <string name="notification_num_channels" msgid="2048144408999179471">"ប្រភេទនៃការជូនដំណឹងចំនួន <xliff:g id="NUMBER">%d</xliff:g>"</string>
     <string name="notification_default_channel_desc" msgid="2506053815870808359">"កម្មវិធីនេះ​មិនមាន​ប្រភេទនៃ​ការជូនដំណឹង​ទេ"</string>
+    <string name="notification_unblockable_desc" msgid="3561016061737896906">"ការជូនដំណឹងពី​កម្មវិធីនេះមិនអាចបិទបានទេ"</string>
     <plurals name="notification_num_channels_desc" formatted="false" msgid="5492793452274077663">
       <item quantity="other">ប្រភេទនៃការ​ជូនដំណឹង 1 ក្នុង​ចំណោម <xliff:g id="NUMBER_1">%d</xliff:g> ដែលបានពី​កម្មវិធី​នេះ</item>
       <item quantity="one">ប្រភេទនៃការ​ជូនដំណឹង 1 ក្នុង​ចំណោម <xliff:g id="NUMBER_0">%d</xliff:g> ដែលបានពី​កម្មវិធី​នេះ</item>
@@ -570,12 +574,16 @@
     <string name="notification_menu_accessibility" msgid="2046162834248888553">"<xliff:g id="APP_NAME">%1$s</xliff:g> <xliff:g id="MENU_DESCRIPTION">%2$s</xliff:g>"</string>
     <string name="notification_menu_gear_description" msgid="2204480013726775108">"ការគ្រប់គ្រង​ការជូន​ដំណឹង"</string>
     <string name="notification_menu_snooze_description" msgid="3653669438131034525">"ជម្រើស​ផ្អាកការ​ជូនដំណឹង"</string>
-    <string name="snooze_option_15_min" msgid="1068727451405610715">"15 នាទី"</string>
-    <string name="snooze_option_30_min" msgid="867081342535195788">"30 នាទី"</string>
-    <string name="snooze_option_1_hour" msgid="1098086401880077154">"1 ម៉ោង"</string>
-    <string name="snooze_option_2_hour" msgid="8332218255658969475">"2 ម៉ោង"</string>
     <string name="snooze_undo" msgid="6074877317002985129">"មិន​ធ្វើវិញ"</string>
     <string name="snoozed_for_time" msgid="2390718332980204462">"បាន​ផ្អាក​រយៈពេល <xliff:g id="TIME_AMOUNT">%1$s</xliff:g>"</string>
+    <plurals name="snoozeHourOptions" formatted="false" msgid="2124335842674413030">
+      <item quantity="other">%d ម៉ោង</item>
+      <item quantity="one">%d ម៉ោង</item>
+    </plurals>
+    <plurals name="snoozeMinuteOptions" formatted="false" msgid="4127251700591510196">
+      <item quantity="other">%d នាទី</item>
+      <item quantity="one">%d នាទី</item>
+    </plurals>
     <string name="battery_panel_title" msgid="7944156115535366613">"ការប្រើប្រាស់ថ្ម"</string>
     <string name="battery_detail_charging_summary" msgid="1279095653533044008">"កម្មវិធីសន្សំថ្មមិនអាចប្រើបានអំឡុងពេលសាកថ្មទេ"</string>
     <string name="battery_detail_switch_title" msgid="6285872470260795421">"កម្មវិធីសន្សំថ្ម"</string>
@@ -718,8 +726,8 @@
     <string name="pip_phone_minimize" msgid="1079119422589131792">"បង្រួម"</string>
     <string name="pip_phone_close" msgid="8416647892889710330">"បិទ"</string>
     <string name="pip_phone_dismiss_hint" msgid="6351678169095923899">"អូស​ចុះក្រោម​ដើម្បី​បដិសេធ"</string>
-    <string name="pip_menu_title" msgid="3328510504196964712">"ម៉ឺនុយ​រូបភាព​ក្នុងរូបភាព"</string>
-    <string name="pip_notification_title" msgid="3204024940158161322">"<xliff:g id="NAME">%s</xliff:g> ស្ថិតក្នុងមុខងាររូបភាពក្នុងរូបភាព"</string>
+    <string name="pip_menu_title" msgid="3328510504196964712">"ម៉ឺនុយ​រូប​ក្នុងរូប"</string>
+    <string name="pip_notification_title" msgid="3204024940158161322">"<xliff:g id="NAME">%s</xliff:g> ស្ថិតក្នុងមុខងាររូបក្នុងរូប"</string>
     <string name="pip_notification_message" msgid="4171698133469539591">"ប្រសិនបើ​អ្នក​មិន​ចង់​ឲ្យ <xliff:g id="NAME">%s</xliff:g> ប្រើ​មុខងារ​នេះ​ទេ សូមចុច​ដើម្បី​បើក​ការកំណត់ រួច​បិទ​វា។"</string>
     <string name="pip_play" msgid="1417176722760265888">"លេង"</string>
     <string name="pip_pause" msgid="8881063404466476571">"ផ្អាក"</string>
@@ -765,4 +773,5 @@
     <string name="qs_dnd_replace" msgid="8019520786644276623">"ជំនួស"</string>
     <string name="running_foreground_services_title" msgid="381024150898615683">"កម្មវិធីដែលកំពុងដំណើរការនៅផ្ទៃខាងក្រោយ"</string>
     <string name="running_foreground_services_msg" msgid="6326247670075574355">"ចុចដើម្បីមើលព័ត៌មានលម្អិតអំពីការប្រើប្រាស់ទិន្នន័យ និងថ្ម"</string>
+    <string name="data_usage_disable_mobile" msgid="5116269981510015864">"បិទទិន្នន័យ​ចល័ត?"</string>
 </resources>

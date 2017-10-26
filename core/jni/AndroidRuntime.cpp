@@ -206,6 +206,7 @@ extern int register_com_android_internal_net_NetworkStatsFactory(JNIEnv *env);
 extern int register_com_android_internal_os_FuseAppLoop(JNIEnv* env);
 extern int register_com_android_internal_os_PathClassLoaderFactory(JNIEnv* env);
 extern int register_com_android_internal_os_Zygote(JNIEnv *env);
+extern int register_com_android_internal_os_ZygoteInit(JNIEnv *env);
 extern int register_com_android_internal_util_VirtualRefBasePtr(JNIEnv *env);
 
 static AndroidRuntime* gCurRuntime = NULL;
@@ -245,7 +246,7 @@ int register_com_android_internal_os_RuntimeInit(JNIEnv* env)
         methods, NELEM(methods));
 }
 
-int register_com_android_internal_os_ZygoteInit(JNIEnv* env)
+int register_com_android_internal_os_ZygoteInit_nativeZygoteInit(JNIEnv* env)
 {
     const JNINativeMethod methods[] = {
         { "nativeZygoteInit", "()V",
@@ -265,8 +266,6 @@ AndroidRuntime::AndroidRuntime(char* argBlockStart, const size_t argBlockLength)
         mArgBlockLength(argBlockLength)
 {
     SkGraphics::Init();
-    // There is also a global font cache, but its budget is specified by
-    // SK_DEFAULT_FONT_CACHE_COUNT_LIMIT and SK_DEFAULT_FONT_CACHE_LIMIT.
 
     // Pre-allocate enough space to hold a fair number of options.
     mOptions.setCapacity(20);
@@ -277,7 +276,6 @@ AndroidRuntime::AndroidRuntime(char* argBlockStart, const size_t argBlockLength)
 
 AndroidRuntime::~AndroidRuntime()
 {
-    SkGraphics::Term();
 }
 
 /*
@@ -679,7 +677,15 @@ int AndroidRuntime::startVm(JavaVM** pJavaVM, JNIEnv** pEnv, bool zygote)
         executionMode = kEMJitCompiler;
     }
 
-    parseRuntimeOption("dalvik.vm.stack-trace-file", stackTraceFileBuf, "-Xstacktracefile:");
+    // If dalvik.vm.stack-trace-dir is set, it enables the "new" stack trace
+    // dump scheme and a new file is created for each stack dump. If it isn't set,
+    // the old scheme is enabled.
+    property_get("dalvik.vm.stack-trace-dir", propBuf, "");
+    if (strlen(propBuf) > 0) {
+        addOption("-Xusetombstonedtraces");
+    } else {
+        parseRuntimeOption("dalvik.vm.stack-trace-file", stackTraceFileBuf, "-Xstacktracefile:");
+    }
 
     strcpy(jniOptsBuf, "-Xjniopts:");
     if (parseRuntimeOption("dalvik.vm.jniopts", jniOptsBuf, "-Xjniopts:")) {
@@ -1281,7 +1287,7 @@ static int register_jni_procs(const RegJNIRec array[], size_t count, JNIEnv* env
 
 static const RegJNIRec gRegJNI[] = {
     REG_JNI(register_com_android_internal_os_RuntimeInit),
-    REG_JNI(register_com_android_internal_os_ZygoteInit),
+    REG_JNI(register_com_android_internal_os_ZygoteInit_nativeZygoteInit),
     REG_JNI(register_android_os_SystemClock),
     REG_JNI(register_android_util_EventLog),
     REG_JNI(register_android_util_Log),
@@ -1383,6 +1389,7 @@ static const RegJNIRec gRegJNI[] = {
     REG_JNI(register_android_os_MemoryFile),
     REG_JNI(register_com_android_internal_os_PathClassLoaderFactory),
     REG_JNI(register_com_android_internal_os_Zygote),
+    REG_JNI(register_com_android_internal_os_ZygoteInit),
     REG_JNI(register_com_android_internal_util_VirtualRefBasePtr),
     REG_JNI(register_android_hardware_Camera),
     REG_JNI(register_android_hardware_camera2_CameraMetadata),

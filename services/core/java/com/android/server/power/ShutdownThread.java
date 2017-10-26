@@ -20,17 +20,22 @@ package com.android.server.power;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.IActivityManager;
+import android.app.KeyguardManager;
 import android.app.ProgressDialog;
+import android.app.WallpaperColors;
+import android.app.WallpaperManager;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.IBluetoothManager;
-import android.media.AudioAttributes;
-import android.nfc.NfcAdapter;
-import android.nfc.INfcAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.media.AudioAttributes;
+import android.nfc.INfcAdapter;
+import android.nfc.NfcAdapter;
 import android.os.FileUtils;
 import android.os.Handler;
 import android.os.PowerManager;
@@ -39,24 +44,24 @@ import android.os.RemoteException;
 import android.os.ServiceManager;
 import android.os.SystemClock;
 import android.os.SystemProperties;
+import android.os.SystemVibrator;
 import android.os.UserHandle;
 import android.os.UserManager;
 import android.os.Vibrator;
-import android.os.SystemVibrator;
-import android.os.storage.IStorageShutdownObserver;
 import android.os.storage.IStorageManager;
-import android.system.ErrnoException;
-import android.system.Os;
+import android.os.storage.IStorageShutdownObserver;
+import android.util.Log;
+import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.android.internal.telephony.ITelephony;
+import com.android.server.LocalServices;
 import com.android.server.pm.PackageManagerService;
+import com.android.server.statusbar.StatusBarManagerInternal;
 
-import android.util.Log;
-import android.view.WindowManager;
-
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 
 public final class ShutdownThread extends Thread {
@@ -243,15 +248,7 @@ public final class ShutdownThread extends Thread {
         shutdownInner(context, confirm);
     }
 
-    private static void beginShutdownSequence(Context context) {
-        synchronized (sIsStartedGuard) {
-            if (sIsStarted) {
-                Log.d(TAG, "Shutdown sequence already running, returning.");
-                return;
-            }
-            sIsStarted = true;
-        }
-
+    private static ProgressDialog showShutdownDialog(Context context) {
         // Throw up a system dialog to indicate the device is rebooting / shutting down.
         ProgressDialog pd = new ProgressDialog(context);
 
@@ -293,6 +290,9 @@ public final class ShutdownThread extends Thread {
                 pd.setMessage(context.getText(
                             com.android.internal.R.string.reboot_to_update_prepare));
             } else {
+                if (showSysuiReboot()) {
+                    return null;
+                }
                 pd.setIndeterminate(true);
                 pd.setMessage(context.getText(
                             com.android.internal.R.string.reboot_to_update_reboot));
@@ -309,6 +309,9 @@ public final class ShutdownThread extends Thread {
                         com.android.internal.R.string.reboot_to_bootloader_message));
             pd.setIndeterminate(true);
         } else {
+            if (showSysuiReboot()) {
+                return null;
+            }
             pd.setTitle(context.getText(com.android.internal.R.string.power_off));
             pd.setMessage(context.getText(com.android.internal.R.string.shutdown_progress));
             pd.setIndeterminate(true);
@@ -317,8 +320,36 @@ public final class ShutdownThread extends Thread {
         pd.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD_DIALOG);
 
         pd.show();
+        return pd;
+    }
 
-        sInstance.mProgressDialog = pd;
+    private static boolean showSysuiReboot() {
+        Log.d(TAG, "Attempting to use SysUI shutdown UI");
+        try {
+            StatusBarManagerInternal service = LocalServices.getService(
+                    StatusBarManagerInternal.class);
+            if (service.showShutdownUi(mReboot, mReason)) {
+                // Sysui will handle shutdown UI.
+                Log.d(TAG, "SysUI handling shutdown UI");
+                return true;
+            }
+        } catch (Exception e) {
+            // If anything went wrong, ignore it and use fallback ui
+        }
+        Log.d(TAG, "SysUI is unavailable");
+        return false;
+    }
+
+    private static void beginShutdownSequence(Context context) {
+        synchronized (sIsStartedGuard) {
+            if (sIsStarted) {
+                Log.d(TAG, "Shutdown sequence already running, returning.");
+                return;
+            }
+            sIsStarted = true;
+        }
+
+        sInstance.mProgressDialog = showShutdownDialog(context);
         sInstance.mContext = context;
         sInstance.mPowerManager = (PowerManager)context.getSystemService(Context.POWER_SERVICE);
 
@@ -530,7 +561,7 @@ public final class ShutdownThread extends Thread {
         Thread t = new Thread() {
             public void run() {
                 boolean nfcOff;
-                boolean bluetoothOff;
+                boolean bluetoothReadyForShutdown;
                 boolean radioOff;
 
                 final INfcAdapter nfc =
@@ -554,15 +585,15 @@ public final class ShutdownThread extends Thread {
                 }
 
                 try {
-                    bluetoothOff = bluetooth == null ||
+                    bluetoothReadyForShutdown = bluetooth == null ||
                             bluetooth.getState() == BluetoothAdapter.STATE_OFF;
-                    if (!bluetoothOff) {
+                    if (!bluetoothReadyForShutdown) {
                         Log.w(TAG, "Disabling Bluetooth...");
                         bluetooth.disable(mContext.getPackageName(), false);  // disable but don't persist new state
                     }
                 } catch (RemoteException ex) {
                     Log.e(TAG, "RemoteException during bluetooth shutdown", ex);
-                    bluetoothOff = true;
+                    bluetoothReadyForShutdown = true;
                 }
 
                 try {
@@ -587,14 +618,19 @@ public final class ShutdownThread extends Thread {
                         sInstance.setRebootProgress(status, null);
                     }
 
-                    if (!bluetoothOff) {
+                    if (!bluetoothReadyForShutdown) {
                         try {
-                            bluetoothOff = bluetooth.getState() == BluetoothAdapter.STATE_OFF;
+                          // BLE only mode can happen when BT is turned off
+                          // We will continue shutting down in such case
+                          bluetoothReadyForShutdown =
+                                  bluetooth.getState() == BluetoothAdapter.STATE_OFF ||
+                                  bluetooth.getState() == BluetoothAdapter.STATE_BLE_TURNING_OFF ||
+                                  bluetooth.getState() == BluetoothAdapter.STATE_BLE_ON;
                         } catch (RemoteException ex) {
                             Log.e(TAG, "RemoteException during bluetooth shutdown", ex);
-                            bluetoothOff = true;
+                            bluetoothReadyForShutdown = true;
                         }
-                        if (bluetoothOff) {
+                        if (bluetoothReadyForShutdown) {
                             Log.i(TAG, "Bluetooth turned off.");
                         }
                     }
@@ -621,7 +657,7 @@ public final class ShutdownThread extends Thread {
                         }
                     }
 
-                    if (radioOff && bluetoothOff && nfcOff) {
+                    if (radioOff && bluetoothReadyForShutdown && nfcOff) {
                         Log.i(TAG, "NFC, Radio and Bluetooth shutdown complete.");
                         done[0] = true;
                         break;

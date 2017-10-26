@@ -29,7 +29,7 @@ import java.io.PrintWriter;
  */
 public class PipTouchState {
     private static final String TAG = "PipTouchHandler";
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
 
     private ViewConfiguration mViewConfig;
 
@@ -61,7 +61,7 @@ public class PipTouchState {
     }
 
     /**
-     * Processess a given touch event and updates the state.
+     * Processes a given touch event and updates the state.
      */
     public void onTouchEvent(MotionEvent ev) {
         switch (ev.getAction()) {

@@ -25,6 +25,7 @@ import android.app.ActivityManager.TaskSnapshot;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.Bitmap.Config;
+import android.graphics.GraphicBuffer;
 import android.os.Process;
 import android.os.SystemClock;
 import android.util.ArraySet;
@@ -290,7 +291,6 @@ class TaskSnapshotPersister {
                 failed = true;
             }
             if (!writeBuffer()) {
-                writeBuffer();
                 failed = true;
             }
             if (failed) {
@@ -325,6 +325,11 @@ class TaskSnapshotPersister {
             final File file = getBitmapFile(mTaskId, mUserId);
             final File reducedFile = getReducedResolutionBitmapFile(mTaskId, mUserId);
             final Bitmap bitmap = Bitmap.createHardwareBitmap(mSnapshot.getSnapshot());
+            if (bitmap == null) {
+                Slog.e(TAG, "Invalid task snapshot hw bitmap");
+                return false;
+            }
+
             final Bitmap swBitmap = bitmap.copy(Config.ARGB_8888, false /* isMutable */);
             final Bitmap reduced = Bitmap.createScaledBitmap(swBitmap,
                     (int) (bitmap.getWidth() * REDUCED_SCALE),

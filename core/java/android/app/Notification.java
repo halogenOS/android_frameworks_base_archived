@@ -33,6 +33,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.ShortcutInfo;
 import android.content.res.ColorStateList;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -559,6 +560,11 @@ public class Notification implements Parcelable
     @SystemApi
     public static final int FLAG_AUTOGROUP_SUMMARY  = 0x00000400;
 
+    /**
+     * @hide
+     */
+    public static final int FLAG_CAN_COLORIZE = 0x00000800;
+
     public int flags;
 
     /** @hide */
@@ -1083,6 +1089,11 @@ public class Notification implements Parcelable
      * @hide
      */
     public static final String EXTRA_CONTAINS_CUSTOM_VIEW = "android.contains.customView";
+
+    /**
+     * @hide
+     */
+    public static final String EXTRA_REDUCED_IMAGES = "android.reduced.images";
 
     /**
      * {@link #extras} key: the audio contents of this notification.
@@ -2536,6 +2547,22 @@ public class Notification implements Parcelable
         }
     }
 
+    /**
+     * @hide
+     */
+    public boolean hasCompletedProgress() {
+        // not a progress notification; can't be complete
+        if (!extras.containsKey(EXTRA_PROGRESS)
+                || !extras.containsKey(EXTRA_PROGRESS_MAX)) {
+            return false;
+        }
+        // many apps use max 0 for 'indeterminate'; not complete
+        if (extras.getInt(EXTRA_PROGRESS_MAX) == 0) {
+            return false;
+        }
+        return extras.getInt(EXTRA_PROGRESS) == extras.getInt(EXTRA_PROGRESS_MAX);
+    }
+
     /** @removed */
     @Deprecated
     public String getChannel() {
@@ -2745,6 +2772,11 @@ public class Notification implements Parcelable
         private int mBackgroundColor = COLOR_INVALID;
         private int mForegroundColor = COLOR_INVALID;
         private int mBackgroundColorHint = COLOR_INVALID;
+        /**
+         * A temporary location where actions are stored. If != null the view originally has action
+         * but doesn't have any for this inflation.
+         */
+        private ArrayList<Action> mOriginalActions;
         private boolean mRebuildStyledRemoteViews;
 
         /**
@@ -4057,7 +4089,53 @@ public class Notification implements Parcelable
                 contentView.setViewLayoutMarginEndDimen(R.id.line1, endMargin);
                 contentView.setViewLayoutMarginEndDimen(R.id.text, endMargin);
                 contentView.setViewLayoutMarginEndDimen(R.id.progress, endMargin);
+                // Bind the reply action
+                Action action = findReplyAction();
+                contentView.setViewVisibility(R.id.reply_icon_action, action != null
+                        ? View.VISIBLE
+                        : View.GONE);
+
+                if (action != null) {
+                    int contrastColor = resolveContrastColor();
+                    contentView.setDrawableParameters(R.id.reply_icon_action,
+                            true /* targetBackground */,
+                            -1,
+                            contrastColor,
+                            PorterDuff.Mode.SRC_ATOP, -1);
+                    int iconColor = NotificationColorUtil.isColorLight(contrastColor)
+                            ? Color.BLACK : Color.WHITE;
+                    contentView.setDrawableParameters(R.id.reply_icon_action,
+                            false /* targetBackground */,
+                            -1,
+                            iconColor,
+                            PorterDuff.Mode.SRC_ATOP, -1);
+                    contentView.setOnClickPendingIntent(R.id.right_icon,
+                            action.actionIntent);
+                    contentView.setOnClickPendingIntent(R.id.reply_icon_action,
+                            action.actionIntent);
+                    contentView.setRemoteInputs(R.id.right_icon, action.mRemoteInputs);
+                    contentView.setRemoteInputs(R.id.reply_icon_action, action.mRemoteInputs);
+
+                }
             }
+            contentView.setViewVisibility(R.id.right_icon_container, mN.mLargeIcon != null
+                    ? View.VISIBLE
+                    : View.GONE);
+        }
+
+        private Action findReplyAction() {
+            ArrayList<Action> actions = mActions;
+            if (mOriginalActions != null) {
+                actions = mOriginalActions;
+            }
+            int numActions = actions.size();
+            for (int i = 0; i < numActions; i++) {
+                Action action = actions.get(i);
+                if (hasValidRemoteInput(action)) {
+                    return action;
+                }
+            }
+            return null;
         }
 
         private void bindNotificationHeader(RemoteViews contentView, boolean ambient) {
@@ -4473,11 +4551,16 @@ public class Notification implements Parcelable
                     savedBundle.getBoolean(EXTRA_SHOW_CHRONOMETER));
             publicExtras.putBoolean(EXTRA_CHRONOMETER_COUNT_DOWN,
                     savedBundle.getBoolean(EXTRA_CHRONOMETER_COUNT_DOWN));
-            publicExtras.putCharSequence(EXTRA_TITLE,
-                    mContext.getString(com.android.internal.R.string.notification_hidden_text));
             mN.extras = publicExtras;
-            final RemoteViews view = ambient ? makeAmbientNotification()
-                    : applyStandardTemplate(getBaseLayoutResource());
+            RemoteViews view;
+            if (ambient) {
+                publicExtras.putCharSequence(EXTRA_TITLE,
+                        mContext.getString(com.android.internal.R.string.notification_hidden_text));
+                view = makeAmbientNotification();
+            } else{
+                view = makeNotificationHeader(false /* ambient */);
+                view.setBoolean(R.id.notification_header, "setExpandOnlyOnButton", true);
+            }
             mN.extras = savedBundle;
             mN.mLargeIcon = largeIcon;
             mN.largeIcon = largeIconLegacy;
@@ -4871,8 +4954,12 @@ public class Notification implements Parcelable
             buildUnstyled();
 
             if (mStyle != null) {
+                mStyle.reduceImageSizes(mContext);
+                mStyle.purgeResources();
                 mStyle.buildStyled(mN);
             }
+
+            mN.reduceImageSizes(mContext);
 
             if (mContext.getApplicationInfo().targetSdkVersion < Build.VERSION_CODES.N
                     && (useExistingRemoteView())) {
@@ -5063,6 +5150,52 @@ public class Notification implements Parcelable
     }
 
     /**
+     * Reduces the image sizes to conform to a maximum allowed size. This also processes all custom
+     * remote views.
+     *
+     * @hide
+     */
+    void reduceImageSizes(Context context) {
+        if (extras.getBoolean(EXTRA_REDUCED_IMAGES)) {
+            return;
+        }
+        if (mLargeIcon != null || largeIcon != null) {
+            Resources resources = context.getResources();
+            Class<? extends Style> style = getNotificationStyle();
+            int maxWidth = resources.getDimensionPixelSize(R.dimen.notification_right_icon_size);
+            int maxHeight = maxWidth;
+            if (MediaStyle.class.equals(style)
+                    || DecoratedMediaCustomViewStyle.class.equals(style)) {
+                maxHeight = resources.getDimensionPixelSize(
+                        R.dimen.notification_media_image_max_height);
+                maxWidth = resources.getDimensionPixelSize(
+                        R.dimen.notification_media_image_max_width);
+            }
+            if (mLargeIcon != null) {
+                mLargeIcon.scaleDownIfNecessary(maxWidth, maxHeight);
+            }
+            if (largeIcon != null) {
+                largeIcon = Icon.scaleDownIfNecessary(largeIcon, maxWidth, maxHeight);
+            }
+        }
+        reduceImageSizesForRemoteView(contentView, context);
+        reduceImageSizesForRemoteView(headsUpContentView, context);
+        reduceImageSizesForRemoteView(bigContentView, context);
+        extras.putBoolean(EXTRA_REDUCED_IMAGES, true);
+    }
+
+    private void reduceImageSizesForRemoteView(RemoteViews remoteView, Context context) {
+        if (remoteView != null) {
+            Resources resources = context.getResources();
+            int maxWidth = resources.getDimensionPixelSize(
+                    R.dimen.notification_custom_view_max_image_width);
+            int maxHeight = resources.getDimensionPixelSize(
+                    R.dimen.notification_custom_view_max_image_height);
+            remoteView.reduceImageSizes(maxWidth, maxHeight);
+        }
+    }
+
+    /**
      * @return whether this notification is a foreground service notification
      */
     private boolean isForegroundService() {
@@ -5099,7 +5232,16 @@ public class Notification implements Parcelable
         if (isColorizedMedia()) {
             return true;
         }
-        return extras.getBoolean(EXTRA_COLORIZED) && isForegroundService();
+        return extras.getBoolean(EXTRA_COLORIZED)
+                && (hasColorizedPermission() || isForegroundService());
+    }
+
+    /**
+     * Returns whether an app can colorize due to the android.permission.USE_COLORIZED_NOTIFICATIONS
+     * permission. The permission is checked when a notification is enqueued.
+     */
+    private boolean hasColorizedPermission() {
+        return (flags & Notification.FLAG_CAN_COLORIZE) != 0;
     }
 
     /**
@@ -5354,6 +5496,14 @@ public class Notification implements Parcelable
         public boolean displayCustomViewInline() {
             return false;
         }
+
+        /**
+         * Reduces the image sizes contained in this style.
+         *
+         * @hide
+         */
+        public void reduceImageSizes(Context context) {
+        }
     }
 
     /**
@@ -5446,6 +5596,27 @@ public class Notification implements Parcelable
             }
             if (mBigLargeIcon != null) {
                 mBigLargeIcon.convertToAshmem();
+            }
+        }
+
+        /**
+         * @hide
+         */
+        @Override
+        public void reduceImageSizes(Context context) {
+            super.reduceImageSizes(context);
+            Resources resources = context.getResources();
+            if (mPicture != null) {
+                int maxPictureWidth = resources.getDimensionPixelSize(
+                        R.dimen.notification_big_picture_max_height);
+                int maxPictureHeight = resources.getDimensionPixelSize(
+                        R.dimen.notification_big_picture_max_width);
+                mPicture = Icon.scaleDownIfNecessary(mPicture, maxPictureWidth, maxPictureHeight);
+            }
+            if (mBigLargeIcon != null) {
+                int rightIconSize = resources.getDimensionPixelSize(
+                        R.dimen.notification_right_icon_size);
+                mBigLargeIcon.scaleDownIfNecessary(rightIconSize, rightIconSize);
             }
         }
 
@@ -5607,10 +5778,11 @@ public class Notification implements Parcelable
         @Override
         public RemoteViews makeContentView(boolean increasedHeight) {
             if (increasedHeight) {
-                ArrayList<Action> actions = mBuilder.mActions;
+                mBuilder.mOriginalActions = mBuilder.mActions;
                 mBuilder.mActions = new ArrayList<>();
                 RemoteViews remoteViews = makeBigContentView();
-                mBuilder.mActions = actions;
+                mBuilder.mActions = mBuilder.mOriginalActions;
+                mBuilder.mOriginalActions = null;
                 return remoteViews;
             }
             return super.makeContentView(increasedHeight);
@@ -5894,10 +6066,11 @@ public class Notification implements Parcelable
                 return mBuilder.applyStandardTemplate(mBuilder.getBaseLayoutResource(),
                         mBuilder.mParams.reset().hasProgress(false).title(title).text(text));
             } else {
-                ArrayList<Action> actions = mBuilder.mActions;
+                mBuilder.mOriginalActions = mBuilder.mActions;
                 mBuilder.mActions = new ArrayList<>();
                 RemoteViews remoteViews = makeBigContentView();
-                mBuilder.mActions = actions;
+                mBuilder.mActions = mBuilder.mOriginalActions;
+                mBuilder.mOriginalActions = null;
                 return remoteViews;
             }
         }
@@ -6727,8 +6900,8 @@ public class Notification implements Parcelable
                 // Need to clone customContent before adding, because otherwise it can no longer be
                 // parceled independently of remoteViews.
                 customContent = customContent.clone();
-                remoteViews.removeAllViews(R.id.notification_main_column);
-                remoteViews.addView(R.id.notification_main_column, customContent);
+                remoteViews.removeAllViewsExceptId(R.id.notification_main_column, R.id.progress);
+                remoteViews.addView(R.id.notification_main_column, customContent, 0 /* index */);
             }
             // also update the end margin if there is an image
             int endMargin = R.dimen.notification_content_margin_end;

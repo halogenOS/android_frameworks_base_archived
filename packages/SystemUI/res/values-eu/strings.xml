@@ -312,6 +312,7 @@
     <string name="quick_settings_more_settings" msgid="326112621462813682">"Ezarpen gehiago"</string>
     <string name="quick_settings_done" msgid="3402999958839153376">"Eginda"</string>
     <string name="quick_settings_connected" msgid="1722253542984847487">"Konektatuta"</string>
+    <string name="quick_settings_connected_battery_level" msgid="4136051440381328892">"Konektatuta. Bateria: <xliff:g id="BATTERY_LEVEL_AS_PERCENTAGE">%1$s</xliff:g>"</string>
     <string name="quick_settings_connecting" msgid="47623027419264404">"Konektatzen…"</string>
     <string name="quick_settings_tethering_label" msgid="7153452060448575549">"Konexioa partekatzea"</string>
     <string name="quick_settings_hotspot_label" msgid="6046917934974004879">"Sare publikoa"</string>
@@ -469,6 +470,8 @@
     <string name="branded_monitoring_description_app_personal" msgid="2669518213949202599">"<xliff:g id="APPLICATION">%1$s</xliff:g> aplikaziora konektatuta zaude. Aplikazio horrek sarean egiten dituzun jarduera pertsonalak kontrola ditzake, mezu elektronikoak, aplikazioak eta webguneak barne."</string>
     <string name="monitoring_description_app_work" msgid="4612997849787922906">"<xliff:g id="ORGANIZATION">%1$s</xliff:g> erakundeak kudeatzen dizu laneko profila. <xliff:g id="APPLICATION">%2$s</xliff:g> aplikaziora dago konektatuta profila, eta aplikazio horrek sarean egiten dituzun jarduerak kontrola ditzake, mezu elektronikoak, aplikazioak eta webguneak barne.\n\nInformazio gehiago lortzeko, jarri administratzailearekin harremanetan."</string>
     <string name="monitoring_description_app_personal_work" msgid="5664165460056859391">"<xliff:g id="ORGANIZATION">%1$s</xliff:g> erakundeak kudeatzen dizu laneko profila. <xliff:g id="APPLICATION_WORK">%2$s</xliff:g> aplikaziora dago konektatuta profila, eta aplikazio horrek sarean egiten dituzun jarduerak kontrola ditzake, mezu elektronikoak, aplikazioak eta webguneak barne. \n\n<xliff:g id="APPLICATION_PERSONAL">%3$s</xliff:g> aplikaziora ere zaude konektatuta, eta hark sare pertsonalean egiten dituzun jarduerak kontrola ditzake."</string>
+    <string name="keyguard_indication_trust_granted" msgid="4985003749105182372">"<xliff:g id="USER_NAME">%1$s</xliff:g> erabiltzailearentzat desblokeatu da"</string>
+    <string name="keyguard_indication_trust_managed" msgid="8319646760022357585">"<xliff:g id="TRUST_AGENT">%1$s</xliff:g> abian da"</string>
     <string name="keyguard_indication_trust_disabled" msgid="7412534203633528135">"Gailua blokeatuta egongo da eskuz desblokeatu arte"</string>
     <string name="hidden_notifications_title" msgid="7139628534207443290">"Eskuratu jakinarazpenak azkarrago"</string>
     <string name="hidden_notifications_text" msgid="2326409389088668981">"Ikusi desblokeatu baino lehen"</string>
@@ -550,9 +553,10 @@
     <string name="tuner_full_importance_settings_off" msgid="8208165412614935229">"Desaktibatuta"</string>
     <string name="power_notification_controls_description" msgid="4372459941671353358">"Bateria-mailaren arabera jakinarazpenak kontrolatzeko aukerekin, 0 eta 5 bitarteko garrantzi-mailetan sailka ditzakezu aplikazioen jakinarazpenak. \n\n"<b>"5. maila"</b>" \n- Erakutsi jakinarazpenen zerrendaren goialdean. \n- Baimendu etetea pantaila osoko moduan zaudenean. \n- Agerrarazi beti jakinarazpenak. \n\n"<b>"4. maila"</b>" \n- Galarazi etetea pantaila osoko moduan zaudenean. \n- Agerrarazi beti jakinarazpenak. \n\n"<b>"3. maila"</b>" \n- Galarazi etetea pantaila osoko moduan zaudenean. \n- Ez agerrarazi jakinarazpenik inoiz. \n\n"<b>"2. maila"</b>" \n- Galarazi etetea pantaila osoko moduan zaudenean. \n- Ez agerrarazi jakinarazpenik inoiz. \n- Ez egin soinurik edo dardararik inoiz. \n\n"<b>"1. maila"</b>" \n- Galarazi etetea pantaila osoko moduan zaudenean. \n- Ez agerrarazi jakinarazpenik inoiz. \n- Ez egin soinurik edo dardararik inoiz. \n- Ezkutatu pantaila blokeatutik eta egoera-barratik. \n- Erakutsi jakinarazpenen zerrendaren behealdean. \n\n"<b>"0. maila"</b>" \n- Blokeatu aplikazioaren jakinarazpen guztiak."</string>
     <string name="notification_header_default_channel" msgid="7506845022070889909">"Jakinarazpenak"</string>
-    <string name="notification_channel_disabled" msgid="5805874247999578073">"Aurrerantzean ez duzu jasoko horrelako jakinarazpenik."</string>
+    <string name="notification_channel_disabled" msgid="2139193533791840539">"Aurrerantzean ez duzu jasoko horrelako jakinarazpenik"</string>
     <string name="notification_num_channels" msgid="2048144408999179471">"Jakinarazpenen <xliff:g id="NUMBER">%d</xliff:g> kategoria"</string>
     <string name="notification_default_channel_desc" msgid="2506053815870808359">"Aplikazio honek ez du jakinarazpen-kategoriarik"</string>
+    <string name="notification_unblockable_desc" msgid="3561016061737896906">"Ezin dira desaktibatu aplikazio honen jakinarazpenak"</string>
     <plurals name="notification_num_channels_desc" formatted="false" msgid="5492793452274077663">
       <item quantity="other">Aplikazio honen 1/<xliff:g id="NUMBER_1">%d</xliff:g> jakinarazpen-kategoria</item>
       <item quantity="one">Aplikazio honen 1/<xliff:g id="NUMBER_0">%d</xliff:g> jakinarazpen-kategoria</item>
@@ -572,12 +576,16 @@
     <string name="notification_menu_accessibility" msgid="2046162834248888553">"<xliff:g id="APP_NAME">%1$s</xliff:g> <xliff:g id="MENU_DESCRIPTION">%2$s</xliff:g>"</string>
     <string name="notification_menu_gear_description" msgid="2204480013726775108">"jakinarazpena kontrolatzeko aukerak"</string>
     <string name="notification_menu_snooze_description" msgid="3653669438131034525">"jakinarazpena atzeratzeko aukerak"</string>
-    <string name="snooze_option_15_min" msgid="1068727451405610715">"15 minutu"</string>
-    <string name="snooze_option_30_min" msgid="867081342535195788">"30 minutu"</string>
-    <string name="snooze_option_1_hour" msgid="1098086401880077154">"1 ordu"</string>
-    <string name="snooze_option_2_hour" msgid="8332218255658969475">"2 ordu"</string>
     <string name="snooze_undo" msgid="6074877317002985129">"DESEGIN"</string>
     <string name="snoozed_for_time" msgid="2390718332980204462">"<xliff:g id="TIME_AMOUNT">%1$s</xliff:g>z atzeratu da"</string>
+    <plurals name="snoozeHourOptions" formatted="false" msgid="2124335842674413030">
+      <item quantity="other">%d ordu</item>
+      <item quantity="one">%d ordu</item>
+    </plurals>
+    <plurals name="snoozeMinuteOptions" formatted="false" msgid="4127251700591510196">
+      <item quantity="other">%d minutu</item>
+      <item quantity="one">%d minutu</item>
+    </plurals>
     <string name="battery_panel_title" msgid="7944156115535366613">"Bateriaren erabilera"</string>
     <string name="battery_detail_charging_summary" msgid="1279095653533044008">"Bateria-aurrezlea ez dago erabilgarri gailua kargatzen ari denean"</string>
     <string name="battery_detail_switch_title" msgid="6285872470260795421">"Bateria-aurrezlea"</string>
@@ -720,8 +728,8 @@
     <string name="pip_phone_minimize" msgid="1079119422589131792">"Minimizatu"</string>
     <string name="pip_phone_close" msgid="8416647892889710330">"Itxi"</string>
     <string name="pip_phone_dismiss_hint" msgid="6351678169095923899">"Baztertzeko, arrastatu behera"</string>
-    <string name="pip_menu_title" msgid="3328510504196964712">"Pantaila txikiaren menua"</string>
-    <string name="pip_notification_title" msgid="3204024940158161322">"Pantaila txikian dago <xliff:g id="NAME">%s</xliff:g>"</string>
+    <string name="pip_menu_title" msgid="3328510504196964712">"Pantaila txiki gainjarriaren menua"</string>
+    <string name="pip_notification_title" msgid="3204024940158161322">"Pantaila txiki gainjarrian dago <xliff:g id="NAME">%s</xliff:g>"</string>
     <string name="pip_notification_message" msgid="4171698133469539591">"Ez baduzu nahi <xliff:g id="NAME">%s</xliff:g> zerbitzuak eginbide hori erabiltzea, sakatu hau ezarpenak ireki eta aukera desaktibatzeko."</string>
     <string name="pip_play" msgid="1417176722760265888">"Erreproduzitu"</string>
     <string name="pip_pause" msgid="8881063404466476571">"Pausatu"</string>
@@ -767,4 +775,5 @@
     <string name="qs_dnd_replace" msgid="8019520786644276623">"Ordeztu"</string>
     <string name="running_foreground_services_title" msgid="381024150898615683">"Aplikazioak exekutatzen ari dira atzeko planoan"</string>
     <string name="running_foreground_services_msg" msgid="6326247670075574355">"Sakatu bateria eta datuen erabilerari buruzko xehetasunak ikusteko"</string>
+    <string name="data_usage_disable_mobile" msgid="5116269981510015864">"Datu-konexioa desaktibatu nahi duzu?"</string>
 </resources>

@@ -21,6 +21,7 @@ import android.net.NetworkBadging;
 import android.os.BatteryManager;
 import android.os.UserManager;
 import android.print.PrintManager;
+import android.provider.Settings;
 import android.view.View;
 
 import com.android.internal.util.UserIcons;
@@ -34,7 +35,7 @@ public class Utils {
     private static String sServicesSystemSharedLibPackageName;
     private static String sSharedSystemSharedLibPackageName;
 
-    public static final int[] WIFI_PIE_FOR_BADGING = {
+    static final int[] WIFI_PIE_FOR_BADGING = {
           com.android.internal.R.drawable.ic_signal_wifi_badged_0_bars,
           com.android.internal.R.drawable.ic_signal_wifi_badged_1_bar,
           com.android.internal.R.drawable.ic_signal_wifi_badged_2_bars,
@@ -129,7 +130,7 @@ public class Utils {
     }
 
     /** Formats a double from 0.0..1.0 as a percentage. */
-    private static String formatPercentage(double percentage) {
+    public static String formatPercentage(double percentage) {
         return NumberFormat.getPercentInstance().format(percentage);
     }
 
@@ -293,12 +294,7 @@ public class Utils {
                 });
     }
 
-    /**
-     * Returns the resource id for the given badge or {@link View.NO_ID} if no badge is to be shown.
-     *
-     * @throws IllegalArgumentException if the given badge value is not supported.
-     */
-    public static int getWifiBadgeResource(int badge) {
+    private static int getWifiBadgeResource(int badge) {
         switch (badge) {
             case NetworkBadging.BADGING_NONE:
                 return View.NO_ID;
@@ -312,5 +308,21 @@ public class Utils {
                 throw new IllegalArgumentException(
                     "No badge resource found for badge value: " + badge);
         }
+    }
+
+    public static int getDefaultStorageManagerDaysToRetain(Resources resources) {
+        int defaultDays = Settings.Secure.AUTOMATIC_STORAGE_MANAGER_DAYS_TO_RETAIN_DEFAULT;
+        try {
+            defaultDays =
+                    resources.getInteger(
+                            com.android
+                                    .internal
+                                    .R
+                                    .integer
+                                    .config_storageManagerDaystoRetainDefault);
+        } catch (Resources.NotFoundException e) {
+            // We are likely in a test environment.
+        }
+        return defaultDays;
     }
 }

@@ -457,6 +457,8 @@ public class ActivityStackSupervisor extends ConfigurationContainer implements D
 
     final ActivityMetricsLogger mActivityMetricsLogger;
 
+    private final ArrayList<ActivityRecord> mTmpActivityList = new ArrayList<>();
+
     @Override
     protected int getChildCount() {
         return mActivityDisplays.size();
@@ -964,17 +966,21 @@ public class ActivityStackSupervisor extends ConfigurationContainer implements D
                 if (!isFocusedStack(stack)) {
                     continue;
                 }
-                ActivityRecord hr = stack.topRunningActivityLocked();
-                if (hr != null) {
-                    if (hr.app == null && app.uid == hr.info.applicationInfo.uid
-                            && processName.equals(hr.processName)) {
+                stack.getAllRunningVisibleActivitiesLocked(mTmpActivityList);
+                final ActivityRecord top = stack.topRunningActivityLocked();
+                final int size = mTmpActivityList.size();
+                for (int i = 0; i < size; i++) {
+                    final ActivityRecord activity = mTmpActivityList.get(i);
+                    if (activity.app == null && app.uid == activity.info.applicationInfo.uid
+                            && processName.equals(activity.processName)) {
                         try {
-                            if (realStartActivityLocked(hr, app, true, true)) {
+                            if (realStartActivityLocked(activity, app,
+                                    top == activity /* andResume */, true /* checkConfig */)) {
                                 didSomething = true;
                             }
                         } catch (RemoteException e) {
                             Slog.w(TAG, "Exception in new application when starting activity "
-                                  + hr.intent.getComponent().flattenToShortString(), e);
+                                    + top.intent.getComponent().flattenToShortString(), e);
                             throw e;
                         }
                     }
@@ -1464,6 +1470,7 @@ public class ActivityStackSupervisor extends ConfigurationContainer implements D
                     mService.getGlobalConfiguration(), r.getMergedOverrideConfiguration());
             r.setLastReportedConfiguration(mergedConfiguration);
 
+            logIfTransactionTooLarge(r.intent, r.icicle);
             app.thread.scheduleLaunchActivity(new Intent(r.intent), r.appToken,
                     System.identityHashCode(r), r.info,
                     // TODO: Have this take the merged configuration instead of separate global and
@@ -1547,6 +1554,21 @@ public class ActivityStackSupervisor extends ConfigurationContainer implements D
         }
 
         return true;
+    }
+
+    private void logIfTransactionTooLarge(Intent intent, Bundle icicle) {
+        int extrasSize = 0;
+        if (intent != null) {
+            final Bundle extras = intent.getExtras();
+            if (extras != null) {
+                extrasSize = extras.getSize();
+            }
+        }
+        int icicleSize = (icicle == null ? 0 : icicle.getSize());
+        if (extrasSize + icicleSize > 200000) {
+            Slog.e(TAG, "Transaction too large, intent: " + intent + ", extras size: " + extrasSize
+                    + ", icicle size: " + icicleSize);
+        }
     }
 
     void startSpecificActivityLocked(ActivityRecord r,
@@ -4452,13 +4474,6 @@ public class ActivityStackSupervisor extends ConfigurationContainer implements D
                 case IDLE_TIMEOUT_MSG: {
                     if (DEBUG_IDLE) Slog.d(TAG_IDLE,
                             "handleMessage: IDLE_TIMEOUT_MSG: r=" + msg.obj);
-                    if (mService.mDidDexOpt) {
-                        mService.mDidDexOpt = false;
-                        Message nmsg = mHandler.obtainMessage(IDLE_TIMEOUT_MSG);
-                        nmsg.obj = msg.obj;
-                        mHandler.sendMessageDelayed(nmsg, IDLE_TIMEOUT);
-                        return;
-                    }
                     // We don't at this point know if the activity is fullscreen,
                     // so we need to be conservative and assume it isn't.
                     activityIdleInternal((ActivityRecord) msg.obj,
@@ -4484,11 +4499,6 @@ public class ActivityStackSupervisor extends ConfigurationContainer implements D
                     }
                 } break;
                 case LAUNCH_TIMEOUT_MSG: {
-                    if (mService.mDidDexOpt) {
-                        mService.mDidDexOpt = false;
-                        mHandler.sendEmptyMessageDelayed(LAUNCH_TIMEOUT_MSG, LAUNCH_TIMEOUT);
-                        return;
-                    }
                     synchronized (mService) {
                         if (mLaunchingActivity.isHeld()) {
                             Slog.w(TAG, "Launch timeout has expired, giving up wake lock!");
@@ -5166,11 +5176,14 @@ public class ActivityStackSupervisor extends ConfigurationContainer implements D
             // Work Challenge is present) let startActivityInPackage handle the intercepting.
             if (!mService.mUserController.shouldConfirmCredentials(task.userId)
                     && task.getRootActivity() != null) {
-                mService.mActivityStarter.sendPowerHintForLaunchStartIfNeeded(true /* forceSend */);
+                final ActivityRecord targetActivity = task.getTopActivity();
+
+                mService.mActivityStarter.sendPowerHintForLaunchStartIfNeeded(true /* forceSend */,
+                        targetActivity);
                 mActivityMetricsLogger.notifyActivityLaunching();
                 mService.moveTaskToFrontLocked(task.taskId, 0, bOptions, true /* fromRecents */);
                 mActivityMetricsLogger.notifyActivityLaunched(ActivityManager.START_TASK_TO_FRONT,
-                        task.getTopActivity());
+                        targetActivity);
 
                 // If we are launching the task in the docked stack, put it into resizing mode so
                 // the window renders full-screen with the background filling the void. Also only

@@ -20,10 +20,12 @@
 #include "RenderTask.h"
 
 #include "../JankTracker.h"
+#include "CacheManager.h"
 #include "TimeLord.h"
 
 #include <GrContext.h>
 #include <cutils/compiler.h>
+#include <SkBitmap.h>
 #include <ui/DisplayInfo.h>
 #include <utils/Looper.h>
 #include <utils/Thread.h>
@@ -33,6 +35,7 @@
 
 namespace android {
 
+class Bitmap;
 class DisplayEventReceiver;
 
 namespace uirenderer {
@@ -100,9 +103,13 @@ public:
     const DisplayInfo& mainDisplayInfo() { return mDisplayInfo; }
 
     GrContext* getGrContext() const { return mGrContext.get(); }
-    void setGrContext(GrContext* cxt) { mGrContext.reset(cxt); }
+    void setGrContext(GrContext* cxt);
 
+    CacheManager& cacheManager() { return *mCacheManager; }
     VulkanManager& vulkanManager() { return *mVkManager; }
+
+    sk_sp<Bitmap> allocateHardwareBitmap(SkBitmap& skBitmap);
+    void dumpGraphicsMemory(int fd);
 
 protected:
     virtual bool threadLoop() override;
@@ -157,6 +164,7 @@ private:
     Readback* mReadback = nullptr;
 
     sk_sp<GrContext> mGrContext;
+    CacheManager* mCacheManager;
     VulkanManager* mVkManager;
 };
 

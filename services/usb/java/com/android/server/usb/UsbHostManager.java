@@ -16,7 +16,6 @@
 
 package com.android.server.usb;
 
-import android.annotation.NonNull;
 import android.annotation.Nullable;
 import android.content.ComponentName;
 import android.content.Context;
@@ -32,6 +31,7 @@ import android.util.Slog;
 
 import com.android.internal.annotations.GuardedBy;
 import com.android.internal.util.IndentingPrintWriter;
+import com.android.server.usb.descriptors.UsbDescriptorParser;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -259,7 +259,18 @@ public class UsbHostManager {
                     getCurrentUserSettings().deviceAttachedForFixedHandler(mNewDevice,
                             usbDeviceConnectionHandler);
                 }
-                mUsbAlsaManager.usbDeviceAdded(mNewDevice);
+                // deviceName is something like: "/dev/bus/usb/001/001"
+                UsbDescriptorParser parser = new UsbDescriptorParser();
+                boolean isInputHeadset = false;
+                boolean isOutputHeadset = false;
+                if (parser.parseDevice(mNewDevice.getDeviceName())) {
+                    isInputHeadset = parser.isInputHeadset();
+                    isOutputHeadset = parser.isOutputHeadset();
+                    Slog.i(TAG, "---- isHeadset[in:" + isInputHeadset
+                            + " , out:" + isOutputHeadset + "]");
+                }
+                mUsbAlsaManager.usbDeviceAdded(mNewDevice,
+                        isInputHeadset, isOutputHeadset);
             } else {
                 Slog.e(TAG, "mNewDevice is null in endUsbDeviceAdded");
             }

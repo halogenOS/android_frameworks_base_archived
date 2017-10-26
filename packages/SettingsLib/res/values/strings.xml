@@ -64,6 +64,14 @@
     <!-- Status for networks disabled from authentication failure (wrong password
          or certificate). -->
     <string name="wifi_disabled_password_failure">Authentication problem</string>
+
+    <!-- Status detail for a network that can't be connected to for some reason -->
+    <string name="wifi_cant_connect">Can\'t connect</string>
+    <!-- Status for a named network that can't be connected to for some reason-->
+    <string name="wifi_cant_connect_to_ap">Can\'t connect to \'<xliff:g id="ap_name">%1$s</xliff:g>\'</string>
+    <!-- Message shown when the user likely entered an incorrect password for a wifi network -->
+    <string name="wifi_check_password_try_again">Check password and try again</string>
+
     <!-- Summary for the remembered network but currently not in range. -->
     <string name="wifi_not_in_range">Not in range</string>
     <!-- Summary for the network but no internet connection was detected. -->
@@ -89,6 +97,19 @@
     <!-- Summary for Connected wifi network without internet -->
     <string name="wifi_connected_no_internet">Connected, no Internet</string>
 
+    <!-- Speed label for very slow network speed -->
+    <string name="speed_label_very_slow">Very Slow</string>
+    <!-- Speed label for slow network speed -->
+    <string name="speed_label_slow">Slow</string>
+    <!-- Speed label for okay network speed -->
+    <string name="speed_label_okay">OK</string>
+    <!-- Speed label for medium network speed -->
+    <string name="speed_label_medium">Medium</string>
+    <!-- Speed label for fast network speed -->
+    <string name="speed_label_fast">Fast</string>
+    <!-- Speed label for very fast network speed -->
+    <string name="speed_label_very_fast">Very Fast</string>
+
     <!-- Bluetooth settings.  Message when a device is disconnected -->
     <string name="bluetooth_disconnected">Disconnected</string>
     <!-- Bluetooth settings.  Message when disconnecting from a device -->
@@ -109,10 +130,19 @@
     <!-- Bluetooth settings.  Message when connected to a device, except for phone/media audio. [CHAR LIMIT=40] -->
     <string name="bluetooth_connected_no_headset_no_a2dp">Connected (no phone or media)</string>
 
+    <!-- Bluetooth settings.  Message when connected to a device, showing remote device battery level. [CHAR LIMIT=NONE] -->
+    <string name="bluetooth_connected_battery_level">Connected, battery <xliff:g id="battery_level_as_percentage">%1$s</xliff:g></string>
+    <!-- Bluetooth settings.  Message when connected to a device, except for phone audio, showing remote device battery level. [CHAR LIMIT=NONE] -->
+    <string name="bluetooth_connected_no_headset_battery_level">Connected (no phone), battery <xliff:g id="battery_level_as_percentage">%1$s</xliff:g></string>
+    <!-- Bluetooth settings.  Message when connected to a device, except for media audio, showing remote device battery level. [CHAR LIMIT=NONE] -->
+    <string name="bluetooth_connected_no_a2dp_battery_level">Connected (no media), battery <xliff:g id="battery_level_as_percentage">%1$s</xliff:g></string>
+    <!-- Bluetooth settings.  Message when connected to a device, except for phone/media audio, showing remote device battery level. [CHAR LIMIT=NONE] -->
+    <string name="bluetooth_connected_no_headset_no_a2dp_battery_level">Connected (no phone or media), battery <xliff:g id="battery_level_as_percentage">%1$s</xliff:g></string>
+
     <!-- Bluetooth settings.  The user-visible string that is used whenever referring to the A2DP profile. -->
     <string name="bluetooth_profile_a2dp">Media audio</string>
     <!-- Bluetooth settings.  The user-visible string that is used whenever referring to the headset or handsfree profile. -->
-    <string name="bluetooth_profile_headset">Phone audio</string>
+    <string name="bluetooth_profile_headset">Phone calls</string>
     <!-- Bluetooth settings.  The user-visible string that is used whenever referring to the OPP profile. -->
     <string name="bluetooth_profile_opp">File transfer</string>
     <!-- Bluetooth settings. The user-visible string that is used whenever referring to the HID profile. -->
@@ -126,15 +156,15 @@
     <!-- Bluetooth settings. The user-visible string that is used whenever referring to the PAN profile (sharing this device's Internet connection). [CHAR LIMIT=40] -->
     <string name="bluetooth_profile_pan_nap">Internet connection sharing</string>
     <!-- Bluetooth settings. The user-visible string that is used whenever referring to the map profile. -->
-    <string name="bluetooth_profile_map">Message Access</string>
+    <string name="bluetooth_profile_map">Text Messages</string>
     <!-- Bluetooth settings. The user-visible string that is used whenever referring to the SAP profile (sharing SIM card). -->
     <string name="bluetooth_profile_sap">SIM Access</string>
 
     <!-- Bluetooth settings. The user-visible string for the setting controlling whether to use a high-quality codec if the device supports it, along with the name of the codec (eg AAC, LDAC, aptX) -->
-    <string name="bluetooth_profile_a2dp_high_quality">Use high quality audio: <xliff:g id="codec_name">%1$s</xliff:g></string>
+    <string name="bluetooth_profile_a2dp_high_quality">HD audio: <xliff:g id="codec_name">%1$s</xliff:g></string>
 
     <!-- Bluetooth settings. Similar to bluetooth_profile_a2dp_high_quality, but used when the device supports high quality audio but we don't know which codec that will be used. -->
-    <string name="bluetooth_profile_a2dp_high_quality_unknown_codec">Use high quality audio</string>
+    <string name="bluetooth_profile_a2dp_high_quality_unknown_codec">HD audio</string>
 
     <!-- Bluetooth settings.  Connection options screen.  The summary for the A2DP checkbox preference when A2DP is connected. -->
     <string name="bluetooth_a2dp_profile_summary_connected">Connected to media audio</string>
@@ -435,6 +465,8 @@
     <string name="wifi_allow_scan_with_traffic">Always allow Wi\u2011Fi Roam Scans</string>
     <!-- Setting Checkbox title whether to always keep mobile data active. [CHAR LIMIT=80] -->
     <string name="mobile_data_always_on">Mobile data always active</string>
+    <!-- Setting Checkbox title whether to enable hardware acceleration for tethering. [CHAR LIMIT=80] -->
+    <string name="tethering_hardware_offload">Tethering hardware acceleration</string>
     <!-- Setting Checkbox title for disabling Bluetooth absolute volume -->
     <string name="bluetooth_disable_absolute_volume">Disable absolute volume</string>
     <!-- Setting Checkbox title for enabling Bluetooth inband ringing -->
@@ -504,6 +536,7 @@
     <!-- Setting Checkbox title whether to enable view attribute inspection -->
     <string name="debug_view_attributes">Enable view attribute inspection</string>
     <string name="mobile_data_always_on_summary">Always keep mobile data active, even when Wi\u2011Fi is active (for fast network switching).</string>
+    <string name="tethering_hardware_offload_summary">Use tethering hardware acceleration if available</string>
     <!-- Title of warning dialog about the implications of enabling USB debugging -->
     <string name="adb_warning_title">Allow USB debugging?</string>
     <!-- Warning text to user about the implications of enabling USB debugging -->
@@ -794,30 +827,31 @@
     <string name="daltonizer_type_overridden">Overridden by <xliff:g id="title" example="Simulate color space">%1$s</xliff:g></string>
 
     <!-- [CHAR_LIMIT=40] Label for estimated remaining duration of battery discharging -->
-    <string name="power_remaining_duration_only">About <xliff:g id="time">%1$s</xliff:g> left</string>
+    <string name="power_remaining_duration_only">About <xliff:g id="time">^1</xliff:g> left</string>
+    <!-- [CHAR_LIMIT=60] Label for estimated remaining duration of battery discharging -->
+    <string name="power_remaining_duration_only_enhanced">About <xliff:g id="time">^1</xliff:g> left based on your usage</string>
     <!-- [CHAR_LIMIT=40] Label for estimated remaining duration of battery charging -->
-    <string name="power_remaining_charging_duration_only"><xliff:g id="time">%1$s</xliff:g> left until fully charged</string>
+    <string name="power_remaining_charging_duration_only"><xliff:g id="time">^1</xliff:g> left until fully charged</string>
 
     <!-- [CHAR_LIMIT=40] Short label for estimated remaining duration of battery charging/discharging -->
-    <string name="power_remaining_duration_only_short"><xliff:g id="time">%1$s</xliff:g> left</string>
+    <string name="power_remaining_duration_only_short"><xliff:g id="time">^1</xliff:g> left</string>
+    <!-- [CHAR_LIMIT=60] Short label for estimated remaining duration of battery charging/discharging -->
+    <string name="power_remaining_duration_only_short_enhanced"><xliff:g id="time">^1</xliff:g> left based on your usage</string>
 
     <!-- [CHAR_LIMIT=40] Label for battery level chart when discharging with duration -->
-    <string name="power_discharging_duration"><xliff:g id="level">%1$s</xliff:g>
-        - about <xliff:g id="time">%2$s</xliff:g> left</string>
+    <string name="power_discharging_duration"><xliff:g id="level">^1</xliff:g> - about <xliff:g id="time">^2</xliff:g> left</string>
+    <!-- [CHAR_LIMIT=60] Label for battery level chart when discharging with duration and using enhanced estimate -->
+    <string name="power_discharging_duration_enhanced"><xliff:g id="level">^1</xliff:g> - about <xliff:g id="time">^2</xliff:g> left based on your usage</string>
 
     <!-- [CHAR_LIMIT=40] Label for battery level chart when discharging with duration -->
-    <string name="power_discharging_duration_short"><xliff:g id="level">%1$s</xliff:g>
-        - <xliff:g id="time">%2$s</xliff:g> left</string>
+    <string name="power_discharging_duration_short"><xliff:g id="level">^1</xliff:g> - <xliff:g id="time">^2</xliff:g> left</string>
 
     <!-- [CHAR_LIMIT=40] Label for battery level chart when charging -->
-    <string name="power_charging"><xliff:g id="level">%1$s</xliff:g> -
-            <xliff:g id="state">%2$s</xliff:g></string>
+    <string name="power_charging"><xliff:g id="level">%1$s</xliff:g> - <xliff:g id="state">%2$s</xliff:g></string>
     <!-- [CHAR_LIMIT=40] Label for battery level chart when charging with duration -->
-    <string name="power_charging_duration"><xliff:g id="level">%1$s</xliff:g> -
-            <xliff:g id="time">%2$s</xliff:g> until fully charged</string>
+    <string name="power_charging_duration"><xliff:g id="level">^1</xliff:g> - <xliff:g id="time">^2</xliff:g> until fully charged</string>
     <!-- [CHAR_LIMIT=40] Short label for battery level chart when charging with duration -->
-    <string name="power_charging_duration_short"><xliff:g id="level">%1$s</xliff:g> -
-        <xliff:g id="time">%2$s</xliff:g></string>
+    <string name="power_charging_duration_short"><xliff:g id="level">^1</xliff:g> - <xliff:g id="time">^2</xliff:g></string>
 
     <!-- Battery Info screen. Value for a status item.  Used for diagnostic info screens, precise translation isn't needed -->
     <string name="battery_info_status_unknown">Unknown</string>

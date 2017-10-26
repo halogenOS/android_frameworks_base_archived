@@ -339,6 +339,12 @@ import java.util.Map;
         (unsigned 64-bit {@linkplain ByteOrder#nativeOrder native-order} integer.)</td>
    </tr>
    <tr>
+    <td>FLAC</td>
+    <td>Metadata blocks</td>
+    <td class=NA>Not Used</td>
+    <td class=NA>Not Used</td>
+   </tr>
+   <tr>
     <td>MPEG-4</td>
     <td>Decoder-specific information from ESDS<sup>*</sup></td>
     <td class=NA>Not Used</td>
@@ -2440,6 +2446,8 @@ final public class MediaCodec {
             }
         };
 
+        private final Pattern zeroPattern = new Pattern(0, 0);
+
         /**
          * The pattern applicable to the protected data in each subsample.
          */
@@ -2462,7 +2470,7 @@ final public class MediaCodec {
             key = newKey;
             iv = newIV;
             mode = newMode;
-            pattern = new Pattern(0, 0);
+            pattern = zeroPattern;
         }
 
         /**

@@ -20,31 +20,36 @@ import com.android.internal.util.MessageUtils;
 import com.android.internal.util.WakeupMessage;
 
 import android.content.Context;
-import android.net.apf.ApfCapabilities;
-import android.net.apf.ApfFilter;
 import android.net.DhcpResults;
+import android.net.INetd;
 import android.net.InterfaceConfiguration;
 import android.net.LinkAddress;
-import android.net.LinkProperties;
 import android.net.LinkProperties.ProvisioningChange;
+import android.net.LinkProperties;
 import android.net.ProxyInfo;
 import android.net.RouteInfo;
 import android.net.StaticIpConfiguration;
+import android.net.apf.ApfCapabilities;
+import android.net.apf.ApfFilter;
 import android.net.dhcp.DhcpClient;
 import android.net.metrics.IpConnectivityLog;
 import android.net.metrics.IpManagerEvent;
 import android.net.util.MultinetworkPolicyTracker;
+import android.net.util.SharedLog;
 import android.os.INetworkManagementService;
 import android.os.Message;
 import android.os.RemoteException;
 import android.os.ServiceManager;
+import android.os.ServiceSpecificException;
 import android.os.SystemClock;
+import android.system.OsConstants;
 import android.text.TextUtils;
 import android.util.LocalLog;
 import android.util.Log;
 import android.util.SparseArray;
 
 import com.android.internal.annotations.VisibleForTesting;
+import com.android.internal.R;
 import com.android.internal.util.IndentingPrintWriter;
 import com.android.internal.util.IState;
 import com.android.internal.util.State;
@@ -184,7 +189,7 @@ public class IpManager extends StateMachine {
         }
 
         private void log(String msg) {
-            mLocalLog.log(PREFIX + msg);
+            mLog.log(PREFIX + msg);
         }
 
         @Override
@@ -319,6 +324,16 @@ public class IpManager extends StateMachine {
                 return this;
             }
 
+            public Builder withIPv6AddrGenModeEUI64() {
+                mConfig.mIPv6AddrGenMode = INetd.IPV6_ADDR_GEN_MODE_EUI64;
+                return this;
+            }
+
+            public Builder withIPv6AddrGenModeStablePrivacy() {
+                mConfig.mIPv6AddrGenMode = INetd.IPV6_ADDR_GEN_MODE_STABLE_PRIVACY;
+                return this;
+            }
+
             public ProvisioningConfiguration build() {
                 return new ProvisioningConfiguration(mConfig);
             }
@@ -331,6 +346,7 @@ public class IpManager extends StateMachine {
         /* package */ StaticIpConfiguration mStaticIpConfig;
         /* package */ ApfCapabilities mApfCapabilities;
         /* package */ int mProvisioningTimeoutMs = DEFAULT_TIMEOUT_MS;
+        /* package */ int mIPv6AddrGenMode = INetd.IPV6_ADDR_GEN_MODE_STABLE_PRIVACY;
 
         public ProvisioningConfiguration() {}
 
@@ -354,6 +370,7 @@ public class IpManager extends StateMachine {
                     .add("mStaticIpConfig: " + mStaticIpConfig)
                     .add("mApfCapabilities: " + mApfCapabilities)
                     .add("mProvisioningTimeoutMs: " + mProvisioningTimeoutMs)
+                    .add("mIPv6AddrGenMode: " + mIPv6AddrGenMode)
                     .toString();
         }
     }
@@ -399,7 +416,7 @@ public class IpManager extends StateMachine {
     private final WakeupMessage mProvisioningTimeoutAlarm;
     private final WakeupMessage mDhcpActionTimeoutAlarm;
     private final MultinetworkPolicyTracker mMultinetworkPolicyTracker;
-    private final LocalLog mLocalLog;
+    private final SharedLog mLog;
     private final LocalLog mConnectivityPacketLog;
     private final MessageHandlingLogger mMsgStateLogger;
     private final IpConnectivityLog mMetricsLog = new IpConnectivityLog();
@@ -440,7 +457,7 @@ public class IpManager extends StateMachine {
         mCallback = new LoggingCallbackWrapper(callback);
         mNwService = nwService;
 
-        mLocalLog = new LocalLog(MAX_LOG_RECORDS);
+        mLog = new SharedLog(MAX_LOG_RECORDS, mTag);
         mConnectivityPacketLog = new LocalLog(MAX_PACKET_RECORDS);
         mMsgStateLogger = new MessageHandlingLogger();
 
@@ -485,7 +502,7 @@ public class IpManager extends StateMachine {
 
             private void logMsg(String msg) {
                 Log.d(mTag, msg);
-                getHandler().post(() -> { mLocalLog.log("OBSERVED " + msg); });
+                getHandler().post(() -> { mLog.log("OBSERVED " + msg); });
             }
         };
 
@@ -493,7 +510,7 @@ public class IpManager extends StateMachine {
         mLinkProperties.setInterfaceName(mInterfaceName);
 
         mMultinetworkPolicyTracker = new MultinetworkPolicyTracker(mContext, getHandler(),
-                () -> { mLocalLog.log("OBSERVED AvoidBadWifi changed"); });
+                () -> { mLog.log("OBSERVED AvoidBadWifi changed"); });
 
         mProvisioningTimeoutAlarm = new WakeupMessage(mContext, getHandler(),
                 mTag + ".EVENT_PROVISIONING_TIMEOUT", EVENT_PROVISIONING_TIMEOUT);
@@ -643,7 +660,7 @@ public class IpManager extends StateMachine {
         pw.println();
         pw.println(mTag + " StateMachine dump:");
         pw.increaseIndent();
-        mLocalLog.readOnlyLocalLog().dump(fd, pw, args);
+        mLog.dump(fd, pw, args);
         pw.decreaseIndent();
 
         pw.println();
@@ -678,7 +695,7 @@ public class IpManager extends StateMachine {
                 msg.arg1, msg.arg2, Objects.toString(msg.obj), mMsgStateLogger);
 
         final String richerLogLine = getWhatToString(msg.what) + " " + logLine;
-        mLocalLog.log(richerLogLine);
+        mLog.log(richerLogLine);
         if (VDBG) {
             Log.d(mTag, richerLogLine);
         }
@@ -703,7 +720,7 @@ public class IpManager extends StateMachine {
     private void logError(String fmt, Object... args) {
         final String msg = "ERROR " + String.format(fmt, args);
         Log.e(mTag, msg);
-        mLocalLog.log(msg);
+        mLog.log(msg);
     }
 
     private void getNetworkInterface() {
@@ -1044,16 +1061,25 @@ public class IpManager extends StateMachine {
         return true;
     }
 
+    private void setIPv6AddrGenModeIfSupported() throws RemoteException {
+        try {
+            mNwService.setIPv6AddrGenMode(mInterfaceName, mConfiguration.mIPv6AddrGenMode);
+        } catch (ServiceSpecificException e) {
+            if (e.errorCode != OsConstants.EOPNOTSUPP) {
+                logError("Unable to set IPv6 addrgen mode: %s", e);
+            }
+        }
+    }
+
     private boolean startIPv6() {
         // Set privacy extensions.
         try {
             mNwService.setInterfaceIpv6PrivacyExtensions(mInterfaceName, true);
+
+            setIPv6AddrGenModeIfSupported();
             mNwService.enableIpv6(mInterfaceName);
-        } catch (RemoteException re) {
-            logError("Unable to change interface settings: %s", re);
-            return false;
-        } catch (IllegalStateException ie) {
-            logError("Unable to change interface settings: %s", ie);
+        } catch (IllegalStateException | RemoteException | ServiceSpecificException e) {
+            logError("Unable to change interface settings: %s", e);
             return false;
         }
 
@@ -1065,6 +1091,7 @@ public class IpManager extends StateMachine {
             mIpReachabilityMonitor = new IpReachabilityMonitor(
                     mContext,
                     mInterfaceName,
+                    mLog,
                     new IpReachabilityMonitor.Callback() {
                         @Override
                         public void notifyLost(InetAddress ip, String logMsg) {
@@ -1260,8 +1287,12 @@ public class IpManager extends StateMachine {
 
         @Override
         public void enter() {
+            // Get the Configuration for ApfFilter from Context
+            boolean filter802_3Frames =
+                    mContext.getResources().getBoolean(R.bool.config_apfDrop802_3Frames);
+
             mApfFilter = ApfFilter.maybeCreate(mConfiguration.mApfCapabilities, mNetworkInterface,
-                    mCallback, mMulticastFiltering);
+                    mCallback, mMulticastFiltering, filter802_3Frames);
             // TODO: investigate the effects of any multicast filtering racing/interfering with the
             // rest of this IP configuration startup.
             if (mApfFilter == null) {

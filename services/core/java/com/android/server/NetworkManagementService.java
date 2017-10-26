@@ -18,6 +18,7 @@ package com.android.server;
 
 import static android.Manifest.permission.CONNECTIVITY_INTERNAL;
 import static android.Manifest.permission.DUMP;
+import static android.Manifest.permission.NETWORK_STACK;
 import static android.Manifest.permission.SHUTDOWN;
 import static android.net.NetworkPolicyManager.FIREWALL_CHAIN_DOZABLE;
 import static android.net.NetworkPolicyManager.FIREWALL_CHAIN_NAME_DOZABLE;
@@ -55,6 +56,7 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.INetd;
 import android.net.INetworkManagementEventObserver;
+import android.net.ITetheringStatsProvider;
 import android.net.InterfaceConfiguration;
 import android.net.IpPrefix;
 import android.net.LinkAddress;
@@ -100,7 +102,6 @@ import com.android.internal.util.HexDump;
 import com.android.internal.util.Preconditions;
 import com.android.server.NativeDaemonConnector.Command;
 import com.android.server.NativeDaemonConnector.SensitiveArg;
-import com.android.server.net.LockdownVpnTracker;
 import com.google.android.collect.Maps;
 
 import java.io.BufferedReader;
@@ -155,7 +156,7 @@ public class NetworkManagementService extends INetworkManagementService.Stub
      */
     public static final String PERMISSION_SYSTEM = "SYSTEM";
 
-    class NetdResponseCode {
+    static class NetdResponseCode {
         /* Keep in sync with system/netd/server/ResponseCode.h */
         public static final int InterfaceListResult       = 110;
         public static final int TetherInterfaceListResult = 111;
@@ -226,12 +227,16 @@ public class NetworkManagementService extends INetworkManagementService.Stub
 
     private final NetworkStatsFactory mStatsFactory = new NetworkStatsFactory();
 
+    @GuardedBy("mTetheringStatsProviders")
+    private final HashMap<ITetheringStatsProvider, String>
+            mTetheringStatsProviders = Maps.newHashMap();
+
     /**
      * If both locks need to be held, then they should be obtained in the order:
      * first {@link #mQuotaLock} and then {@link #mRulesLock}.
      */
-    private Object mQuotaLock = new Object();
-    private Object mRulesLock = new Object();
+    private final Object mQuotaLock = new Object();
+    private final Object mRulesLock = new Object();
 
     /** Set of interfaces with active quotas. */
     @GuardedBy("mQuotaLock")
@@ -276,7 +281,7 @@ public class NetworkManagementService extends INetworkManagementService.Stub
     @GuardedBy("mQuotaLock")
     private volatile boolean mDataSaverMode;
 
-    private Object mIdleTimerLock = new Object();
+    private final Object mIdleTimerLock = new Object();
     /** Set of interfaces with active idle timers. */
     private static class IdleTimerParams {
         public final int timeout;
@@ -332,6 +337,10 @@ public class NetworkManagementService extends INetworkManagementService.Stub
         Watchdog.getInstance().addMonitor(this);
 
         LocalServices.addService(NetworkManagementInternal.class, new LocalService());
+
+        synchronized (mTetheringStatsProviders) {
+            mTetheringStatsProviders.put(new NetdTetheringStatsProvider(), "netd");
+        }
     }
 
     @VisibleForTesting
@@ -521,6 +530,23 @@ public class NetworkManagementService extends INetworkManagementService.Stub
         }
     }
 
+    @Override
+    public void registerTetheringStatsProvider(ITetheringStatsProvider provider, String name) {
+        mContext.enforceCallingOrSelfPermission(NETWORK_STACK, TAG);
+        Preconditions.checkNotNull(provider);
+        synchronized(mTetheringStatsProviders) {
+            mTetheringStatsProviders.put(provider, name);
+        }
+    }
+
+    @Override
+    public void unregisterTetheringStatsProvider(ITetheringStatsProvider provider) {
+        mContext.enforceCallingOrSelfPermission(NETWORK_STACK, TAG);
+        synchronized(mTetheringStatsProviders) {
+            mTetheringStatsProviders.remove(provider);
+        }
+    }
+
     // Sync the state of the given chain with the native daemon.
     private void syncFirewallChainLocked(int chain, String name) {
         SparseIntArray rules;
@@ -660,7 +686,7 @@ public class NetworkManagementService extends INetworkManagementService.Stub
                 }
             }
 
-            setFirewallEnabled(mFirewallEnabled || LockdownVpnTracker.isEnabled());
+            setFirewallEnabled(mFirewallEnabled);
 
             syncFirewallChainLocked(FIREWALL_CHAIN_NONE, "");
             syncFirewallChainLocked(FIREWALL_CHAIN_STANDBY, "standby ");
@@ -1055,6 +1081,15 @@ public class NetworkManagementService extends INetworkManagementService.Stub
             mConnector.execute("interface", "ipv6", iface, "enable");
         } catch (NativeDaemonConnectorException e) {
             throw e.rethrowAsParcelableException();
+        }
+    }
+
+    @Override
+    public void setIPv6AddrGenMode(String iface, int mode) throws ServiceSpecificException {
+        try {
+            mNetdService.setIPv6AddrGenMode(iface, mode);
+        } catch (RemoteException e) {
+            throw e.rethrowAsRuntimeException();
         }
     }
 
@@ -1781,14 +1816,16 @@ public class NetworkManagementService extends INetworkManagementService.Stub
         }
     }
 
-    @Override
-    public NetworkStats getNetworkStatsTethering() {
-        mContext.enforceCallingOrSelfPermission(CONNECTIVITY_INTERNAL, TAG);
-
-        final NetworkStats stats = new NetworkStats(SystemClock.elapsedRealtime(), 1);
-        try {
-            final NativeDaemonEvent[] events = mConnector.executeForList(
-                    "bandwidth", "gettetherstats");
+    private class NetdTetheringStatsProvider extends ITetheringStatsProvider.Stub {
+        @Override
+        public NetworkStats getTetherStats() {
+            final NativeDaemonEvent[] events;
+            try {
+                events = mConnector.executeForList("bandwidth", "gettetherstats");
+            } catch (NativeDaemonConnectorException e) {
+                throw e.rethrowAsParcelableException();
+            }
+            final NetworkStats stats = new NetworkStats(SystemClock.elapsedRealtime(), 1);
             for (NativeDaemonEvent event : events) {
                 if (event.getCode() != TetheringStatsListResult) continue;
 
@@ -1814,8 +1851,24 @@ public class NetworkManagementService extends INetworkManagementService.Stub
                     throw new IllegalStateException("problem parsing tethering stats: " + event);
                 }
             }
-        } catch (NativeDaemonConnectorException e) {
-            throw e.rethrowAsParcelableException();
+            return stats;
+        }
+    }
+
+    @Override
+    public NetworkStats getNetworkStatsTethering() {
+        mContext.enforceCallingOrSelfPermission(CONNECTIVITY_INTERNAL, TAG);
+
+        final NetworkStats stats = new NetworkStats(SystemClock.elapsedRealtime(), 1);
+        synchronized (mTetheringStatsProviders) {
+            for (ITetheringStatsProvider provider: mTetheringStatsProviders.keySet()) {
+                try {
+                    stats.combineAllValues(provider.getTetherStats());
+                } catch (RemoteException e) {
+                    Log.e(TAG, "Problem reading tethering stats from " +
+                            mTetheringStatsProviders.get(provider) + ": " + e);
+                }
+            }
         }
         return stats;
     }
@@ -1933,30 +1986,6 @@ public class NetworkManagementService extends INetworkManagementService.Stub
         final String rule = allow ? "allow" : "deny";
         try {
             mConnector.execute("firewall", "set_interface_rule", iface, rule);
-        } catch (NativeDaemonConnectorException e) {
-            throw e.rethrowAsParcelableException();
-        }
-    }
-
-    @Override
-    public void setFirewallEgressSourceRule(String addr, boolean allow) {
-        enforceSystemUid();
-        Preconditions.checkState(mFirewallEnabled);
-        final String rule = allow ? "allow" : "deny";
-        try {
-            mConnector.execute("firewall", "set_egress_source_rule", addr, rule);
-        } catch (NativeDaemonConnectorException e) {
-            throw e.rethrowAsParcelableException();
-        }
-    }
-
-    @Override
-    public void setFirewallEgressDestRule(String addr, int port, boolean allow) {
-        enforceSystemUid();
-        Preconditions.checkState(mFirewallEnabled);
-        final String rule = allow ? "allow" : "deny";
-        try {
-            mConnector.execute("firewall", "set_egress_dest_rule", addr, port, rule);
         } catch (NativeDaemonConnectorException e) {
             throw e.rethrowAsParcelableException();
         }

@@ -24,6 +24,7 @@ import android.annotation.SdkConstant;
 import android.annotation.SdkConstant.SdkConstantType;
 import android.annotation.SystemApi;
 import android.app.ActivityManager;
+import android.app.AppGlobals;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager.InstallReason;
@@ -1355,6 +1356,17 @@ public class PackageInstaller {
          * if unavailable.
          */
         public @Nullable Bitmap getAppIcon() {
+            if (appIcon == null) {
+                // Icon may have been omitted for calls that return bulk session
+                // lists, so try fetching the specific icon.
+                try {
+                    final SessionInfo info = AppGlobals.getPackageManager().getPackageInstaller()
+                            .getSessionInfo(sessionId);
+                    appIcon = (info != null) ? info.appIcon : null;
+                } catch (RemoteException e) {
+                    throw e.rethrowFromSystemServer();
+                }
+            }
             return appIcon;
         }
 

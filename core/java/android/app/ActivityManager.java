@@ -360,6 +360,13 @@ public class ActivityManager {
             FIRST_START_NON_FATAL_ERROR_CODE + 1;
 
     /**
+     * Result for IActivityManaqer.startActivity: a new activity start was aborted. Never returned
+     * externally.
+     * @hide
+     */
+    public static final int START_ABORTED = FIRST_START_NON_FATAL_ERROR_CODE + 2;
+
+    /**
      * Flag for IActivityManaqer.startActivity: do special start mode where
      * a new activity is launched only if it is needed.
      * @hide
@@ -648,6 +655,9 @@ public class ActivityManager {
      * @hide
      */
     public static final int COMPAT_MODE_TOGGLE = 2;
+
+    private static final boolean DEVELOPMENT_FORCE_LOW_RAM =
+            SystemProperties.getBoolean("debug.force_low_ram", false);
 
     /** @hide */
     public static class StackId {
@@ -1108,7 +1118,20 @@ public class ActivityManager {
 
     /** @hide */
     public static boolean isLowRamDeviceStatic() {
-        return RoSystemProperties.CONFIG_LOW_RAM;
+        return RoSystemProperties.CONFIG_LOW_RAM ||
+                (Build.IS_DEBUGGABLE && DEVELOPMENT_FORCE_LOW_RAM);
+    }
+
+    /**
+     * Returns true if this is a small battery device. Exactly whether a device is considered to be
+     * small battery is ultimately up to the device configuration, but currently it generally means
+     * something in the class of a device with 1000 mAh or less. This is mostly intended to be used
+     * to determine whether certain features should be altered to account for a drastically smaller
+     * battery.
+     * @hide
+     */
+    public static boolean isSmallBatteryDevice() {
+        return RoSystemProperties.CONFIG_SMALL_BATTERY;
     }
 
     /**

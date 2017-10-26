@@ -25,6 +25,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.ChangedPackages;
 import android.content.pm.InstantAppInfo;
 import android.content.pm.FeatureInfo;
+import android.content.pm.IDexModuleRegisterCallback;
 import android.content.pm.IPackageInstallObserver2;
 import android.content.pm.IPackageInstaller;
 import android.content.pm.IPackageDeleteObserver;
@@ -475,12 +476,44 @@ interface IPackageManager {
             String loaderIsa);
 
     /**
+     * Register an application dex module with the package manager.
+     * The package manager will keep track of the given module for future optimizations.
+     *
+     * Dex module optimizations will disable the classpath checking at runtime. The client bares
+     * the responsibility to ensure that the static assumptions on classes in the optimized code
+     * hold at runtime (e.g. there's no duplicate classes in the classpath).
+     *
+     * Note that the package manager already keeps track of dex modules loaded with
+     * {@link dalvik.system.DexClassLoader} and {@link dalvik.system.PathClassLoader}.
+     * This can be called for an eager registration.
+     *
+     * The call might take a while and the results will be posted on the main thread, using
+     * the given callback.
+     *
+     * If the module is intended to be shared with other apps, make sure that the file
+     * permissions allow for it.
+     * If at registration time the permissions allow for others to read it, the module would
+     * be marked as a shared module which might undergo a different optimization strategy.
+     * (usually shared modules will generated larger optimizations artifacts,
+     * taking more disk space).
+     *
+     * @param packageName the package name to which the dex module belongs
+     * @param dexModulePath the absolute path of the dex module.
+     * @param isSharedModule whether or not the module is intended to be used by other apps.
+     * @param callback if not null,
+     *   {@link android.content.pm.IDexModuleRegisterCallback.IDexModuleRegisterCallback#onDexModuleRegistered}
+     *   will be called once the registration finishes.
+     */
+     oneway void registerDexModule(in String packageName, in String dexModulePath,
+             in boolean isSharedModule, IDexModuleRegisterCallback callback);
+
+    /**
      * Ask the package manager to perform a dex-opt for the given reason. The package
      * manager will map the reason to a compiler filter according to the current system
      * configuration.
      */
     boolean performDexOpt(String packageName, boolean checkProfiles,
-            int compileReason, boolean force);
+            int compileReason, boolean force, boolean bootComplete);
 
     /**
      * Ask the package manager to perform a dex-opt with the given compiler filter.
@@ -489,7 +522,7 @@ interface IPackageManager {
      *       definite state.
      */
     boolean performDexOptMode(String packageName, boolean checkProfiles,
-            String targetCompilerFilter, boolean force);
+            String targetCompilerFilter, boolean force, boolean bootComplete);
 
     /**
      * Ask the package manager to perform a dex-opt with the given compiler filter on the

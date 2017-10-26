@@ -25,6 +25,7 @@
 #include <SkPictureRecorder.h>
 #include <SkPixelSerializer.h>
 #include <SkStream.h>
+#include "VectorDrawable.h"
 
 #include <unistd.h>
 
@@ -40,15 +41,16 @@ uint8_t SkiaPipeline::mSpotShadowAlpha = 0;
 
 Vector3 SkiaPipeline::mLightCenter = {FLT_MIN, FLT_MIN, FLT_MIN};
 
-SkiaPipeline::SkiaPipeline(RenderThread& thread) :  mRenderThread(thread) { }
+SkiaPipeline::SkiaPipeline(RenderThread& thread) :  mRenderThread(thread) {
+    mVectorDrawables.reserve(30);
+}
 
 TaskManager* SkiaPipeline::getTaskManager() {
     return &mTaskManager;
 }
 
 void SkiaPipeline::onDestroyHardwareResources() {
-    // No need to flush the caches here. There is a timer
-    // which will flush temporary resources over time.
+    mRenderThread.cacheManager().trimStaleResources();
 }
 
 bool SkiaPipeline::pinImages(std::vector<SkImage*>& mutableImages) {
@@ -70,15 +72,18 @@ void SkiaPipeline::unpinImages() {
 }
 
 void SkiaPipeline::renderLayers(const FrameBuilder::LightGeometry& lightGeometry,
-        LayerUpdateQueue* layerUpdateQueue, bool opaque,
+        LayerUpdateQueue* layerUpdateQueue, bool opaque, bool wideColorGamut,
         const BakedOpRenderer::LightInfo& lightInfo) {
     updateLighting(lightGeometry, lightInfo);
     ATRACE_NAME("draw layers");
-    renderLayersImpl(*layerUpdateQueue, opaque);
+    renderVectorDrawableCache();
+    renderLayersImpl(*layerUpdateQueue, opaque, wideColorGamut);
     layerUpdateQueue->clear();
 }
 
-void SkiaPipeline::renderLayersImpl(const LayerUpdateQueue& layers, bool opaque) {
+void SkiaPipeline::renderLayersImpl(const LayerUpdateQueue& layers,
+        bool opaque, bool wideColorGamut) {
+    // TODO: Handle wide color gamut
     // Render all layers that need to be updated, in order.
     for (size_t i = 0; i < layers.entries().size(); i++) {
         RenderNode* layerNode = layers.entries()[i].renderNode.get();
@@ -126,12 +131,13 @@ void SkiaPipeline::renderLayersImpl(const LayerUpdateQueue& layers, bool opaque)
 }
 
 bool SkiaPipeline::createOrUpdateLayer(RenderNode* node,
-        const DamageAccumulator& damageAccumulator) {
+        const DamageAccumulator& damageAccumulator, bool wideColorGamut) {
     SkSurface* layer = node->getLayerSurface();
     if (!layer || layer->width() != node->getWidth() || layer->height() != node->getHeight()) {
         SkImageInfo info = SkImageInfo::MakeN32Premul(node->getWidth(), node->getHeight());
         SkSurfaceProps props(0, kUnknown_SkPixelGeometry);
         SkASSERT(mRenderThread.getGrContext() != nullptr);
+        // TODO: Handle wide color gamut requests
         node->setLayerSurface(
                 SkSurface::MakeRenderTarget(mRenderThread.getGrContext(), SkBudgeted::kYes,
                         info, 0, &props));
@@ -155,11 +161,11 @@ void SkiaPipeline::prepareToDraw(const RenderThread& thread, Bitmap* bitmap) {
     GrContext* context = thread.getGrContext();
     if (context) {
         ATRACE_FORMAT("Bitmap#prepareToDraw %dx%d", bitmap->width(), bitmap->height());
-        SkBitmap skiaBitmap;
-        bitmap->getSkBitmap(&skiaBitmap);
-        sk_sp<SkImage> image = SkMakeImageFromRasterBitmap(skiaBitmap, kNever_SkCopyPixelsMode);
-        SkImage_pinAsTexture(image.get(), context);
-        SkImage_unpinAsTexture(image.get(), context);
+        auto image = bitmap->makeImage();
+        if (image.get() && !bitmap->isHardware()) {
+            SkImage_pinAsTexture(image.get(), context);
+            SkImage_unpinAsTexture(image.get(), context);
+        }
     }
 }
 
@@ -176,12 +182,37 @@ public:
     }
 };
 
+void SkiaPipeline::renderVectorDrawableCache() {
+    //render VectorDrawables into offscreen buffers
+    for (auto vd : mVectorDrawables) {
+        sk_sp<SkSurface> surface;
+        if (!vd->canReuseSurface()) {
+#ifndef ANDROID_ENABLE_LINEAR_BLENDING
+            sk_sp<SkColorSpace> colorSpace = nullptr;
+#else
+            sk_sp<SkColorSpace> colorSpace = SkColorSpace::MakeSRGB();
+#endif
+            int scaledWidth = SkScalarCeilToInt(vd->properties().getScaledWidth());
+            int scaledHeight = SkScalarCeilToInt(vd->properties().getScaledHeight());
+            SkImageInfo info = SkImageInfo::MakeN32(scaledWidth, scaledHeight,
+                    kPremul_SkAlphaType, colorSpace);
+            SkASSERT(mRenderThread.getGrContext() != nullptr);
+            surface = SkSurface::MakeRenderTarget(mRenderThread.getGrContext(), SkBudgeted::kYes,
+                    info);
+        }
+        vd->updateCache(surface);
+    }
+    mVectorDrawables.clear();
+}
+
 void SkiaPipeline::renderFrame(const LayerUpdateQueue& layers, const SkRect& clip,
-        const std::vector<sp<RenderNode>>& nodes, bool opaque, const Rect &contentDrawBounds,
-        sk_sp<SkSurface> surface) {
+        const std::vector<sp<RenderNode>>& nodes, bool opaque, bool wideColorGamut,
+        const Rect &contentDrawBounds, sk_sp<SkSurface> surface) {
+
+    renderVectorDrawableCache();
 
     // draw all layers up front
-    renderLayersImpl(layers, opaque);
+    renderLayersImpl(layers, opaque, wideColorGamut);
 
     // initialize the canvas for the current frame
     SkCanvas* canvas = surface->getCanvas();
@@ -199,7 +230,7 @@ void SkiaPipeline::renderFrame(const LayerUpdateQueue& layers, const SkRect& cli
         }
     }
 
-    renderFrameImpl(layers, clip, nodes, opaque, contentDrawBounds, canvas);
+    renderFrameImpl(layers, clip, nodes, opaque, wideColorGamut, contentDrawBounds, canvas);
 
     if (skpCaptureEnabled() && recordingPicture) {
         sk_sp<SkPicture> picture = recorder->finishRecordingAsPicture();
@@ -232,8 +263,8 @@ static Rect nodeBounds(RenderNode& node) {
 }
 
 void SkiaPipeline::renderFrameImpl(const LayerUpdateQueue& layers, const SkRect& clip,
-        const std::vector<sp<RenderNode>>& nodes, bool opaque, const Rect &contentDrawBounds,
-        SkCanvas* canvas) {
+        const std::vector<sp<RenderNode>>& nodes, bool opaque, bool wideColorGamut,
+        const Rect &contentDrawBounds, SkCanvas* canvas) {
     SkAutoCanvasRestore saver(canvas, true);
     canvas->androidFramework_setDeviceClipRestriction(clip.roundOut());
 
@@ -360,7 +391,7 @@ void SkiaPipeline::renderOverdraw(const LayerUpdateQueue& layers, const SkRect& 
     // each time a pixel would have been drawn.
     // Pass true for opaque so we skip the clear - the overdrawCanvas is already zero
     // initialized.
-    renderFrameImpl(layers, clip, nodes, true, contentDrawBounds, &overdrawCanvas);
+    renderFrameImpl(layers, clip, nodes, true, false, contentDrawBounds, &overdrawCanvas);
     sk_sp<SkImage> counts = offscreen->makeImageSnapshot();
 
     // Draw overdraw colors to the canvas.  The color filter will convert counts to colors.

@@ -741,6 +741,8 @@
     <string name="quick_settings_done">Done</string>
     <!-- QuickSettings: Control panel: Label for connected device. [CHAR LIMIT=NONE] -->
     <string name="quick_settings_connected">Connected</string>
+    <!-- QuickSettings: Control panel: Label for connected device, showing remote device battery level. [CHAR LIMIT=NONE] -->
+    <string name="quick_settings_connected_battery_level">Connected, battery <xliff:g id="battery_level_as_percentage">%1$s</xliff:g></string>
     <!-- QuickSettings: Control panel: Label for connecting device. [CHAR LIMIT=NONE] -->
     <string name="quick_settings_connecting">Connecting...</string>
     <!-- QuickSettings: Tethering. [CHAR LIMIT=NONE] -->
@@ -1195,6 +1197,12 @@
         <xliff:g id="application_personal">%3$s</xliff:g>, which can monitor your personal network
         activity.</string>
 
+    <!-- Indication on the keyguard that appears when a trust agents unlocks the device. [CHAR LIMIT=40] -->
+    <string name="keyguard_indication_trust_granted">Unlocked for <xliff:g id="user_name" example="John Doe">%1$s</xliff:g></string>
+
+    <!-- Indication on the keyguard that appears when a trust agent is active and available. [CHAR LIMIT=40] -->
+    <string name="keyguard_indication_trust_managed"><xliff:g id="trust_agent" example="Smart Lock">%1$s</xliff:g> is running</string>
+
     <!-- Indication on the keyguard that appears when the user disables trust agents until the next time they unlock manually. [CHAR LIMIT=NONE] -->
     <string name="keyguard_indication_trust_disabled">Device will stay locked until you manually unlock</string>
 
@@ -1442,7 +1450,7 @@
     <string name="notification_header_default_channel">Notifications</string>
 
     <!-- Notification Inline Controls: Shown when a channel's notifications are currently blocked -->
-    <string name="notification_channel_disabled">You won\'t get these notifications anymore.</string>
+    <string name="notification_channel_disabled">You won\'t get these notifications anymore</string>
 
     <!-- Notification: Control panel: Label that shows how many channels are included in this bundle
         of notifications.  Replaces the channel name and only appears when there is more than one channel. -->
@@ -1451,6 +1459,9 @@
     <!-- Notification: Control panel: Label that shows when an app has not upgraded to use channels.
         Hints that the user's only option is to block all of the app's notifications. -->
     <string name="notification_default_channel_desc">This app doesn\'t have notification categories</string>
+
+    <!-- Notification: Control panel: Label that displays when the app's notifications cannot be blocked. -->
+    <string name="notification_unblockable_desc">Notifications from this app can\'t be turned off</string>
 
     <!-- Notification: Control panel: Label that shows how many channels this application has
         defined, describing the current notification channel as "1 out of n notification categories from this app". -->
@@ -1502,19 +1513,26 @@
     <!-- Notification: Menu row: Content description for the snooze icon. [CHAR LIMIT=NONE] -->
     <string name="notification_menu_snooze_description">notification snooze options</string>
 
-    <!-- Notification: Menu row: Snooze options: 15 minute option. [CHAR LIMIT=50]-->
-    <string name="snooze_option_15_min">15 minutes</string>
-    <!-- Notification: Menu row: Snooze options: 30 minute option. [CHAR LIMIT=50]-->
-    <string name="snooze_option_30_min">30 minutes</string>
-    <!-- Notification: Menu row: Snooze options: 1 hour option. [CHAR LIMIT=50]-->
-    <string name="snooze_option_1_hour">1 hour</string>
-    <!-- Notification: Menu row: Snooze options: 1 hour option. [CHAR LIMIT=50]-->
-    <string name="snooze_option_2_hour">2 hours</string>
-    <!-- Notification: Menu row: Snooze undo button label. [CHAR LIMIT=50]-->
+    <!-- Notification: Snooze panel: Snooze undo button label. [CHAR LIMIT=50]-->
     <string name="snooze_undo">UNDO</string>
 
-    <!-- Notification: Menu row: Snooze: message indicating how long the notification was snoozed for. [CHAR LIMIT=100]-->
+    <!-- Notification: Snooze panel: message indicating how long the notification was snoozed for. [CHAR LIMIT=100]-->
     <string name="snoozed_for_time">Snoozed for <xliff:g id="time_amount" example="15 minutes">%1$s</xliff:g></string>
+
+    <!-- Notification:Snooze panel: Snooze options for hours -->
+    <plurals name="snoozeHourOptions">
+        <item quantity="one">%d hour</item>
+        <item quantity="two">%d hours</item>
+        <item quantity="few">%d hours</item>
+        <item quantity="other">%d hours</item>
+    </plurals>
+
+   <!--  Notification: Snooze panel: Snooze options for minutes -->
+   <plurals name="snoozeMinuteOptions">
+        <item quantity="one">%d minute</item>
+        <item quantity="few">%d minutes</item>
+        <item quantity="other">%d minutes</item>
+    </plurals>
 
     <!-- Title of the battery settings detail panel [CHAR LIMIT=20] -->
     <string name="battery_panel_title">Battery usage</string>
@@ -2027,5 +2045,8 @@
         user what will happen when they tap on that item (which is an application that has
         been identified for them as running). [CHAR LIMIT=NONE] -->
     <string name="running_foreground_services_msg">Tap for details on battery and data usage</string>
+
+    <!-- Prompt to turn off data usage [CHAR LIMIT=NONE] -->
+    <string name="data_usage_disable_mobile" msgid="8656552431969276305">Turn off mobile data?</string>
 
 </resources>

@@ -228,6 +228,18 @@ void RenderProxy::setOpaque(bool opaque) {
     post(task);
 }
 
+CREATE_BRIDGE2(setWideGamut, CanvasContext* context, bool wideGamut) {
+    args->context->setWideGamut(args->wideGamut);
+    return nullptr;
+}
+
+void RenderProxy::setWideGamut(bool wideGamut) {
+    SETUP_TASK(setWideGamut);
+    args->context = mContext;
+    args->wideGamut = wideGamut;
+    post(task);
+}
+
 int64_t* RenderProxy::frameInfo() {
     return mDrawFrameTask.frameInfo();
 }
@@ -458,18 +470,7 @@ uint32_t RenderProxy::frameTimePercentile(int p) {
 }
 
 CREATE_BRIDGE2(dumpGraphicsMemory, int fd, RenderThread* thread) {
-    args->thread->jankTracker().dump(args->fd);
-
-    FILE *file = fdopen(args->fd, "a");
-    if (Caches::hasInstance()) {
-        String8 cachesLog;
-        Caches::getInstance().dumpMemoryUsage(cachesLog);
-        fprintf(file, "\nCaches:\n%s\n", cachesLog.string());
-    } else {
-        fprintf(file, "\nNo caches instance.\n");
-    }
-    fprintf(file, "\nPipeline=FrameBuilder\n");
-    fflush(file);
+    args->thread->dumpGraphicsMemory(args->fd);
     return nullptr;
 }
 
@@ -665,7 +666,7 @@ void RenderProxy::prepareToDraw(Bitmap& bitmap) {
 }
 
 CREATE_BRIDGE2(allocateHardwareBitmap, RenderThread* thread, SkBitmap* bitmap) {
-    sk_sp<Bitmap> hardwareBitmap = Bitmap::allocateHardwareBitmap(*args->thread, *args->bitmap);
+    sk_sp<Bitmap> hardwareBitmap = args->thread->allocateHardwareBitmap(*args->bitmap);
     return hardwareBitmap.release();
 }
 

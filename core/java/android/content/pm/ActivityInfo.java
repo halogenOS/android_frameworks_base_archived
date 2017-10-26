@@ -28,8 +28,6 @@ import android.util.Printer;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-import static android.view.WindowManager.LayoutParams.ROTATION_ANIMATION_ROTATE;
-
 /**
  * Information you can retrieve about a particular application
  * activity or receiver. This corresponds to information collected

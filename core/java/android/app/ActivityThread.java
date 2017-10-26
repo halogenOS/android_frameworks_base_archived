@@ -29,8 +29,8 @@ import android.content.ComponentName;
 import android.content.ContentProvider;
 import android.content.Context;
 import android.content.IContentProvider;
-import android.content.Intent;
 import android.content.IIntentReceiver;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.IPackageManager;
@@ -91,6 +91,7 @@ import android.provider.ContactsContract;
 import android.provider.Downloads;
 import android.provider.FontsContract;
 import android.provider.Settings;
+import android.renderscript.RenderScriptCacheDir;
 import android.security.NetworkSecurityPolicy;
 import android.security.net.config.NetworkSecurityConfigProvider;
 import android.util.AndroidRuntimeException;
@@ -114,7 +115,6 @@ import android.view.ViewRootImpl;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.WindowManagerGlobal;
-import android.renderscript.RenderScriptCacheDir;
 import android.webkit.WebView;
 
 import com.android.internal.annotations.GuardedBy;
@@ -128,7 +128,20 @@ import com.android.internal.util.ArrayUtils;
 import com.android.internal.util.FastPrintWriter;
 import com.android.org.conscrypt.OpenSSLSocketImpl;
 import com.android.org.conscrypt.TrustedCertificateStore;
+
+import dalvik.system.BaseDexClassLoader;
+import dalvik.system.CloseGuard;
+import dalvik.system.VMDebug;
+import dalvik.system.VMRuntime;
+
 import com.google.android.collect.Lists;
+
+import libcore.io.DropBox;
+import libcore.io.EventLogger;
+import libcore.io.IoUtils;
+import libcore.net.event.NetworkEventDispatcher;
+
+import org.apache.harmony.dalvik.ddmc.DdmVmInternal;
 
 import java.io.File;
 import java.io.FileDescriptor;
@@ -145,16 +158,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.TimeZone;
-
-import libcore.io.DropBox;
-import libcore.io.EventLogger;
-import libcore.io.IoUtils;
-import libcore.net.event.NetworkEventDispatcher;
-import dalvik.system.BaseDexClassLoader;
-import dalvik.system.CloseGuard;
-import dalvik.system.VMDebug;
-import dalvik.system.VMRuntime;
-import org.apache.harmony.dalvik.ddmc.DdmVmInternal;
 
 final class RemoteServiceException extends AndroidRuntimeException {
     public RemoteServiceException(String msg) {
@@ -2388,13 +2391,13 @@ public final class ActivityThread {
                         memInfo.nativeSwappablePss, memInfo.nativeSharedDirty,
                         memInfo.nativePrivateDirty, memInfo.nativeSharedClean,
                         memInfo.nativePrivateClean, memInfo.hasSwappedOutPss ?
-                        memInfo.nativeSwappedOut : memInfo.nativeSwappedOutPss,
+                        memInfo.nativeSwappedOutPss : memInfo.nativeSwappedOut,
                         nativeMax, nativeAllocated, nativeFree);
                 printRow(pw, HEAP_FULL_COLUMN, "Dalvik Heap", memInfo.dalvikPss,
                         memInfo.dalvikSwappablePss, memInfo.dalvikSharedDirty,
                         memInfo.dalvikPrivateDirty, memInfo.dalvikSharedClean,
                         memInfo.dalvikPrivateClean, memInfo.hasSwappedOutPss ?
-                        memInfo.dalvikSwappedOut : memInfo.dalvikSwappedOutPss,
+                        memInfo.dalvikSwappedOutPss : memInfo.dalvikSwappedOut,
                         dalvikMax, dalvikAllocated, dalvikFree);
             } else {
                 printRow(pw, HEAP_COLUMN, "", "Pss", "Private",
@@ -2705,8 +2708,14 @@ public final class ActivityThread {
         Activity activity = null;
         try {
             java.lang.ClassLoader cl = appContext.getClassLoader();
-            activity = mInstrumentation.newActivity(
-                    cl, component.getClassName(), r.intent);
+            if (appContext.getApplicationContext() instanceof Application) {
+                activity = ((Application) appContext.getApplicationContext())
+                        .instantiateActivity(cl, component.getClassName(), r.intent);
+            }
+            if (activity == null) {
+                activity = mInstrumentation.newActivity(
+                        cl, component.getClassName(), r.intent);
+            }
             StrictMode.incrementExpectedActivityCount(activity.getClass());
             r.intent.setExtrasClassLoader(cl);
             r.intent.prepareToEnterProcess();
@@ -2887,6 +2896,9 @@ public final class ActivityThread {
             TAG, "Handling launch of " + r);
 
         // Initialize before creating the activity
+        if (!ThreadedRenderer.sRendererDisabled) {
+            GraphicsEnvironment.earlyInitEGL();
+        }
         WindowManagerGlobal.initialize();
 
         Activity a = performLaunchActivity(r, customIntent);
@@ -3228,7 +3240,8 @@ public final class ActivityThread {
             data.intent.setExtrasClassLoader(cl);
             data.intent.prepareToEnterProcess();
             data.setExtrasClassLoader(cl);
-            receiver = (BroadcastReceiver)cl.loadClass(component).newInstance();
+            receiver = instantiate(cl, component, data.intent, app,
+                    Application::instantiateReceiver);
         } catch (Exception e) {
             if (DEBUG_BROADCAST) Slog.i(TAG,
                     "Finishing failed broadcast to " + data.intent.getComponent());
@@ -3316,12 +3329,13 @@ public final class ActivityThread {
             } else {
                 try {
                     if (DEBUG_BACKUP) Slog.v(TAG, "Initializing agent class " + classname);
+                    ContextImpl context = ContextImpl.createAppContext(this, packageInfo);
 
                     java.lang.ClassLoader cl = packageInfo.getClassLoader();
-                    agent = (BackupAgent) cl.loadClass(classname).newInstance();
+                    agent = instantiate(cl, classname, context,
+                            Application::instantiateBackupAgent);
 
                     // set up the agent's context
-                    ContextImpl context = ContextImpl.createAppContext(this, packageInfo);
                     context.setOuterContext(agent);
                     agent.attach(context);
 
@@ -3381,9 +3395,12 @@ public final class ActivityThread {
         LoadedApk packageInfo = getPackageInfoNoCheck(
                 data.info.applicationInfo, data.compatInfo);
         Service service = null;
+        Application app = null;
         try {
+            app = packageInfo.makeApplication(false, mInstrumentation);
             java.lang.ClassLoader cl = packageInfo.getClassLoader();
-            service = (Service) cl.loadClass(data.info.name).newInstance();
+            service = instantiate(cl, data.info.name, data.intent, app,
+                    Application::instantiateService);
         } catch (Exception e) {
             if (!mInstrumentation.onException(service, e)) {
                 throw new RuntimeException(
@@ -3398,7 +3415,6 @@ public final class ActivityThread {
             ContextImpl context = ContextImpl.createAppContext(this, packageInfo);
             context.setOuterContext(service);
 
-            Application app = packageInfo.makeApplication(false, mInstrumentation);
             service.attach(context, this, data.info.name, data.token, app,
                     ActivityManager.getService());
             service.onCreate();
@@ -4938,7 +4954,8 @@ public final class ActivityThread {
             // If the new config is the same as the config this Activity is already running with and
             // the override config also didn't change, then don't bother calling
             // onConfigurationChanged.
-            int diff = activity.mCurrentConfig.diff(newConfig);
+            final int diff = activity.mCurrentConfig.diffPublicOnly(newConfig);
+
             if (diff != 0 || !mResourcesManager.isSameResourcesOverrideConfig(activityToken,
                     amOverrideConfig)) {
                 // Always send the task-level config changes. For system-level configuration, if
@@ -5026,6 +5043,14 @@ public final class ActivityThread {
 
         int configDiff = 0;
 
+        // This flag tracks whether the new configuration is fundamentally equivalent to the
+        // existing configuration. This is necessary to determine whether non-activity
+        // callbacks should receive notice when the only changes are related to non-public fields.
+        // We do not gate calling {@link #performActivityConfigurationChanged} based on this flag
+        // as that method uses the same check on the activity config override as well.
+        final boolean equivalent = config != null && mConfiguration != null
+                && (0 == mConfiguration.diffPublicOnly(config));
+
         synchronized (mResourcesManager) {
             if (mPendingConfiguration != null) {
                 if (!mPendingConfiguration.isOtherSeqNewer(config)) {
@@ -5082,7 +5107,7 @@ public final class ActivityThread {
                     Activity a = (Activity) cb;
                     performConfigurationChangedForActivity(mActivities.get(a.getActivityToken()),
                             config);
-                } else {
+                } else if (!equivalent) {
                     performConfigurationChanged(cb, config);
                 }
             }
@@ -5372,26 +5397,45 @@ public final class ActivityThread {
         WindowManagerGlobal.getInstance().trimMemory(level);
     }
 
-    private void setupGraphicsSupport(Context context, File cacheDir) {
-        if (Process.isIsolated()) {
-            // Isolated processes aren't going to do UI.
-            return;
-        }
+    private void setupGraphicsSupport(Context context) {
         Trace.traceBegin(Trace.TRACE_TAG_ACTIVITY_MANAGER, "setupGraphicsSupport");
-        try {
-            int uid = Process.myUid();
-            String[] packages = getPackageManager().getPackagesForUid(uid);
 
-            if (packages != null) {
-                ThreadedRenderer.setupDiskCache(cacheDir);
-                RenderScriptCacheDir.setupDiskCache(cacheDir);
-                GraphicsEnvironment.setupGraphicsEnvironment(context);
+        // The system package doesn't have real data directories, so don't set up cache paths.
+        if (!"android".equals(context.getPackageName())) {
+            // This cache location probably points at credential-encrypted
+            // storage which may not be accessible yet; assign it anyway instead
+            // of pointing at device-encrypted storage.
+            final File cacheDir = context.getCacheDir();
+            if (cacheDir != null) {
+                // Provide a usable directory for temporary files
+                System.setProperty("java.io.tmpdir", cacheDir.getAbsolutePath());
+            } else {
+                Log.v(TAG, "Unable to initialize \"java.io.tmpdir\" property "
+                        + "due to missing cache directory");
             }
-        } catch (RemoteException e) {
-            throw e.rethrowFromSystemServer();
-        } finally {
-            Trace.traceEnd(Trace.TRACE_TAG_ACTIVITY_MANAGER);
+
+            // Setup a location to store generated/compiled graphics code.
+            final Context deviceContext = context.createDeviceProtectedStorageContext();
+            final File codeCacheDir = deviceContext.getCodeCacheDir();
+            if (codeCacheDir != null) {
+                try {
+                    int uid = Process.myUid();
+                    String[] packages = getPackageManager().getPackagesForUid(uid);
+                    if (packages != null) {
+                        ThreadedRenderer.setupDiskCache(codeCacheDir);
+                        RenderScriptCacheDir.setupDiskCache(codeCacheDir);
+                    }
+                } catch (RemoteException e) {
+                    Trace.traceEnd(Trace.TRACE_TAG_ACTIVITY_MANAGER);
+                    throw e.rethrowFromSystemServer();
+                }
+            } else {
+                Log.w(TAG, "Unable to use shader/script cache: missing code-cache directory");
+            }
         }
+
+        GraphicsEnvironment.chooseDriver(context);
+        Trace.traceEnd(Trace.TRACE_TAG_ACTIVITY_MANAGER);
     }
 
     private void updateDefaultDensity() {
@@ -5477,15 +5521,6 @@ public final class ActivityThread {
         Process.setArgV0(data.processName);
         android.ddm.DdmHandleAppName.setAppName(data.processName,
                                                 UserHandle.myUserId());
-
-        if (data.persistent) {
-            // Persistent processes on low-memory devices do not get to
-            // use hardware accelerated drawing, since this can add too much
-            // overhead to the process.
-            if (!ActivityManager.isHighEndGfx()) {
-                ThreadedRenderer.disable(false);
-            }
-        }
 
         if (mProfiler.profileFd != null) {
             mProfiler.startProfiling();
@@ -5673,27 +5708,8 @@ public final class ActivityThread {
         updateLocaleListFromAppContext(appContext,
                 mResourcesManager.getConfiguration().getLocales());
 
-        if (!Process.isIsolated() && !"android".equals(appContext.getPackageName())) {
-            // This cache location probably points at credential-encrypted
-            // storage which may not be accessible yet; assign it anyway instead
-            // of pointing at device-encrypted storage.
-            final File cacheDir = appContext.getCacheDir();
-            if (cacheDir != null) {
-                // Provide a usable directory for temporary files
-                System.setProperty("java.io.tmpdir", cacheDir.getAbsolutePath());
-            } else {
-                Log.v(TAG, "Unable to initialize \"java.io.tmpdir\" property "
-                        + "due to missing cache directory");
-            }
-
-            // Setup a location to store generated/compiled graphics code.
-            final Context deviceContext = appContext.createDeviceProtectedStorageContext();
-            final File codeCacheDir = deviceContext.getCodeCacheDir();
-            if (codeCacheDir != null) {
-                setupGraphicsSupport(appContext, codeCacheDir);
-            } else {
-                Log.e(TAG, "Unable to setupGraphicsSupport due to missing code-cache directory");
-            }
+        if (!Process.isIsolated()) {
+            setupGraphicsSupport(appContext);
         }
 
         // If we use profiles, setup the dex reporter to notify package manager
@@ -5724,8 +5740,8 @@ public final class ActivityThread {
 
             try {
                 final ClassLoader cl = instrContext.getClassLoader();
-                mInstrumentation = (Instrumentation)
-                    cl.loadClass(data.instrumentationName.getClassName()).newInstance();
+                mInstrumentation = instantiate(cl, data.instrumentationName.getClassName(),
+                        instrContext, Application::instantiateInstrumentation);
             } catch (Exception e) {
                 throw new RuntimeException(
                     "Unable to instantiate instrumentation "
@@ -6270,8 +6286,8 @@ public final class ActivityThread {
 
             try {
                 final java.lang.ClassLoader cl = c.getClassLoader();
-                localProvider = (ContentProvider)cl.
-                    loadClass(info.name).newInstance();
+                localProvider = instantiate(cl, info.name, context,
+                        Application::instantiateProvider);
                 provider = localProvider.getIContentProvider();
                 if (provider == null) {
                     Slog.e(TAG, "Failed to instantiate class " +
@@ -6468,6 +6484,49 @@ public final class ActivityThread {
             }
             return defaultValue;
         }
+    }
+
+    private <T> T instantiate(ClassLoader cl, String className, Context c,
+            Instantiator<T> instantiator)
+            throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+        Application app = getApp(c);
+        if (app != null) {
+            T a = instantiator.instantiate(app, cl, className);
+            if (a != null) return a;
+        }
+        return (T) cl.loadClass(className).newInstance();
+    }
+
+    private <T> T instantiate(ClassLoader cl, String className, Intent intent, Context c,
+            IntentInstantiator<T> instantiator)
+            throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+        Application app = getApp(c);
+        if (app != null) {
+            T a = instantiator.instantiate(app, cl, className, intent);
+            if (a != null) return a;
+        }
+        return (T) cl.loadClass(className).newInstance();
+    }
+
+    private Application getApp(Context c) {
+        // We need this shortcut to avoid actually calling getApplicationContext() on an Application
+        // because the Application may not return itself for getApplicationContext() because the
+        // API doesn't enforce it.
+        if (c instanceof Application) return (Application) c;
+        if (c.getApplicationContext() instanceof Application) {
+            return (Application) c.getApplicationContext();
+        }
+        return null;
+    }
+
+    private interface Instantiator<T> {
+        T instantiate(Application app, ClassLoader cl, String className)
+                throws ClassNotFoundException, IllegalAccessException, InstantiationException;
+    }
+
+    private interface IntentInstantiator<T> {
+        T instantiate(Application app, ClassLoader cl, String className, Intent intent)
+                throws ClassNotFoundException, IllegalAccessException, InstantiationException;
     }
 
     private static class EventLoggingReporter implements EventLogger.Reporter {

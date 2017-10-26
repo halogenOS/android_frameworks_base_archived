@@ -20,6 +20,7 @@ package android.os;
 import android.net.InterfaceConfiguration;
 import android.net.INetd;
 import android.net.INetworkManagementEventObserver;
+import android.net.ITetheringStatsProvider;
 import android.net.Network;
 import android.net.NetworkStats;
 import android.net.RouteInfo;
@@ -95,6 +96,12 @@ interface INetworkManagementService
      * Enable IPv6 on an interface
      */
     void enableIpv6(String iface);
+
+    /**
+     * Set IPv6 autoconf address generation mode.
+     * This is a no-op if an unsupported mode is requested.
+     */
+    void setIPv6AddrGenMode(String iface, int mode);
 
     /**
      * Enables or enables IPv6 ND offload.
@@ -199,6 +206,18 @@ interface INetworkManagementService
      *  Disables Network Address Translation between two interfaces.
      */
     void disableNat(String internalInterface, String externalInterface);
+
+    /**
+     * Registers a {@code ITetheringStatsProvider} to provide tethering statistics.
+     * All registered providers will be called in order, and their results will be added together.
+     * Netd is always registered as a tethering stats provider.
+     */
+    void registerTetheringStatsProvider(ITetheringStatsProvider provider, String name);
+
+    /**
+     * Unregisters a previously-registered {@code ITetheringStatsProvider}.
+     */
+    void unregisterTetheringStatsProvider(ITetheringStatsProvider provider);
 
     /**
      ** PPPD
@@ -315,8 +334,6 @@ interface INetworkManagementService
     void setFirewallEnabled(boolean enabled);
     boolean isFirewallEnabled();
     void setFirewallInterfaceRule(String iface, boolean allow);
-    void setFirewallEgressSourceRule(String addr, boolean allow);
-    void setFirewallEgressDestRule(String addr, int port, boolean allow);
     void setFirewallUidRule(int chain, int uid, int rule);
     void setFirewallUidRules(int chain, in int[] uids, in int[] rules);
     void setFirewallChainEnabled(int chain, boolean enable);

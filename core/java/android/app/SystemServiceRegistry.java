@@ -126,6 +126,7 @@ import android.telecom.TelecomManager;
 import android.telephony.CarrierConfigManager;
 import android.telephony.SubscriptionManager;
 import android.telephony.TelephonyManager;
+import android.telephony.euicc.EuiccManager;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
@@ -492,6 +493,13 @@ final class SystemServiceRegistry {
                 return new TelecomManager(ctx.getOuterContext());
             }});
 
+        registerService(Context.EUICC_SERVICE, EuiccManager.class,
+                new CachedServiceFetcher<EuiccManager>() {
+            @Override
+            public EuiccManager createService(ContextImpl ctx) {
+                return new EuiccManager(ctx.getOuterContext());
+            }});
+
         registerService(Context.UI_MODE_SERVICE, UiModeManager.class,
                 new CachedServiceFetcher<UiModeManager>() {
             @Override
@@ -793,7 +801,7 @@ final class SystemServiceRegistry {
         registerService(Context.RADIO_SERVICE, RadioManager.class,
                 new CachedServiceFetcher<RadioManager>() {
             @Override
-            public RadioManager createService(ContextImpl ctx) {
+            public RadioManager createService(ContextImpl ctx) throws ServiceNotFoundException {
                 return new RadioManager(ctx);
             }});
 

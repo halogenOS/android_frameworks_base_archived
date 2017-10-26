@@ -659,6 +659,13 @@ class ActivityStack<T extends StackWindowController> extends ConfigurationContai
         return topRunningActivityLocked(false /* focusableOnly */);
     }
 
+    void getAllRunningVisibleActivitiesLocked(ArrayList<ActivityRecord> outActivities) {
+        outActivities.clear();
+        for (int taskNdx = mTaskHistory.size() - 1; taskNdx >= 0; --taskNdx) {
+            mTaskHistory.get(taskNdx).getAllRunningVisibleActivitiesLocked(outActivities);
+        }
+    }
+
     private ActivityRecord topRunningActivityLocked(boolean focusableOnly) {
         for (int taskNdx = mTaskHistory.size() - 1; taskNdx >= 0; --taskNdx) {
             ActivityRecord r = mTaskHistory.get(taskNdx).topRunningActivityLocked();
@@ -743,6 +750,13 @@ class ActivityStack<T extends StackWindowController> extends ConfigurationContai
             return mTaskHistory.get(size - 1);
         }
         return null;
+    }
+
+    final TaskRecord bottomTask() {
+        if (mTaskHistory.isEmpty()) {
+            return null;
+        }
+        return mTaskHistory.get(0);
     }
 
     TaskRecord taskForIdLocked(int id) {
@@ -1690,14 +1704,20 @@ class ActivityStack<T extends StackWindowController> extends ConfigurationContai
         }
         final int stackBehindTopId = (stackBehindTopIndex >= 0)
                 ? mStacks.get(stackBehindTopIndex).mStackId : INVALID_STACK_ID;
-        if ((topStackId == DOCKED_STACK_ID || topStackId == PINNED_STACK_ID)
-                && (stackIndex == stackBehindTopIndex
-                || (stackBehindTopId == DOCKED_STACK_ID
-                && stackIndex == stackBehindTopIndex - 1))) {
-            // Stacks directly behind the docked or pinned stack are always visible.
-            // Also this stack is visible if behind docked stack and the docked stack is behind the
-            // top-most pinned stack
-            return STACK_VISIBLE;
+        if (topStackId == DOCKED_STACK_ID || StackId.isAlwaysOnTop(topStackId)) {
+            if (stackIndex == stackBehindTopIndex) {
+                // Stacks directly behind the docked or pinned stack are always visible.
+                return STACK_VISIBLE;
+            } else if (StackId.isAlwaysOnTop(topStackId) && stackIndex == stackBehindTopIndex - 1) {
+                // Otherwise, this stack can also be visible if it is directly behind a docked stack
+                // or translucent assistant stack behind an always-on-top top-most stack
+                if (stackBehindTopId == DOCKED_STACK_ID) {
+                    return STACK_VISIBLE;
+                } else if (stackBehindTopId == ASSISTANT_STACK_ID) {
+                    return mStacks.get(stackBehindTopIndex).isStackTranslucent(starting, mStackId)
+                            ? STACK_VISIBLE : STACK_INVISIBLE;
+                }
+            }
         }
 
         if (StackId.isBackdropToTranslucentActivity(topStackId)
@@ -1896,7 +1916,16 @@ class ActivityStack<T extends StackWindowController> extends ConfigurationContai
                         // the recents activity from an app.
                         behindFullscreenActivity = true;
                     }
-
+                } else if (mStackId == FULLSCREEN_WORKSPACE_STACK_ID) {
+                    if (DEBUG_VISIBILITY) Slog.v(TAG_VISIBILITY, "Skipping after task=" + task
+                            + " returning to non-application type=" + task.getTaskToReturnTo());
+                    // Once we reach a fullscreen stack task that has a running activity and should
+                    // return to another stack task, then no other activities behind that one should
+                    // be visible.
+                    if (task.topRunningActivityLocked() != null &&
+                            task.getTaskToReturnTo() != APPLICATION_ACTIVITY_TYPE) {
+                        behindFullscreenActivity = true;
+                    }
                 }
             }
 
@@ -2881,9 +2910,13 @@ class ActivityStack<T extends StackWindowController> extends ConfigurationContai
                         transit = TRANSIT_TASK_OPEN_BEHIND;
                     } else {
                         // If a new task is being launched, then mark the existing top activity as
-                        // supporting picture-in-picture while pausing
-                        if (focusedTopActivity != null &&
-                                focusedTopActivity.getStack().getStackId() != PINNED_STACK_ID) {
+                        // supporting picture-in-picture while pausing only if the starting activity
+                        // would not be considered an overlay on top of the current activity
+                        // (eg. not fullscreen, or the assistant)
+                        if (focusedTopActivity != null
+                                && focusedTopActivity.getStackId() != PINNED_STACK_ID
+                                && r.getStackId() != ASSISTANT_STACK_ID
+                                && r.fullscreen) {
                             focusedTopActivity.supportsPictureInPictureWhilePausing = true;
                         }
                         transit = TRANSIT_TASK_OPEN;
@@ -3365,6 +3398,16 @@ class ActivityStack<T extends StackWindowController> extends ConfigurationContai
      * @param allowFocusSelf Is the focus allowed to remain on the same stack.
      */
     private boolean adjustFocusToNextFocusableStackLocked(String reason, boolean allowFocusSelf) {
+        if (isAssistantStack() && bottomTask() != null &&
+                bottomTask().getTaskToReturnTo() == HOME_ACTIVITY_TYPE) {
+            // If the current stack is the assistant stack, then use the return-to type to determine
+            // whether to return to the home screen. This is needed to workaround an issue where
+            // launching a fullscreen task (and subequently returning from that task) will cause
+            // the fullscreen stack to be found as the next focusable stack below, even if the
+            // assistant was launched over home.
+            return mStackSupervisor.moveHomeStackTaskToTop(reason);
+        }
+
         final ActivityStack stack = mStackSupervisor.getNextFocusableStackLocked(
                 allowFocusSelf ? null : this);
         final String myReason = reason + " adjustFocusToNextFocusableStack";
@@ -3379,6 +3422,15 @@ class ActivityStack<T extends StackWindowController> extends ConfigurationContai
             // visible, then use the task return to value to determine the home task to display
             // next.
             return mStackSupervisor.moveHomeStackTaskToTop(reason);
+        }
+
+        if (stack.isAssistantStack() && top != null
+                && top.getTask().getTaskToReturnTo() == HOME_ACTIVITY_TYPE) {
+            // It is possible for the home stack to not be directly underneath the assistant stack.
+            // For example, the assistant may start an activity in the fullscreen stack. Upon
+            // returning to the assistant stack, we must ensure that the home stack is underneath
+            // when appropriate.
+            mStackSupervisor.moveHomeStackTaskToTop("adjustAssistantReturnToHome");
         }
 
         stack.moveToFront(myReason);
@@ -3650,7 +3702,7 @@ class ActivityStack<T extends StackWindowController> extends ConfigurationContai
 
             finishActivityResultsLocked(r, resultCode, resultData);
 
-            final boolean endTask = index <= 0;
+            final boolean endTask = index <= 0 && !task.isClearingToReuseTask();
             final int transit = endTask ? TRANSIT_TASK_CLOSE : TRANSIT_ACTIVITY_CLOSE;
             if (mResumedActivity == r) {
                 if (DEBUG_VISIBILITY || DEBUG_TRANSITION) Slog.v(TAG_TRANSITION,
@@ -4548,8 +4600,10 @@ class ActivityStack<T extends StackWindowController> extends ConfigurationContai
             updateTransitLocked(TRANSIT_TASK_TO_FRONT, options);
         }
         // If a new task is moved to the front, then mark the existing top activity as supporting
-        // picture-in-picture while paused
-        if (topActivity != null && topActivity.getStack().getStackId() != PINNED_STACK_ID) {
+        // picture-in-picture while paused only if the task would not be considered an oerlay on top
+        // of the current activity (eg. not fullscreen, or the assistant)
+        if (topActivity != null && topActivity.getStackId() != PINNED_STACK_ID
+                && tr.getStackId() != ASSISTANT_STACK_ID && tr.containsOnlyFullscreenActivities()) {
             topActivity.supportsPictureInPictureWhilePausing = true;
         }
 

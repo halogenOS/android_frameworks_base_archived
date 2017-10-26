@@ -92,6 +92,24 @@ public abstract class ConnectionService extends Service {
     @SdkConstant(SdkConstant.SdkConstantType.SERVICE_ACTION)
     public static final String SERVICE_INTERFACE = "android.telecom.ConnectionService";
 
+    /**
+     * Boolean extra used by Telecom to inform a {@link ConnectionService} that the purpose of it
+     * being asked to create a new outgoing {@link Connection} is to perform a handover of an
+     * ongoing call on the device from another {@link PhoneAccount}/{@link ConnectionService}.  Will
+     * be specified in the {@link ConnectionRequest#getExtras()} passed by Telecom when
+     * {@link #onCreateOutgoingConnection(PhoneAccountHandle, ConnectionRequest)} is called.
+     * <p>
+     * When your {@link ConnectionService} receives this extra, it should communicate the fact that
+     * this is a handover to the other device's matching {@link ConnectionService}.  That
+     * {@link ConnectionService} will continue the handover using
+     * {@link TelecomManager#addNewIncomingCall(PhoneAccountHandle, Bundle)}, specifying
+     * {@link TelecomManager#EXTRA_IS_HANDOVER}.  Telecom will match the phone numbers of the
+     * handover call on the other device with ongoing calls for {@link ConnectionService}s which
+     * support {@link PhoneAccount#EXTRA_SUPPORTS_HANDOVER_FROM}.
+     * @hide
+     */
+    public static final String EXTRA_IS_HANDOVER = TelecomManager.EXTRA_IS_HANDOVER;
+
     // Flag controlling whether PII is emitted into the logs
     private static final boolean PII_DEBUG = Log.isLoggable(android.util.Log.DEBUG);
 
@@ -1656,6 +1674,7 @@ public abstract class ConnectionService extends Service {
         Log.d(this, "stopRtt(%s)", callId);
         if (mConnectionById.containsKey(callId)) {
             findConnectionForAction(callId, "stopRtt").onStopRtt();
+            findConnectionForAction(callId, "stopRtt").unsetRttProperty();
         } else if (mConferenceById.containsKey(callId)) {
             Log.w(this, "stopRtt called on a conference.");
         }

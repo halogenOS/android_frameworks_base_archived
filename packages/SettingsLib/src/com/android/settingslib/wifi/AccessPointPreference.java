@@ -60,14 +60,28 @@ public class AccessPointPreference extends Preference {
     private int mLevel;
     private CharSequence mContentDescription;
     private int mDefaultIconResId;
-    private int mWifiBadge = NetworkBadging.BADGING_NONE;
+    private int mWifiSpeed = NetworkBadging.BADGING_NONE;
 
     static final int[] WIFI_CONNECTION_STRENGTH = {
+            R.string.accessibility_no_wifi,
             R.string.accessibility_wifi_one_bar,
             R.string.accessibility_wifi_two_bars,
             R.string.accessibility_wifi_three_bars,
             R.string.accessibility_wifi_signal_full
     };
+
+    public static String generatePreferenceKey(AccessPoint accessPoint) {
+        StringBuilder builder = new StringBuilder();
+
+        if (TextUtils.isEmpty(accessPoint.getBssid())) {
+            builder.append(accessPoint.getSsidStr());
+        } else {
+            builder.append(accessPoint.getBssid());
+        }
+
+        builder.append(',').append(accessPoint.getSecurity());
+        return builder.toString();
+    }
 
     // Used for dummy pref.
     public AccessPointPreference(Context context, AttributeSet attrs) {
@@ -160,8 +174,11 @@ public class AccessPointPreference extends Preference {
             safeSetDefaultIcon();
             return;
         }
-        TronUtils.logWifiSettingsBadge(context, mWifiBadge);
-        Drawable drawable = NetworkBadging.getWifiIcon(level, mWifiBadge, getContext().getTheme());
+        TronUtils.logWifiSettingsSpeed(context, mWifiSpeed);
+
+        // TODO(b/62355275): Revert this to N code after deleting NetworkBadging API
+        Drawable drawable = NetworkBadging.getWifiIcon(
+                level, NetworkBadging.BADGING_NONE, getContext().getTheme());
         if (!mForSavedNetworks && drawable != null) {
             drawable.setTint(Utils.getColorAttr(context, android.R.attr.colorControlNormal));
             setIcon(drawable);
@@ -219,10 +236,10 @@ public class AccessPointPreference extends Preference {
 
         final Context context = getContext();
         int level = mAccessPoint.getLevel();
-        int wifiBadge = mAccessPoint.getBadge();
-        if (level != mLevel || wifiBadge != mWifiBadge) {
+        int wifiSpeed = mAccessPoint.getSpeed();
+        if (level != mLevel || wifiSpeed != mWifiSpeed) {
             mLevel = level;
-            mWifiBadge = wifiBadge;
+            mWifiSpeed = wifiSpeed;
             updateIcon(mLevel, context);
             notifyChanged();
         }

@@ -203,6 +203,34 @@ public final class BluetoothDevice implements Parcelable {
             "android.bluetooth.device.action.BOND_STATE_CHANGED";
 
     /**
+     * Broadcast Action: Indicates the battery level of a remote device has
+     * been retrieved for the first time, or changed since the last retrieval
+     * <p>Always contains the extra fields {@link #EXTRA_DEVICE} and {@link
+     * #EXTRA_BATTERY_LEVEL}.
+     * <p>Requires {@link android.Manifest.permission#BLUETOOTH} to receive.
+     * @hide
+     */
+    @SdkConstant(SdkConstantType.BROADCAST_INTENT_ACTION)
+    public static final String ACTION_BATTERY_LEVEL_CHANGED =
+            "android.bluetooth.device.action.BATTERY_LEVEL_CHANGED";
+
+    /**
+     * Used as an Integer extra field in {@link #ACTION_BATTERY_LEVEL_CHANGED}
+     * intent. It contains the most recently retrieved battery level information
+     * ranging from 0% to 100% for a remote device, {@link #BATTERY_LEVEL_UNKNOWN}
+     * when the valid is unknown or there is an error
+     * @hide
+     */
+    public static final String EXTRA_BATTERY_LEVEL =
+            "android.bluetooth.device.extra.BATTERY_LEVEL";
+
+    /**
+     * Used as the unknown value for {@link #EXTRA_BATTERY_LEVEL} and {@link #getBatteryLevel()}
+     * @hide
+     */
+    public static final int BATTERY_LEVEL_UNKNOWN = -1;
+
+    /**
      * Used as a Parcelable {@link BluetoothDevice} extra field in every intent
      * broadcast by this class. It contains the {@link BluetoothDevice} that
      * the intent applies to.
@@ -858,6 +886,27 @@ public final class BluetoothDevice implements Parcelable {
             name = getName();
         }
         return name;
+    }
+
+    /**
+     * Get the most recent identified battery level of this Bluetooth device
+     * <p>Requires {@link android.Manifest.permission#BLUETOOTH}
+     *
+     * @return Battery level in percents from 0 to 100, or {@link #BATTERY_LEVEL_UNKNOWN} if
+     *         Bluetooth is disabled, or device is disconnected, or does not have any battery
+     *         reporting service, or return value is invalid
+     * @hide
+     */
+    @RequiresPermission(Manifest.permission.BLUETOOTH)
+    public int getBatteryLevel() {
+        if (sService == null) {
+            Log.e(TAG, "Bluetooth disabled. Cannot get remote device battery level");
+            return BATTERY_LEVEL_UNKNOWN;
+        }
+        try {
+            return sService.getBatteryLevel(this);
+        } catch (RemoteException e) {Log.e(TAG, "", e);}
+        return BATTERY_LEVEL_UNKNOWN;
     }
 
     /**
@@ -1709,6 +1758,38 @@ public final class BluetoothDevice implements Parcelable {
     public BluetoothGatt connectGatt(Context context, boolean autoConnect,
                                      BluetoothGattCallback callback, int transport, int phy,
                                      Handler handler) {
+        return connectGatt(context, autoConnect, callback, transport, false, phy, handler);
+    }
+
+    /**
+     * Connect to GATT Server hosted by this device. Caller acts as GATT client.
+     * The callback is used to deliver results to Caller, such as connection status as well
+     * as any further GATT client operations.
+     * The method returns a BluetoothGatt instance. You can use BluetoothGatt to conduct
+     * GATT client operations.
+     * @param callback GATT callback handler that will receive asynchronous callbacks.
+     * @param autoConnect Whether to directly connect to the remote device (false)
+     *                    or to automatically connect as soon as the remote
+     *                    device becomes available (true).
+     * @param transport preferred transport for GATT connections to remote dual-mode devices
+     *             {@link BluetoothDevice#TRANSPORT_AUTO} or
+     *             {@link BluetoothDevice#TRANSPORT_BREDR} or {@link BluetoothDevice#TRANSPORT_LE}
+     * @param opportunistic Whether this GATT client is opportunistic. An opportunistic GATT client
+     *                      does not hold a GATT connection. It automatically disconnects when no
+     *                      other GATT connections are active for the remote device.
+     * @param phy preferred PHY for connections to remote LE device. Bitwise OR of any of
+     *             {@link BluetoothDevice#PHY_LE_1M_MASK}, {@link BluetoothDevice#PHY_LE_2M_MASK},
+     *             an d{@link BluetoothDevice#PHY_LE_CODED_MASK}. This option does not take effect
+     *             if {@code autoConnect} is set to true.
+     * @param handler The handler to use for the callback. If {@code null}, callbacks will happen
+     *             on an un-specified background thread.
+     * @return A BluetoothGatt instance. You can use BluetoothGatt to conduct GATT client
+     *         operations.
+     * @hide
+     */
+    public BluetoothGatt connectGatt(Context context, boolean autoConnect,
+                                     BluetoothGattCallback callback, int transport,
+                                     boolean opportunistic, int phy, Handler handler) {
         if (callback == null)
             throw new NullPointerException("callback is null");
 
@@ -1722,7 +1803,7 @@ public final class BluetoothDevice implements Parcelable {
                 // BLE is not supported
                 return null;
             }
-            BluetoothGatt gatt = new BluetoothGatt(iGatt, this, transport, phy);
+            BluetoothGatt gatt = new BluetoothGatt(iGatt, this, transport, opportunistic, phy);
             gatt.connect(autoConnect, callback, handler);
             return gatt;
         } catch (RemoteException e) {Log.e(TAG, "", e);}

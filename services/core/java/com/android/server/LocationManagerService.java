@@ -243,6 +243,8 @@ public class LocationManagerService extends ILocationManager.Stub {
 
     private GnssLocationProvider.GnssSystemInfoProvider mGnssSystemInfoProvider;
 
+    private GnssLocationProvider.GnssMetricsProvider mGnssMetricsProvider;
+
     private GnssLocationProvider.GnssBatchingProvider mGnssBatchingProvider;
     private IBatchedLocationCallback mGnssBatchingCallback;
     private LinkedCallback mGnssBatchingDeathCallback;
@@ -587,6 +589,7 @@ public class LocationManagerService extends ILocationManager.Stub {
                     mLocationHandler.getLooper());
             mGnssSystemInfoProvider = gnssProvider.getGnssSystemInfoProvider();
             mGnssBatchingProvider = gnssProvider.getGnssBatchingProvider();
+            mGnssMetricsProvider = gnssProvider.getGnssMetricsProvider();
             mGnssStatusProvider = gnssProvider.getGnssStatusProvider();
             mNetInitiatedListener = gnssProvider.getNetInitiatedListener();
             addProviderLocked(gnssProvider);
@@ -3036,6 +3039,12 @@ public class LocationManagerService extends ILocationManager.Stub {
         if (!DumpUtils.checkDumpPermission(mContext, TAG, pw)) return;
 
         synchronized (mLock) {
+            if (args.length > 0 && args[0].equals("--gnssmetrics")) {
+                if (mGnssMetricsProvider != null) {
+                    pw.append(mGnssMetricsProvider.getGnssMetricsAsProtoString());
+                }
+                return;
+            }
             pw.println("Current Location Manager state:");
             pw.println("  Location Listeners:");
             for (Receiver receiver : mReceivers.values()) {

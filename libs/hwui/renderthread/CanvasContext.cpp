@@ -186,7 +186,8 @@ void CanvasContext::setSurface(Surface* surface) {
 
     mNativeSurface = surface;
 
-    bool hasSurface = mRenderPipeline->setSurface(surface, mSwapBehavior);
+    ColorMode colorMode = mWideColorGamut ? ColorMode::WideColorGamut : ColorMode::Srgb;
+    bool hasSurface = mRenderPipeline->setSurface(surface, mSwapBehavior, colorMode);
 
     mFrameNumber = -1;
 
@@ -239,6 +240,10 @@ void CanvasContext::setLightCenter(const Vector3& lightCenter) {
 
 void CanvasContext::setOpaque(bool opaque) {
     mOpaque = opaque;
+}
+
+void CanvasContext::setWideGamut(bool wideGamut) {
+    mWideColorGamut = wideGamut;
 }
 
 bool CanvasContext::makeCurrent() {
@@ -416,7 +421,7 @@ void CanvasContext::draw() {
     SkRect windowDirty = computeDirtyRect(frame, &dirty);
 
     bool drew = mRenderPipeline->draw(frame, windowDirty, dirty, mLightGeometry, &mLayerUpdateQueue,
-            mContentDrawBounds, mOpaque, mLightInfo, mRenderNodes, &(profiler()));
+            mContentDrawBounds, mOpaque, mWideColorGamut, mLightInfo, mRenderNodes, &(profiler()));
 
     waitOnFences();
 
@@ -558,7 +563,8 @@ void CanvasContext::buildLayer(RenderNode* node) {
     // purposes when the frame is actually drawn
     node->setPropertyFieldsDirty(RenderNode::GENERIC);
 
-    mRenderPipeline->renderLayers(mLightGeometry, &mLayerUpdateQueue, mOpaque, mLightInfo);
+    mRenderPipeline->renderLayers(mLightGeometry, &mLayerUpdateQueue,
+            mOpaque, mWideColorGamut, mLightInfo);
 
     node->incStrong(nullptr);
     mPrefetchedLayers.insert(node);
@@ -580,15 +586,37 @@ void CanvasContext::destroyHardwareResources() {
 }
 
 void CanvasContext::trimMemory(RenderThread& thread, int level) {
-    // No context means nothing to free
-    if (!thread.eglManager().hasEglContext()) return;
-
-    ATRACE_CALL();
-    if (level >= TRIM_MEMORY_COMPLETE) {
-        thread.renderState().flush(Caches::FlushMode::Full);
-        thread.eglManager().destroy();
-    } else if (level >= TRIM_MEMORY_UI_HIDDEN) {
-        thread.renderState().flush(Caches::FlushMode::Moderate);
+    auto renderType = Properties::getRenderPipelineType();
+    switch (renderType) {
+        case RenderPipelineType::OpenGL: {
+            // No context means nothing to free
+            if (!thread.eglManager().hasEglContext()) return;
+            ATRACE_CALL();
+            if (level >= TRIM_MEMORY_COMPLETE) {
+                thread.renderState().flush(Caches::FlushMode::Full);
+                thread.eglManager().destroy();
+            } else if (level >= TRIM_MEMORY_UI_HIDDEN) {
+                thread.renderState().flush(Caches::FlushMode::Moderate);
+            }
+            break;
+        }
+        case RenderPipelineType::SkiaGL:
+        case RenderPipelineType::SkiaVulkan: {
+            // No context means nothing to free
+            if (!thread.getGrContext()) return;
+            ATRACE_CALL();
+            if (level >= TRIM_MEMORY_COMPLETE) {
+                thread.cacheManager().trimMemory(CacheManager::TrimMemoryMode::Complete);
+                thread.eglManager().destroy();
+                thread.vulkanManager().destroy();
+            } else if (level >= TRIM_MEMORY_UI_HIDDEN) {
+                thread.cacheManager().trimMemory(CacheManager::TrimMemoryMode::UiHidden);
+            }
+            break;
+        }
+        default:
+            LOG_ALWAYS_FATAL("canvas context type %d not supported", (int32_t) renderType);
+            break;
     }
 }
 

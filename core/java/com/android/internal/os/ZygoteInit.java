@@ -132,6 +132,9 @@ public class ZygoteInit {
         bootTimingsTraceLog.traceBegin("PreloadResources");
         preloadResources();
         bootTimingsTraceLog.traceEnd(); // PreloadResources
+        Trace.traceBegin(Trace.TRACE_TAG_DALVIK, "PreloadAppProcessHALs");
+        nativePreloadAppProcessHALs();
+        Trace.traceEnd(Trace.TRACE_TAG_DALVIK);
         Trace.traceBegin(Trace.TRACE_TAG_DALVIK, "PreloadOpenGL");
         preloadOpenGL();
         Trace.traceEnd(Trace.TRACE_TAG_DALVIK);
@@ -183,6 +186,8 @@ public class ZygoteInit {
         System.loadLibrary("compiler_rt");
         System.loadLibrary("jnigraphics");
     }
+
+    native private static void nativePreloadAppProcessHALs();
 
     private static void preloadOpenGL() {
         String driverPackageName = SystemProperties.get(PROPERTY_GFX_DRIVER);
@@ -745,7 +750,7 @@ public class ZygoteInit {
             bootTimingsTraceLog.traceEnd(); // ZygoteInit
             // Disable tracing so that forked processes do not inherit stale tracing tags from
             // Zygote.
-            Trace.setTracingEnabled(false);
+            Trace.setTracingEnabled(false, 0);
 
             // Zygote process unmounts root storage spaces.
             Zygote.nativeUnmountStorageOnInit();
@@ -786,21 +791,7 @@ public class ZygoteInit {
     private static void waitForSecondaryZygote(String socketName) {
         String otherZygoteName = Process.ZYGOTE_SOCKET.equals(socketName) ?
                 Process.SECONDARY_ZYGOTE_SOCKET : Process.ZYGOTE_SOCKET;
-        while (true) {
-            try {
-                final ZygoteProcess.ZygoteState zs =
-                        ZygoteProcess.ZygoteState.connect(otherZygoteName);
-                zs.close();
-                break;
-            } catch (IOException ioe) {
-                Log.w(TAG, "Got error connecting to zygote, retrying. msg= " + ioe.getMessage());
-            }
-
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException ie) {
-            }
-        }
+        ZygoteProcess.waitForConnectionToZygote(otherZygoteName);
     }
 
     static boolean isPreloadComplete() {

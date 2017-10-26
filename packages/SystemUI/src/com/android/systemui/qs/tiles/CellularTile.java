@@ -16,6 +16,8 @@
 
 package com.android.systemui.qs.tiles;
 
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -24,6 +26,7 @@ import android.service.quicksettings.Tile;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager.LayoutParams;
 import android.widget.Switch;
 
 import com.android.internal.logging.MetricsLogger;
@@ -31,6 +34,7 @@ import com.android.internal.logging.nano.MetricsProto.MetricsEvent;
 import com.android.settingslib.net.DataUsageController;
 import com.android.systemui.Dependency;
 import com.android.systemui.R;
+import com.android.systemui.R.string;
 import com.android.systemui.plugins.ActivityStarter;
 import com.android.systemui.plugins.qs.DetailAdapter;
 import com.android.systemui.plugins.qs.QSIconView;
@@ -38,8 +42,9 @@ import com.android.systemui.plugins.qs.QSTile.SignalState;
 import com.android.systemui.qs.CellTileView;
 import com.android.systemui.qs.CellTileView.SignalIcon;
 import com.android.systemui.qs.QSHost;
-import com.android.systemui.qs.SignalTileView;
 import com.android.systemui.qs.tileimpl.QSTileImpl;
+import com.android.systemui.statusbar.phone.SystemUIDialog;
+import com.android.systemui.statusbar.policy.KeyguardMonitor;
 import com.android.systemui.statusbar.policy.NetworkController;
 import com.android.systemui.statusbar.policy.NetworkController.IconState;
 import com.android.systemui.statusbar.policy.NetworkController.SignalCallback;
@@ -55,11 +60,13 @@ public class CellularTile extends QSTileImpl<SignalState> {
 
     private final CellSignalCallback mSignalCallback = new CellSignalCallback();
     private final ActivityStarter mActivityStarter;
+    private final KeyguardMonitor mKeyguardMonitor;
 
     public CellularTile(QSHost host) {
         super(host);
         mController = Dependency.get(NetworkController.class);
         mActivityStarter = Dependency.get(ActivityStarter.class);
+        mKeyguardMonitor = Dependency.get(KeyguardMonitor.class);
         mDataController = mController.getMobileDataController();
         mDetailAdapter = new CellularDetailAdapter();
     }
@@ -95,7 +102,31 @@ public class CellularTile extends QSTileImpl<SignalState> {
 
     @Override
     protected void handleClick() {
-        mDataController.setMobileDataEnabled(!mDataController.isMobileDataEnabled());
+        if (mDataController.isMobileDataEnabled()) {
+            if (mKeyguardMonitor.isSecure() && !mKeyguardMonitor.canSkipBouncer()) {
+                mActivityStarter.postQSRunnableDismissingKeyguard(this::showDisableDialog);
+            } else {
+                mUiHandler.post(this::showDisableDialog);
+            }
+        } else {
+            mDataController.setMobileDataEnabled(true);
+        }
+    }
+
+    private void showDisableDialog() {
+        mHost.collapsePanels();
+        AlertDialog dialog = new Builder(mContext)
+                .setMessage(string.data_usage_disable_mobile)
+                .setNegativeButton(android.R.string.cancel, null)
+                .setPositiveButton(
+                        com.android.internal.R.string.alert_windows_notification_turn_off_action,
+                        (d, w) -> mDataController.setMobileDataEnabled(false))
+                .create();
+        dialog.getWindow().setType(LayoutParams.TYPE_KEYGUARD_DIALOG);
+        SystemUIDialog.setShowForAllUsers(dialog, true);
+        SystemUIDialog.registerDismissListener(dialog);
+        SystemUIDialog.setWindowOnTop(dialog);
+        dialog.show();
     }
 
     @Override
@@ -139,6 +170,7 @@ public class CellularTile extends QSTileImpl<SignalState> {
         state.expandedAccessibilityClassName = Switch.class.getName();
         state.value = mDataController.isMobileDataSupported()
                 && mDataController.isMobileDataEnabled();
+
         state.icon = new SignalIcon(cb.mobileSignalIconId);
         if (cb.airplaneModeEnabled) {
             state.state = Tile.STATE_INACTIVE;

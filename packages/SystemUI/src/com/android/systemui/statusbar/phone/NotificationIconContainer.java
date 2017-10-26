@@ -123,6 +123,7 @@ public class NotificationIconContainer extends AlphaOptimizedFrameLayout {
     private boolean mDisallowNextAnimation;
     private boolean mAnimationsEnabled = true;
     private ArrayMap<String, ArrayList<StatusBarIcon>> mReplacingIcons;
+    private int mDarkOffsetX;
 
     public NotificationIconContainer(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -389,6 +390,14 @@ public class NotificationIconContainer extends AlphaOptimizedFrameLayout {
                 iconState.xTranslation = getWidth() - iconState.xTranslation - view.getWidth();
             }
         }
+
+        if (mDark && mDarkOffsetX != 0) {
+            for (int i = 0; i < childCount; i++) {
+                View view = getChildAt(i);
+                IconState iconState = mIconStates.get(view);
+                iconState.xTranslation += mDarkOffsetX;
+            }
+        }
     }
 
     private float getLayoutEnd() {
@@ -512,7 +521,12 @@ public class NotificationIconContainer extends AlphaOptimizedFrameLayout {
         mReplacingIcons = replacingIcons;
     }
 
+    public void setDarkOffsetX(int offsetX) {
+        mDarkOffsetX = offsetX;
+    }
+
     public class IconState extends ViewState {
+        public static final int NO_VALUE = NotificationIconContainer.NO_VALUE;
         public float iconAppearAmount = 1.0f;
         public float clampedAppearAmount = 1.0f;
         public int visibleState;
@@ -525,6 +539,8 @@ public class NotificationIconContainer extends AlphaOptimizedFrameLayout {
         public boolean justUndarkened;
         public int iconColor = StatusBarIconView.NO_COLOR;
         public boolean noAnimations;
+        public boolean isLastExpandIcon;
+        public int customTransformHeight = NO_VALUE;
 
         @Override
         public void applyToView(View view) {
@@ -600,6 +616,10 @@ public class NotificationIconContainer extends AlphaOptimizedFrameLayout {
             justReplaced = false;
             needsCannedAnimation = false;
             justUndarkened = false;
+        }
+
+        public boolean hasCustomTransformHeight() {
+            return isLastExpandIcon && customTransformHeight != NO_VALUE;
         }
 
         @Override

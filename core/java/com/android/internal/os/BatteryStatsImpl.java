@@ -171,6 +171,7 @@ public class BatteryStatsImpl extends BatteryStats {
 
     public interface PlatformIdleStateCallback {
         public String getPlatformLowPowerStats();
+        public String getSubsystemLowPowerStats();
     }
 
     private final PlatformIdleStateCallback mPlatformIdleStateCallback;
@@ -2878,6 +2879,12 @@ public class BatteryStatsImpl extends BatteryStats {
                         mPlatformIdleStateCallback.getPlatformLowPowerStats();
                 if (DEBUG) Slog.i(TAG, "WRITE PlatformIdleState:" +
                         mCurHistoryStepDetails.statPlatformIdleState);
+
+                mCurHistoryStepDetails.statSubsystemPowerState =
+                        mPlatformIdleStateCallback.getSubsystemLowPowerStats();
+                if (DEBUG) Slog.i(TAG, "WRITE SubsystemPowerState:" +
+                        mCurHistoryStepDetails.statSubsystemPowerState);
+
             }
             computeHistoryStepDetails(mCurHistoryStepDetails, mLastHistoryStepDetails);
             if (includeStepDetails != 0) {
@@ -3590,7 +3597,12 @@ public class BatteryStatsImpl extends BatteryStats {
     }
 
     public void noteUidProcessStateLocked(int uid, int state) {
-        uid = mapUid(uid);
+        int parentUid = mapUid(uid);
+        if (uid != parentUid) {
+            // Isolated UIDs process state is already rolled up into parent, so no need to track
+            // Otherwise the parent's process state will get downgraded incorrectly
+            return;
+        }
         getUidStatsLocked(uid).updateUidProcessStateLocked(state);
     }
 
@@ -4845,7 +4857,7 @@ public class BatteryStatsImpl extends BatteryStats {
         }
     }
 
-    private void noteBluetoothScanStoppedLocked(int uid) {
+    private void noteBluetoothScanStoppedLocked(int uid, boolean isUnoptimized) {
         uid = mapUid(uid);
         final long elapsedRealtime = mClocks.elapsedRealtime();
         final long uptime = mClocks.uptimeMillis();
@@ -4857,13 +4869,13 @@ public class BatteryStatsImpl extends BatteryStats {
             addHistoryRecordLocked(elapsedRealtime, uptime);
             mBluetoothScanTimer.stopRunningLocked(elapsedRealtime);
         }
-        getUidStatsLocked(uid).noteBluetoothScanStoppedLocked(elapsedRealtime);
+        getUidStatsLocked(uid).noteBluetoothScanStoppedLocked(elapsedRealtime, isUnoptimized);
     }
 
-    public void noteBluetoothScanStoppedFromSourceLocked(WorkSource ws) {
+    public void noteBluetoothScanStoppedFromSourceLocked(WorkSource ws, boolean isUnoptimized) {
         final int N = ws.size();
         for (int i = 0; i < N; i++) {
-            noteBluetoothScanStoppedLocked(ws.get(i));
+            noteBluetoothScanStoppedLocked(ws.get(i), isUnoptimized);
         }
     }
 
@@ -6114,14 +6126,11 @@ public class BatteryStatsImpl extends BatteryStats {
             }
         }
 
-        public void noteBluetoothScanStoppedLocked(long elapsedRealtimeMs) {
+        public void noteBluetoothScanStoppedLocked(long elapsedRealtimeMs, boolean isUnoptimized) {
             if (mBluetoothScanTimer != null) {
                 mBluetoothScanTimer.stopRunningLocked(elapsedRealtimeMs);
             }
-            // In the ble code, a scan cannot change types and nested starts are not possible.
-            // So if an unoptimizedScan is running, it is now being stopped.
-            if (mBluetoothUnoptimizedScanTimer != null
-                    && mBluetoothUnoptimizedScanTimer.isRunningLocked()) {
+            if (isUnoptimized && mBluetoothUnoptimizedScanTimer != null) {
                 mBluetoothUnoptimizedScanTimer.stopRunningLocked(elapsedRealtimeMs);
             }
         }
@@ -6546,8 +6555,11 @@ public class BatteryStatsImpl extends BatteryStats {
          * inactive so can be dropped.
          */
         @VisibleForTesting(visibility = VisibleForTesting.Visibility.PACKAGE)
-        public boolean reset() {
+        public boolean reset(long uptime, long realtime) {
             boolean active = false;
+
+            mOnBatteryBackgroundTimeBase.init(uptime, realtime);
+            mOnBatteryScreenOffBackgroundTimeBase.init(uptime, realtime);
 
             if (mWifiRunningTimer != null) {
                 active |= !mWifiRunningTimer.reset(false);
@@ -6733,11 +6745,6 @@ public class BatteryStatsImpl extends BatteryStats {
 
             mLastStepUserTime = mLastStepSystemTime = 0;
             mCurStepUserTime = mCurStepSystemTime = 0;
-
-            mOnBatteryBackgroundTimeBase.reset(mBsi.mClocks.elapsedRealtime() * 1000,
-                    mBsi.mClocks.uptimeMillis() * 1000);
-            mOnBatteryScreenOffBackgroundTimeBase.reset(mBsi.mClocks.elapsedRealtime() * 1000,
-                    mBsi.mClocks.uptimeMillis() * 1000);
 
             if (!active) {
                 if (mWifiRunningTimer != null) {
@@ -9330,7 +9337,7 @@ public class BatteryStatsImpl extends BatteryStats {
         mNumConnectivityChange = mLoadedNumConnectivityChange = mUnpluggedNumConnectivityChange = 0;
 
         for (int i=0; i<mUidStats.size(); i++) {
-            if (mUidStats.valueAt(i).reset()) {
+            if (mUidStats.valueAt(i).reset(uptimeMillis * 1000, elapsedRealtimeMillis * 1000)) {
                 mUidStats.remove(mUidStats.keyAt(i));
                 i--;
             }

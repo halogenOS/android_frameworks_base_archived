@@ -316,6 +316,7 @@
     <string name="quick_settings_more_settings" msgid="326112621462813682">"Več nastavitev"</string>
     <string name="quick_settings_done" msgid="3402999958839153376">"Končano"</string>
     <string name="quick_settings_connected" msgid="1722253542984847487">"Povezava je vzpostavljena"</string>
+    <string name="quick_settings_connected_battery_level" msgid="4136051440381328892">"Povezava je vzpostavljena, raven napolnjenosti akumulatorja je <xliff:g id="BATTERY_LEVEL_AS_PERCENTAGE">%1$s</xliff:g>"</string>
     <string name="quick_settings_connecting" msgid="47623027419264404">"Vzpostavljanje povezave ..."</string>
     <string name="quick_settings_tethering_label" msgid="7153452060448575549">"Internet prek mobilne naprave"</string>
     <string name="quick_settings_hotspot_label" msgid="6046917934974004879">"Dostopna točka"</string>
@@ -473,6 +474,8 @@
     <string name="branded_monitoring_description_app_personal" msgid="2669518213949202599">"Povezani ste z aplikacijo <xliff:g id="APPLICATION">%1$s</xliff:g>, ki lahko nadzira vašo osebno omrežno dejavnost, vključno z e-pošto, aplikacijami in spletnimi mesti."</string>
     <string name="monitoring_description_app_work" msgid="4612997849787922906">"Delovni profil upravlja organizacija <xliff:g id="ORGANIZATION">%1$s</xliff:g>. Profil je povezan z aplikacijo <xliff:g id="APPLICATION">%2$s</xliff:g>, ki lahko nadzira vašo delovno omrežno dejavnost, vključno z e-pošto, aplikacijami in spletnimi mesti.\n\nZa več informacij se obrnite na skrbnika."</string>
     <string name="monitoring_description_app_personal_work" msgid="5664165460056859391">"Delovni profil upravlja organizacija <xliff:g id="ORGANIZATION">%1$s</xliff:g>. Profil je povezan z aplikacijo <xliff:g id="APPLICATION_WORK">%2$s</xliff:g>, ki lahko nadzira vašo delovno omrežno dejavnost, vključno z e-pošto, aplikacijami in spletnimi mesti.\n\nPovezani ste tudi z aplikacijo <xliff:g id="APPLICATION_PERSONAL">%3$s</xliff:g>, ki lahko nadzira vašo osebno omrežno dejavnost."</string>
+    <string name="keyguard_indication_trust_granted" msgid="4985003749105182372">"Odklenjeno za uporabnika <xliff:g id="USER_NAME">%1$s</xliff:g>"</string>
+    <string name="keyguard_indication_trust_managed" msgid="8319646760022357585">"<xliff:g id="TRUST_AGENT">%1$s</xliff:g> se izvaja"</string>
     <string name="keyguard_indication_trust_disabled" msgid="7412534203633528135">"Naprava bo ostala zaklenjena, dokler je ročno ne odklenete."</string>
     <string name="hidden_notifications_title" msgid="7139628534207443290">"Hitrejše prejemanje obvestil"</string>
     <string name="hidden_notifications_text" msgid="2326409389088668981">"Oglejte si jih pred odklepanjem"</string>
@@ -554,9 +557,10 @@
     <string name="tuner_full_importance_settings_off" msgid="8208165412614935229">"Izklopljeno"</string>
     <string name="power_notification_controls_description" msgid="4372459941671353358">"S kontrolniki za pomebnost obvestila je mogoče za obvestila aplikacije nastaviti stopnjo pomembnosti od 0 do 5. \n\n"<b>"Stopnja 5"</b>" \n– Prikaz na vrhu seznama obvestil \n– Omogočanje prekinitev v celozaslonskem načinu \n– Vedno prikaži hitre predoglede \n\n"<b>"Stopnja 4"</b>" \n– Preprečevanje prekinitev v celozaslonskem načinu \n– Vedno prikaži hitre predoglede \n\n"<b>"Stopnja 3"</b>" \n– Preprečevanje prekinitev v celozaslonskem načinu \n– Nikoli ne prikaži hitrih predogledov \n\n"<b>"Stopnja 2"</b>" \n– Preprečevanje prekinitev v celozaslonskem načinu \n– Nikoli ne prikaži hitrih predogledov \n– Nikoli ne uporabi zvoka in vibriranja \n\n"<b>"Stopnja 1"</b>" \n– Preprečevanje prekinitev v celozaslonskem načinu \n– Nikoli ne prikaži hitrih predogledov \n– Nikoli ne uporabi zvoka in vibriranja \n– Skrivanje na zaklenjenem zaslonu in v vrstici stanja \n– Prikaz na dnu seznama obvestil \n\n"<b>"Stopnja 0"</b>" \n– Blokiranje vseh obvestil aplikacije"</string>
     <string name="notification_header_default_channel" msgid="7506845022070889909">"Obvestila"</string>
-    <string name="notification_channel_disabled" msgid="5805874247999578073">"Teh obvestil ne boste več prejemali."</string>
+    <string name="notification_channel_disabled" msgid="2139193533791840539">"Teh obvestil ne boste več prejemali"</string>
     <string name="notification_num_channels" msgid="2048144408999179471">"Št. kategorij obvestil: <xliff:g id="NUMBER">%d</xliff:g>"</string>
     <string name="notification_default_channel_desc" msgid="2506053815870808359">"Ta aplikacija nima kategorij obvestil"</string>
+    <string name="notification_unblockable_desc" msgid="3561016061737896906">"Obvestil te aplikacije ni mogoče izklopiti"</string>
     <plurals name="notification_num_channels_desc" formatted="false" msgid="5492793452274077663">
       <item quantity="one">1 od <xliff:g id="NUMBER_1">%d</xliff:g> kategorije obvestil iz te aplikacije</item>
       <item quantity="two">1 od <xliff:g id="NUMBER_1">%d</xliff:g> kategorij obvestil iz te aplikacije</item>
@@ -580,12 +584,20 @@
     <string name="notification_menu_accessibility" msgid="2046162834248888553">"<xliff:g id="APP_NAME">%1$s</xliff:g> <xliff:g id="MENU_DESCRIPTION">%2$s</xliff:g>"</string>
     <string name="notification_menu_gear_description" msgid="2204480013726775108">"kontrolniki obvestil"</string>
     <string name="notification_menu_snooze_description" msgid="3653669438131034525">"možnosti preložitve obvestil"</string>
-    <string name="snooze_option_15_min" msgid="1068727451405610715">"15 minut"</string>
-    <string name="snooze_option_30_min" msgid="867081342535195788">"30 minut"</string>
-    <string name="snooze_option_1_hour" msgid="1098086401880077154">"1 ura"</string>
-    <string name="snooze_option_2_hour" msgid="8332218255658969475">"2 uri"</string>
     <string name="snooze_undo" msgid="6074877317002985129">"RAZVELJAVI"</string>
     <string name="snoozed_for_time" msgid="2390718332980204462">"Preloženo za <xliff:g id="TIME_AMOUNT">%1$s</xliff:g>"</string>
+    <plurals name="snoozeHourOptions" formatted="false" msgid="2124335842674413030">
+      <item quantity="one">%d ura</item>
+      <item quantity="two">%d uri</item>
+      <item quantity="few">%d ure</item>
+      <item quantity="other">%d ur</item>
+    </plurals>
+    <plurals name="snoozeMinuteOptions" formatted="false" msgid="4127251700591510196">
+      <item quantity="one">%d minuta</item>
+      <item quantity="two">%d minuti</item>
+      <item quantity="few">%d minute</item>
+      <item quantity="other">%d minut</item>
+    </plurals>
     <string name="battery_panel_title" msgid="7944156115535366613">"Poraba akumulatorja"</string>
     <string name="battery_detail_charging_summary" msgid="1279095653533044008">"Varčevanje z energijo akumulatorja med polnjenjem ni na voljo"</string>
     <string name="battery_detail_switch_title" msgid="6285872470260795421">"Varčevanje z energijo akumulatorja"</string>
@@ -775,4 +787,5 @@
     <string name="qs_dnd_replace" msgid="8019520786644276623">"Zamenjaj"</string>
     <string name="running_foreground_services_title" msgid="381024150898615683">"Aplikacije, ki se izvajajo v ozadju"</string>
     <string name="running_foreground_services_msg" msgid="6326247670075574355">"Dotaknite se za prikaz podrobnosti porabe akumulatorja in prenosa podatkov"</string>
+    <string name="data_usage_disable_mobile" msgid="5116269981510015864">"Želite izklopiti prenos podatkov v mobilnih omrežjih?"</string>
 </resources>

@@ -32,8 +32,12 @@ LOCAL_STATIC_JAVA_LIBRARIES := \
     tzdata_shared2 \
     tzdata_update2 \
     android.hidl.base-V1.0-java-static \
+    android.hardware.weaver-V1.0-java-static \
     android.hardware.biometrics.fingerprint-V2.1-java-static \
+    android.hardware.oemlock-V1.0-java-static \
+    android.hardware.tetheroffload.control-V1.0-java-static \
     android.hardware.vibrator-V1.0-java-constants \
+    android.hardware.configstore-V1.0-java-static
 
 ifneq ($(INCREMENTAL_BUILDS),)
     LOCAL_PROGUARD_ENABLED := disabled

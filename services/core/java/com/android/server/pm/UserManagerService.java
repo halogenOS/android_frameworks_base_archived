@@ -223,6 +223,7 @@ public class UserManagerService extends IUserManager.Stub {
     // Tron counters
     private static final String TRON_GUEST_CREATED = "users_guest_created";
     private static final String TRON_USER_CREATED = "users_user_created";
+    private static final String TRON_DEMO_CREATED = "users_demo_created";
 
     private final Context mContext;
     private final PackageManagerService mPm;
@@ -2523,7 +2524,8 @@ public class UserManagerService extends IUserManager.Stub {
             addedIntent.putExtra(Intent.EXTRA_USER_HANDLE, userId);
             mContext.sendBroadcastAsUser(addedIntent, UserHandle.ALL,
                     android.Manifest.permission.MANAGE_USERS);
-            MetricsLogger.count(mContext, isGuest ? TRON_GUEST_CREATED : TRON_USER_CREATED, 1);
+            MetricsLogger.count(mContext, isGuest ? TRON_GUEST_CREATED
+                    : (isDemo ? TRON_DEMO_CREATED : TRON_USER_CREATED), 1);
         } finally {
             Binder.restoreCallingIdentity(ident);
         }
@@ -3650,7 +3652,7 @@ public class UserManagerService extends IUserManager.Stub {
         public UserInfo createUserEvenWhenDisallowed(String name, int flags) {
             UserInfo user = createUserInternalUnchecked(name, flags, UserHandle.USER_NULL, null);
             // Keep this in sync with UserManager.createUser
-            if (user != null && !user.isAdmin()) {
+            if (user != null && !user.isAdmin() && !user.isDemo()) {
                 setUserRestriction(UserManager.DISALLOW_SMS, true, user.id);
                 setUserRestriction(UserManager.DISALLOW_OUTGOING_CALLS, true, user.id);
             }

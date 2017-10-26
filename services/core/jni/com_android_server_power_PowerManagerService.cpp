@@ -18,7 +18,7 @@
 
 //#define LOG_NDEBUG 0
 
-#include <android/hardware/power/1.0/IPower.h>
+#include <android/hardware/power/1.1/IPower.h>
 #include "JNIHelp.h"
 #include "jni.h"
 
@@ -40,7 +40,7 @@
 
 using android::hardware::Return;
 using android::hardware::Void;
-using android::hardware::power::V1_0::IPower;
+using android::hardware::power::V1_1::IPower;
 using android::hardware::power::V1_0::PowerHint;
 using android::hardware::power::V1_0::Feature;
 using android::String8;
@@ -56,13 +56,14 @@ static struct {
 // ----------------------------------------------------------------------------
 
 static jobject gPowerManagerServiceObj;
-sp<IPower> gPowerHal = nullptr;
+sp<android::hardware::power::V1_0::IPower> gPowerHalV1_0 = nullptr;
+sp<android::hardware::power::V1_1::IPower> gPowerHalV1_1 = nullptr;
 bool gPowerHalExists = true;
 std::mutex gPowerHalMutex;
 static nsecs_t gLastEventTime[USER_ACTIVITY_EVENT_LAST + 1];
 
 // Throttling interval for user activity calls.
-static const nsecs_t MIN_TIME_BETWEEN_USERACTIVITIES = 500 * 1000000L; // 500ms
+static const nsecs_t MIN_TIME_BETWEEN_USERACTIVITIES = 100 * 1000000L; // 100ms
 
 // ----------------------------------------------------------------------------
 
@@ -79,16 +80,17 @@ static bool checkAndClearExceptionFromCallback(JNIEnv* env, const char* methodNa
 // Check validity of current handle to the power HAL service, and call getService() if necessary.
 // The caller must be holding gPowerHalMutex.
 bool getPowerHal() {
-    if (gPowerHalExists && gPowerHal == nullptr) {
-        gPowerHal = IPower::getService();
-        if (gPowerHal != nullptr) {
+    if (gPowerHalExists && gPowerHalV1_0 == nullptr) {
+        gPowerHalV1_0 = android::hardware::power::V1_0::IPower::getService();
+        if (gPowerHalV1_0 != nullptr) {
+            gPowerHalV1_1 =  android::hardware::power::V1_1::IPower::castFrom(gPowerHalV1_0);
             ALOGI("Loaded power HAL service");
         } else {
             ALOGI("Couldn't load power HAL service");
             gPowerHalExists = false;
         }
     }
-    return gPowerHal != nullptr;
+    return gPowerHalV1_0 != nullptr;
 }
 
 // Check if a call to a power HAL function failed; if so, log the failure and invalidate the
@@ -96,19 +98,11 @@ bool getPowerHal() {
 static void processReturn(const Return<void> &ret, const char* functionName) {
     if (!ret.isOk()) {
         ALOGE("%s() failed: power HAL service not available.", functionName);
-        gPowerHal = nullptr;
+        gPowerHalV1_0 = nullptr;
     }
 }
 
 void android_server_PowerManagerService_userActivity(nsecs_t eventTime, int32_t eventType) {
-    // Tell the power HAL when user activity occurs.
-    gPowerHalMutex.lock();
-    if (getPowerHal()) {
-        Return<void> ret = gPowerHal->powerHint(PowerHint::INTERACTION, 0);
-        processReturn(ret, "powerHint");
-    }
-    gPowerHalMutex.unlock();
-
     if (gPowerManagerServiceObj) {
         // Throttle calls into user activity by event type.
         // We're a little conservative about argument checking here in case the caller
@@ -123,6 +117,21 @@ void android_server_PowerManagerService_userActivity(nsecs_t eventTime, int32_t 
                 return;
             }
             gLastEventTime[eventType] = eventTime;
+
+
+            // Tell the power HAL when user activity occurs.
+            gPowerHalMutex.lock();
+            if (getPowerHal()) {
+              Return<void> ret;
+              if (gPowerHalV1_1 != nullptr) {
+                ret = gPowerHalV1_1->powerHintAsync(PowerHint::INTERACTION, 0);
+              } else {
+                ret = gPowerHalV1_0->powerHint(PowerHint::INTERACTION, 0);
+              }
+              processReturn(ret, "powerHint");
+            }
+            gPowerHalMutex.unlock();
+
         }
 
         JNIEnv* env = AndroidRuntime::getJNIEnv();
@@ -157,9 +166,11 @@ static void nativeReleaseSuspendBlocker(JNIEnv *env, jclass /* clazz */, jstring
 static void nativeSetInteractive(JNIEnv* /* env */, jclass /* clazz */, jboolean enable) {
     std::lock_guard<std::mutex> lock(gPowerHalMutex);
     if (getPowerHal()) {
-        String8 err("Excessive delay in setInteractive(%s) while turning screen %s");
-        ALOGD_IF_SLOW(20, String8::format(err, enable ? "true" : "false", enable ? "on" : "off"));
-        Return<void> ret = gPowerHal->setInteractive(enable);
+        String8 err = String8::format(
+                "Excessive delay in setInteractive(%s) while turning screen %s",
+                enable ? "true" : "false", enable ? "on" : "off");
+        ALOGD_IF_SLOW(20, err);
+        Return<void> ret = gPowerHalV1_0->setInteractive(enable);
         processReturn(ret, "setInteractive");
     }
 }
@@ -177,7 +188,12 @@ static void nativeSetAutoSuspend(JNIEnv* /* env */, jclass /* clazz */, jboolean
 static void nativeSendPowerHint(JNIEnv *env, jclass clazz, jint hintId, jint data) {
     std::lock_guard<std::mutex> lock(gPowerHalMutex);
     if (getPowerHal()) {
-        Return<void> ret =  gPowerHal->powerHint((PowerHint)hintId, data);
+        Return<void> ret;
+        if (gPowerHalV1_1 != nullptr) {
+            ret =  gPowerHalV1_1->powerHintAsync((PowerHint)hintId, data);
+        } else {
+            ret =  gPowerHalV1_0->powerHint((PowerHint)hintId, data);
+        }
         processReturn(ret, "powerHint");
     }
 }
@@ -185,7 +201,7 @@ static void nativeSendPowerHint(JNIEnv *env, jclass clazz, jint hintId, jint dat
 static void nativeSetFeature(JNIEnv *env, jclass clazz, jint featureId, jint data) {
     std::lock_guard<std::mutex> lock(gPowerHalMutex);
     if (getPowerHal()) {
-        Return<void> ret = gPowerHal->setFeature((Feature)featureId, static_cast<bool>(data));
+        Return<void> ret = gPowerHalV1_0->setFeature((Feature)featureId, static_cast<bool>(data));
         processReturn(ret, "setFeature");
     }
 }

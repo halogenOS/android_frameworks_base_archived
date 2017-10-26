@@ -32,15 +32,15 @@ import android.graphics.Paint;
 import android.graphics.Picture;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
-import android.net.http.SslCertificate;
 import android.net.Uri;
+import android.net.http.SslCertificate;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.os.StrictMode;
 import android.os.RemoteException;
+import android.os.StrictMode;
 import android.print.PrintDocumentAdapter;
 import android.security.KeyChain;
 import android.util.AttributeSet;
@@ -50,10 +50,10 @@ import android.view.DragEvent;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewStructure;
 import android.view.ViewDebug;
 import android.view.ViewGroup;
 import android.view.ViewHierarchyEncoder;
+import android.view.ViewStructure;
 import android.view.ViewTreeObserver;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
@@ -1664,6 +1664,25 @@ public class WebView extends AbsoluteLayout
     }
 
     /**
+     * Starts Safe Browsing initialization. This should only be called once.
+     * @param context is the activity context the WebView will be used in.
+     * @param callback will be called with the value true if initialization is
+     * successful. The callback will be run on the UI thread.
+     * @hide
+     */
+    public static void initSafeBrowsing(Context context, ValueCallback<Boolean> callback) {
+        getFactory().getStatics().initSafeBrowsing(context, callback);
+    }
+
+    /**
+     * Shuts down Safe Browsing. This should only be called once.
+     * @hide
+     */
+    public static void shutdownSafeBrowsing() {
+        getFactory().getStatics().shutdownSafeBrowsing();
+    }
+
+    /**
      * Gets the WebBackForwardList for this WebView. This contains the
      * back/forward list for use in querying each item in the history stack.
      * This is a copy of the private WebBackForwardList so it contains only a
@@ -1982,12 +2001,12 @@ public class WebView extends AbsoluteLayout
      * messages to a certain target origin. See
      * <a href="https://html.spec.whatwg.org/multipage/comms.html#posting-messages">
      * HTML5 spec</a> for how target origin can be used.
+     * <p>
+     * A target origin can be set as a wildcard ("*"). However this is not recommended.
+     * See the page above for security issues.
      *
      * @param message the WebMessage
-     * @param targetOrigin the target origin. This is the origin of the page
-     *          that is intended to receive the message. For best security
-     *          practices, the user should not specify a wildcard (*) when
-     *          specifying the origin.
+     * @param targetOrigin the target origin.
      */
     public void postWebMessage(WebMessage message, Uri targetOrigin) {
         checkThread();
@@ -2691,6 +2710,18 @@ public class WebView extends AbsoluteLayout
      * understood by the {@link android.service.autofill.AutofillService} implementations:
      *
      * <ol>
+     *   <li>Only the HTML nodes inside a {@code FORM} are generated.
+     *   <li>The source of the HTML is set using {@link ViewStructure#setWebDomain(String)} in the
+     *   node representing the WebView.
+     *   <li>If a web page has multiple {@code FORM}s, only the data for the current form is
+     *   represented&mdash;if the user taps a field from another form, then the current autofill
+     *   context is canceled (by calling {@link android.view.autofill.AutofillManager#cancel()} and
+     *   a new context is created for that {@code FORM}.
+     *   <li>Similarly, if the page has {@code IFRAME} nodes, they are not initially represented in
+     *   the view structure until the user taps a field from a {@code FORM} inside the
+     *   {@code IFRAME}, in which case it would be treated the same way as multiple forms described
+     *   above, except that the {@link ViewStructure#setWebDomain(String) web domain} of the
+     *   {@code FORM} contains the {@code src} attribute from the {@code IFRAME} node.
      *   <li>If the Android SDK provides a similar View, then should be set with the
      *   fully-qualified class name of such view.
      *   <li>The W3C autofill field ({@code autocomplete} tag attribute) maps to

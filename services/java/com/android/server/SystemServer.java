@@ -35,6 +35,7 @@ import android.os.FactoryTest;
 import android.os.FileUtils;
 import android.os.IIncidentManager;
 import android.os.Looper;
+import android.os.Message;
 import android.os.PowerManager;
 import android.os.Process;
 import android.os.RemoteException;
@@ -64,6 +65,7 @@ import com.android.server.accessibility.AccessibilityManagerService;
 import com.android.server.am.ActivityManagerService;
 import com.android.server.audio.AudioService;
 import com.android.server.camera.CameraServiceProxy;
+import com.android.server.car.CarServiceHelperService;
 import com.android.server.clipboard.ClipboardService;
 import com.android.server.connectivity.IpConnectivityMetrics;
 import com.android.server.coverage.CoverageService;
@@ -85,6 +87,7 @@ import com.android.server.media.projection.MediaProjectionManagerService;
 import com.android.server.net.NetworkPolicyManagerService;
 import com.android.server.net.NetworkStatsService;
 import com.android.server.notification.NotificationManagerService;
+import com.android.server.oemlock.OemLockService;
 import com.android.server.om.OverlayManagerService;
 import com.android.server.os.DeviceIdentifiersPolicyService;
 import com.android.server.os.SchedulingPolicyService;
@@ -98,8 +101,8 @@ import com.android.server.pm.UserManagerService;
 import com.android.server.policy.PhoneWindowManager;
 import com.android.server.power.PowerManagerService;
 import com.android.server.power.ShutdownThread;
+import com.android.server.radio.RadioService;
 import com.android.server.restrictions.RestrictionsManagerService;
-import com.android.server.retaildemo.RetailDemoModeService;
 import com.android.server.security.KeyAttestationApplicationIdProviderService;
 import com.android.server.security.KeyChainSystemService;
 import com.android.server.soundtrigger.SoundTriggerService;
@@ -176,7 +179,7 @@ public final class SystemServer {
     private static final String JOB_SCHEDULER_SERVICE_CLASS =
             "com.android.server.job.JobSchedulerService";
     private static final String LOCK_SETTINGS_SERVICE_CLASS =
-            "com.android.server.LockSettingsService$Lifecycle";
+            "com.android.server.locksettings.LockSettingsService$Lifecycle";
     private static final String STORAGE_MANAGER_SERVICE_CLASS =
             "com.android.server.StorageManagerService$Lifecycle";
     private static final String STORAGE_STATS_SERVICE_CLASS =
@@ -474,7 +477,20 @@ public final class SystemServer {
                     }
                 }
             }
-            ShutdownThread.rebootOrShutdown(null, reboot, reason);
+            Runnable runnable = new Runnable() {
+                @Override
+                public void run() {
+                    synchronized (this) {
+                        ShutdownThread.rebootOrShutdown(null, reboot, reason);
+                    }
+                }
+            };
+
+            // ShutdownThread must run on a looper capable of displaying the UI.
+            Message msg = Message.obtain(UiThread.getHandler(), runnable);
+            msg.setAsynchronous(true);
+            UiThread.getHandler().sendMessage(msg);
+
         }
     }
 
@@ -717,6 +733,8 @@ public final class SystemServer {
         boolean disableVrManager = SystemProperties.getBoolean("config.disable_vrmanager", false);
         boolean disableCameraService = SystemProperties.getBoolean("config.disable_cameraservice",
                 false);
+        // TODO(b/36863239): Remove when transitioned from native service.
+        boolean enableRadioService = SystemProperties.getBoolean("config.enable_java_radio", false);
 
         boolean isEmulator = SystemProperties.get("ro.kernel.qemu").equals("1");
 
@@ -773,13 +791,6 @@ public final class SystemServer {
             traceEnd();
 
             mContentResolver = context.getContentResolver();
-
-            if (!disableCameraService) {
-                Slog.i(TAG, "Camera Service Proxy");
-                traceBeginAndSlog("StartCameraServiceProxy");
-                mSystemServiceManager.startService(CameraServiceProxy.class);
-                traceEnd();
-            }
 
             // The AccountManager must come before the ContentService
             traceBeginAndSlog("StartAccountManagerService");
@@ -984,12 +995,15 @@ public final class SystemServer {
                 }
                 traceEnd();
 
-                if (!SystemProperties.get(PERSISTENT_DATA_BLOCK_PROP).equals("")) {
+                final boolean hasPdb = !SystemProperties.get(PERSISTENT_DATA_BLOCK_PROP).equals("");
+                if (hasPdb) {
                     traceBeginAndSlog("StartPersistentDataBlock");
                     mSystemServiceManager.startService(PersistentDataBlockService.class);
                     traceEnd();
+                }
 
-                    // Implementation depends on persistent data block
+                if (hasPdb || OemLockService.isHalPresent()) {
+                    // Implementation depends on pdb or the OemLock HAL
                     traceBeginAndSlog("StartOemLockService");
                     mSystemServiceManager.startService(OemLockService.class);
                     traceEnd();
@@ -1207,6 +1221,13 @@ public final class SystemServer {
             traceBeginAndSlog("StartAudioService");
             mSystemServiceManager.startService(AudioService.Lifecycle.class);
             traceEnd();
+
+            if (enableRadioService &&
+                    mPackageManager.hasSystemFeature(PackageManager.FEATURE_RADIO)) {
+                traceBeginAndSlog("StartRadioService");
+                mSystemServiceManager.startService(RadioService.class);
+                traceEnd();
+            }
 
             if (!disableNonCoreServices) {
                 traceBeginAndSlog("StartDockObserver");
@@ -1525,6 +1546,12 @@ public final class SystemServer {
             }
         }
 
+        if (!disableCameraService) {
+            traceBeginAndSlog("StartCameraServiceProxy");
+            mSystemServiceManager.startService(CameraServiceProxy.class);
+            traceEnd();
+        }
+
         // Before things start rolling, be sure we have decided whether
         // we are in safe mode.
         final boolean safeMode = wm.detectSafeMode();
@@ -1544,10 +1571,6 @@ public final class SystemServer {
         // MMS service broker
         traceBeginAndSlog("StartMmsService");
         mmsService = mSystemServiceManager.startService(MmsServiceBroker.class);
-        traceEnd();
-
-        traceBeginAndSlog("StartRetailDemoModeService");
-        mSystemServiceManager.startService(RetailDemoModeService.class);
         traceEnd();
 
         if (mPackageManager.hasSystemFeature(PackageManager.FEATURE_AUTOFILL)) {
@@ -1698,6 +1721,12 @@ public final class SystemServer {
                     mWebViewUpdateService.prepareWebViewInSystemServer();
                     traceLog.traceEnd();
                 }, WEBVIEW_PREPARATION);
+            }
+
+            if (mPackageManager.hasSystemFeature(PackageManager.FEATURE_AUTOMOTIVE)) {
+                traceBeginAndSlog("StartCarServiceHelperService");
+                mSystemServiceManager.startService(CarServiceHelperService.class);
+                traceEnd();
             }
 
             traceBeginAndSlog("StartSystemUI");

@@ -865,7 +865,7 @@ public class PackageInstallerService extends IPackageInstaller.Stub {
             for (int i = 0; i < mSessions.size(); i++) {
                 final PackageInstallerSession session = mSessions.valueAt(i);
                 if (session.userId == userId) {
-                    result.add(session.generateInfo());
+                    result.add(session.generateInfo(false));
                 }
             }
         }
@@ -883,7 +883,7 @@ public class PackageInstallerService extends IPackageInstaller.Stub {
                 final PackageInstallerSession session = mSessions.valueAt(i);
                 if (Objects.equals(session.installerPackageName, installerPackageName)
                         && session.userId == userId) {
-                    result.add(session.generateInfo());
+                    result.add(session.generateInfo(false));
                 }
             }
         }

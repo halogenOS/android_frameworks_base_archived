@@ -314,6 +314,7 @@
     <string name="quick_settings_more_settings" msgid="326112621462813682">"הגדרות נוספות"</string>
     <string name="quick_settings_done" msgid="3402999958839153376">"בוצע"</string>
     <string name="quick_settings_connected" msgid="1722253542984847487">"מחובר"</string>
+    <string name="quick_settings_connected_battery_level" msgid="4136051440381328892">"מחובר, הסוללה ב-<xliff:g id="BATTERY_LEVEL_AS_PERCENTAGE">%1$s</xliff:g>"</string>
     <string name="quick_settings_connecting" msgid="47623027419264404">"מתחבר..."</string>
     <string name="quick_settings_tethering_label" msgid="7153452060448575549">"שיתוף אינטרנט בין ניידים"</string>
     <string name="quick_settings_hotspot_label" msgid="6046917934974004879">"נקודה לשיתוף אינטרנט"</string>
@@ -471,6 +472,8 @@
     <string name="branded_monitoring_description_app_personal" msgid="2669518213949202599">"אתה מחובר לאפליקציה <xliff:g id="APPLICATION">%1$s</xliff:g>, שיכולה לעקוב אחר הפעילות שלך ברשת הפרטית, כולל הודעות אימייל, אפליקציות ואתרים."</string>
     <string name="monitoring_description_app_work" msgid="4612997849787922906">"פרופיל העבודה שלך מנוהל על ידי <xliff:g id="ORGANIZATION">%1$s</xliff:g>. הפרופיל מחובר לאפליקציה <xliff:g id="APPLICATION">%2$s</xliff:g>, שיכולה לעקוב אחר הפעילות שלך ברשת, כולל הודעות אימייל, אפליקציות ואתרים.\n\nלמידע נוסף, פנה למנהל המערכת."</string>
     <string name="monitoring_description_app_personal_work" msgid="5664165460056859391">"פרופיל העבודה שלך מנוהל על ידי <xliff:g id="ORGANIZATION">%1$s</xliff:g>. הפרופיל מחובר לאפליקציה <xliff:g id="APPLICATION_WORK">%2$s</xliff:g>, שיכולה לעקוב אחר הפעילות שלך ברשת, כולל הודעות אימייל, אפליקציות ואתרים.\n\nהפרופיל מחובר גם לאפליקציה <xliff:g id="APPLICATION_PERSONAL">%3$s</xliff:g>, שיכולה לעקוב אחר הפעילות שלך ברשת."</string>
+    <string name="keyguard_indication_trust_granted" msgid="4985003749105182372">"הנעילה בוטלה על ידי <xliff:g id="USER_NAME">%1$s</xliff:g>"</string>
+    <string name="keyguard_indication_trust_managed" msgid="8319646760022357585">"<xliff:g id="TRUST_AGENT">%1$s</xliff:g> פועל"</string>
     <string name="keyguard_indication_trust_disabled" msgid="7412534203633528135">"המכשיר יישאר נעול עד שתבטל את נעילתו באופן ידני"</string>
     <string name="hidden_notifications_title" msgid="7139628534207443290">"קבל התראות מהר יותר"</string>
     <string name="hidden_notifications_text" msgid="2326409389088668981">"צפה בהן לפני שתבטל נעילה"</string>
@@ -531,7 +534,7 @@
     <string name="tuner_warning" msgid="8730648121973575701">"‏System UI Tuner מספק לך דרכים נוספות להתאים אישית את ממשק המשתמש של Android. התכונות הניסיוניות האלה עשויות להשתנות, להתקלקל או להיעלם בגרסאות עתידיות. המשך בזהירות."</string>
     <string name="tuner_persistent_warning" msgid="8597333795565621795">"התכונות הניסיוניות האלה עשויות להשתנות, להתקלקל או להיעלם בגרסאות עתידיות. המשך בזהירות."</string>
     <string name="got_it" msgid="2239653834387972602">"הבנתי"</string>
-    <string name="tuner_toast" msgid="603429811084428439">"‏מזל טוב! System UI Tuner נוסף ל\'הגדרות\'"</string>
+    <string name="tuner_toast" msgid="603429811084428439">"‏מזל טוב! ה-System UI Tuner נוסף ל\'הגדרות\'"</string>
     <string name="remove_from_settings" msgid="8389591916603406378">"הסר מההגדרות"</string>
     <string name="remove_from_settings_prompt" msgid="6069085993355887748">"‏האם להסיר את System UI Tuner ולהפסיק להשתמש בכל התכונות שלו?"</string>
     <string name="activity_not_found" msgid="348423244327799974">"האפליקציה אינה מותקנת במכשיר"</string>
@@ -552,9 +555,10 @@
     <string name="tuner_full_importance_settings_off" msgid="8208165412614935229">"כבוי"</string>
     <string name="power_notification_controls_description" msgid="4372459941671353358">"בעזרת פקדים של הודעות הפעלה, תוכל להגדיר רמת חשיבות מ-0 עד 5 להודעות אפליקציה. \n\n"<b>"רמה 5"</b>" \n- הצג בראש רשימת ההודעות \n- אפשר הפרעה במסך מלא \n- תמיד אפשר הצצה \n\n"<b>"רמה 4"</b>" \n- מנע הפרעה במסך מלא \n- תמיד אפשר הצצה \n\n"<b>"רמה 3"</b>" \n- מנע הפרעה במסך מלא \n- אף פעם אל תאפשר הצצה \n\n"<b>"רמה 2"</b>" \n- מנע הפרעה במסך מלא \n- אף פעם אל תאפשר הצצה \n- אף פעם אל תאפשר קול ורטט \n\n"<b>"רמה 1"</b>" \n- מנע הפרעה במסך מלא \n- אף פעם אל תאפשר הצצה \n- אף פעם אל תאפשר קול ורטט \n- הסתר ממסך הנעילה ומשורת הסטטוס \n- הצג בתחתית רשימת ההודעות \n\n"<b>"רמה 0"</b>" \n- חסום את כל ההודעות מהאפליקציה"</string>
     <string name="notification_header_default_channel" msgid="7506845022070889909">"הודעות"</string>
-    <string name="notification_channel_disabled" msgid="5805874247999578073">"לא תקבל את ההודעות האלה יותר."</string>
+    <string name="notification_channel_disabled" msgid="2139193533791840539">"לא תקבל את ההודעות האלה יותר"</string>
     <string name="notification_num_channels" msgid="2048144408999179471">"<xliff:g id="NUMBER">%d</xliff:g> קטגוריות של התראות"</string>
     <string name="notification_default_channel_desc" msgid="2506053815870808359">"האפליקציה הזו לא תומכת בקטגוריות של הודעות"</string>
+    <string name="notification_unblockable_desc" msgid="3561016061737896906">"לא ניתן לכבות התראות של האפליקציה הזאת"</string>
     <plurals name="notification_num_channels_desc" formatted="false" msgid="5492793452274077663">
       <item quantity="two">קטגוריית הודעות אחת מתוך <xliff:g id="NUMBER_1">%d</xliff:g> מאפליקציה זו</item>
       <item quantity="many">קטגוריית הודעות אחת מתוך <xliff:g id="NUMBER_1">%d</xliff:g> מאפליקציה זו</item>
@@ -578,12 +582,20 @@
     <string name="notification_menu_accessibility" msgid="2046162834248888553">"<xliff:g id="APP_NAME">%1$s</xliff:g> <xliff:g id="MENU_DESCRIPTION">%2$s</xliff:g>"</string>
     <string name="notification_menu_gear_description" msgid="2204480013726775108">"בקרת הודעות"</string>
     <string name="notification_menu_snooze_description" msgid="3653669438131034525">"אפשרויות של דחיית הודעות לטיפול בהמשך"</string>
-    <string name="snooze_option_15_min" msgid="1068727451405610715">"15 דקות"</string>
-    <string name="snooze_option_30_min" msgid="867081342535195788">"30 דקות"</string>
-    <string name="snooze_option_1_hour" msgid="1098086401880077154">"שעה אחת"</string>
-    <string name="snooze_option_2_hour" msgid="8332218255658969475">"שעתיים"</string>
     <string name="snooze_undo" msgid="6074877317002985129">"ביטול"</string>
     <string name="snoozed_for_time" msgid="2390718332980204462">"נדחה לטיפול בעוד <xliff:g id="TIME_AMOUNT">%1$s</xliff:g>"</string>
+    <plurals name="snoozeHourOptions" formatted="false" msgid="2124335842674413030">
+      <item quantity="two">שעתיים</item>
+      <item quantity="many">‏%d שעות</item>
+      <item quantity="other">‏%d שעות</item>
+      <item quantity="one">שעה</item>
+    </plurals>
+    <plurals name="snoozeMinuteOptions" formatted="false" msgid="4127251700591510196">
+      <item quantity="two">‏%d דקות</item>
+      <item quantity="many">‏%d דקות</item>
+      <item quantity="other">‏%d דקות</item>
+      <item quantity="one">דקה</item>
+    </plurals>
     <string name="battery_panel_title" msgid="7944156115535366613">"שימוש בסוללה"</string>
     <string name="battery_detail_charging_summary" msgid="1279095653533044008">"תכונת החיסכון בסוללה אינה זמינה בעת טעינת המכשיר"</string>
     <string name="battery_detail_switch_title" msgid="6285872470260795421">"חיסכון בסוללה"</string>
@@ -773,4 +785,5 @@
     <string name="qs_dnd_replace" msgid="8019520786644276623">"החלף"</string>
     <string name="running_foreground_services_title" msgid="381024150898615683">"אפליקציות שפועלות ברקע"</string>
     <string name="running_foreground_services_msg" msgid="6326247670075574355">"הקש לקבלת פרטים על צריכה של נתונים וסוללה"</string>
+    <string name="data_usage_disable_mobile" msgid="5116269981510015864">"לכבות את חבילת הגלישה?"</string>
 </resources>

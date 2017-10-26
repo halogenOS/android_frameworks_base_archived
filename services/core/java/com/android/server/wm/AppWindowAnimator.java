@@ -198,6 +198,14 @@ public class AppWindowAnimator {
         return animation != null || mAppToken.inPendingTransaction;
     }
 
+    /**
+     * @return whether an animation is about to start, i.e. the animation is set already but we
+     *         haven't processed the first frame yet.
+     */
+    boolean isAnimationStarting() {
+        return animation != null && !animating;
+    }
+
     public int getTransit() {
         return mTransit;
     }
@@ -350,7 +358,7 @@ public class AppWindowAnimator {
 
     // This must be called while inside a transaction.
     boolean stepAnimationLocked(long currentTime) {
-        if (mService.okToDisplay()) {
+        if (mService.okToAnimate()) {
             // We will run animations as long as the display isn't frozen.
 
             if (animation == sDummyAnimation) {
@@ -416,6 +424,7 @@ public class AppWindowAnimator {
         if (DEBUG_ANIM) Slog.v(TAG, "Animation done in " + mAppToken
                 + ": reportedVisible=" + mAppToken.reportedVisible
                 + " okToDisplay=" + mService.okToDisplay()
+                + " okToAnimate=" + mService.okToAnimate()
                 + " startingDisplayed=" + mAppToken.startingDisplayed);
 
         transformation.clear();

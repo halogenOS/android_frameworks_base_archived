@@ -349,7 +349,9 @@ public class UsbDeviceConnection {
     @Override
     protected void finalize() throws Throwable {
         try {
-            mCloseGuard.warnIfOpen();
+            if (mCloseGuard != null) {
+                mCloseGuard.warnIfOpen();
+            }
         } finally {
             super.finalize();
         }

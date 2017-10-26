@@ -17,23 +17,24 @@
 package android.provider;
 
 import static com.google.android.collect.Sets.newHashSet;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
+
 import static java.lang.reflect.Modifier.isFinal;
 import static java.lang.reflect.Modifier.isPublic;
 import static java.lang.reflect.Modifier.isStatic;
 
-import android.platform.test.annotations.Presubmit;
 import android.support.test.filters.SmallTest;
 import android.support.test.runner.AndroidJUnit4;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.lang.reflect.Field;
 import java.util.HashSet;
 import java.util.Set;
-
-import org.junit.Test;
-import org.junit.runner.RunWith;
 
 /** Tests that ensure appropriate settings are backed up. */
 @RunWith(AndroidJUnit4.class)
@@ -102,6 +103,7 @@ public class SettingsBackupTest {
                     Settings.Global.APP_IDLE_CONSTANTS,
                     Settings.Global.ASSISTED_GPS_ENABLED,
                     Settings.Global.AUDIO_SAFE_VOLUME_STATE,
+                    Settings.Global.BACKUP_REFACTORED_SERVICE_DISABLED,
                     Settings.Global.BATTERY_DISCHARGE_DURATION_THRESHOLD,
                     Settings.Global.BATTERY_DISCHARGE_THRESHOLD,
                     Settings.Global.BLE_SCAN_ALWAYS_AVAILABLE,
@@ -193,6 +195,8 @@ public class SettingsBackupTest {
                     Settings.Global.ENHANCED_4G_MODE_ENABLED,
                     Settings.Global.EPHEMERAL_COOKIE_MAX_SIZE_BYTES,
                     Settings.Global.ERROR_LOGCAT_PREFIX,
+                    Settings.Global.EUICC_PROVISIONED,
+                    Settings.Global.EUICC_FACTORY_RESET_TIMEOUT_MILLIS,
                     Settings.Global.FANCY_IME_ANIMATIONS,
                     Settings.Global.FORCE_ALLOW_ON_EXTERNAL,
                     Settings.Global.FSTRIM_MANDATORY_INTERVAL,
@@ -294,7 +298,6 @@ public class SettingsBackupTest {
                     Settings.Global.RECOMMENDED_NETWORK_EVALUATOR_CACHE_EXPIRY_MS,
                     Settings.Global.READ_EXTERNAL_STORAGE_ENFORCED_DEFAULT,
                     Settings.Global.REQUIRE_PASSWORD_TO_DECRYPT,
-                    Settings.Global.RETAIL_DEMO_MODE_CONSTANTS,
                     Settings.Global.SAFE_BOOT_DISALLOWED,
                     Settings.Global.SAMPLING_PROFILER_MS,
                     Settings.Global.SELINUX_STATUS,
@@ -408,10 +411,12 @@ public class SettingsBackupTest {
                  Settings.Secure.AUTOMATIC_STORAGE_MANAGER_BYTES_CLEARED,
                  Settings.Secure.AUTOMATIC_STORAGE_MANAGER_ENABLED,
                  Settings.Secure.AUTOMATIC_STORAGE_MANAGER_LAST_RUN,
+                 Settings.Secure.AUTOMATIC_STORAGE_MANAGER_TURNED_OFF_BY_POLICY,
                  Settings.Secure.BACKUP_AUTO_RESTORE,
                  Settings.Secure.BACKUP_ENABLED,
                  Settings.Secure.BACKUP_PROVISIONED,
                  Settings.Secure.BACKUP_TRANSPORT,
+                 Settings.Secure.CAMERA_LIFT_TRIGGER_ENABLED, // Candidate for backup?
                  Settings.Secure.CARRIER_APPS_HANDLED,
                  Settings.Secure.CMAS_ADDITIONAL_BROADCAST_PKG,
                  Settings.Secure.COMPLETED_CATEGORY_PREFIX,
@@ -424,6 +429,7 @@ public class SettingsBackupTest {
                  Settings.Secure.DISABLED_SYSTEM_INPUT_METHODS,
                  Settings.Secure.DISPLAY_DENSITY_FORCED,
                  Settings.Secure.DOZE_ALWAYS_ON,
+                 Settings.Secure.DOZE_PULSE_ON_LONG_PRESS,
                  Settings.Secure.EMERGENCY_ASSISTANCE_APPLICATION,
                  Settings.Secure.ENABLED_NOTIFICATION_ASSISTANT,
                  Settings.Secure.ENABLED_NOTIFICATION_POLICY_ACCESS_PACKAGES,
@@ -444,17 +450,15 @@ public class SettingsBackupTest {
                  Settings.Secure.MANAGED_PROFILE_CONTACT_REMOTE_SEARCH,
                  Settings.Secure.MULTI_PRESS_TIMEOUT,
                  Settings.Secure.NFC_PAYMENT_FOREGROUND,
+                 Settings.Secure.NIGHT_DISPLAY_ACTIVATED,
+                 Settings.Secure.NIGHT_DISPLAY_LAST_ACTIVATED_TIME,
                  Settings.Secure.OVERVIEW_LAST_STACK_ACTIVE_TIME,
                  Settings.Secure.PACKAGE_VERIFIER_STATE,
                  Settings.Secure.PACKAGE_VERIFIER_USER_CONSENT,
                  Settings.Secure.PARENTAL_CONTROL_LAST_UPDATE,
                  Settings.Secure.PAYMENT_SERVICE_SEARCH_URI,
                  Settings.Secure.PRINT_SERVICE_SEARCH_URI,
-                 Settings.Secure.SCREENSAVER_ACTIVATE_ON_DOCK, // Candidate?
-                 Settings.Secure.SCREENSAVER_ACTIVATE_ON_SLEEP, // Candidate?
-                 Settings.Secure.SCREENSAVER_COMPONENTS,
                  Settings.Secure.SCREENSAVER_DEFAULT_COMPONENT, // Candidate?
-                 Settings.Secure.SCREENSAVER_ENABLED, // Candidate?
                  Settings.Secure.SEARCH_GLOBAL_SEARCH_ACTIVITY,
                  Settings.Secure.SEARCH_MAX_RESULTS_PER_SOURCE,
                  Settings.Secure.SEARCH_MAX_RESULTS_TO_DISPLAY,

@@ -18,6 +18,7 @@ package com.android.server.wm;
 
 import android.content.res.Configuration;
 import android.graphics.Rect;
+import android.hardware.display.DisplayManager;
 import android.hardware.power.V1_0.PowerHint;
 import android.os.Binder;
 import android.os.Debug;
@@ -51,6 +52,7 @@ import static android.app.AppOpsManager.MODE_ALLOWED;
 import static android.app.AppOpsManager.MODE_DEFAULT;
 import static android.app.AppOpsManager.OP_NONE;
 import static android.view.Display.DEFAULT_DISPLAY;
+import static android.view.Display.INVALID_DISPLAY;
 import static android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
 import static android.view.WindowManager.LayoutParams.PRIVATE_FLAG_KEYGUARD;
 import static android.view.WindowManager.LayoutParams.PRIVATE_FLAG_SUSTAINED_PERFORMANCE_MODE;
@@ -243,12 +245,24 @@ class RootWindowContainer extends WindowContainer<DisplayContent> {
                     displayId, displayInfo);
             mService.configureDisplayPolicyLocked(dc);
 
-            // TODO(multi-display): Create an input channel for each display with touch capability.
-            if (displayId == DEFAULT_DISPLAY && mService.canDispatchPointerEvents()) {
-                dc.mTapDetector = new TaskTapPointerEventListener(
-                        mService, dc);
+            // Tap Listeners are supported for:
+            // 1. All physical displays (multi-display).
+            // 2. VirtualDisplays that support virtual touch input. (Only VR for now)
+            // TODO(multi-display): Support VirtualDisplays with no virtual touch input.
+            if ((display.getType() != Display.TYPE_VIRTUAL
+                    || (display.getType() == Display.TYPE_VIRTUAL
+                        // Only VR VirtualDisplays
+                        && displayId == mService.mVr2dDisplayId))
+                    && mService.canDispatchPointerEvents()) {
+                if (DEBUG_DISPLAY) {
+                    Slog.d(TAG,
+                            "Registering PointerEventListener for DisplayId: " + displayId);
+                }
+                dc.mTapDetector = new TaskTapPointerEventListener(mService, dc);
                 mService.registerPointerEventListener(dc.mTapDetector);
-                mService.registerPointerEventListener(mService.mMousePositionTracker);
+                if (displayId == DEFAULT_DISPLAY) {
+                    mService.registerPointerEventListener(mService.mMousePositionTracker);
+                }
             }
         }
 
@@ -753,6 +767,15 @@ class RootWindowContainer extends WindowContainer<DisplayContent> {
                 mService.mH.obtainMessage(SEND_NEW_CONFIGURATION, displayId).sendToTarget();
             } else {
                 mUpdateRotation = false;
+            }
+            // Update rotation of VR virtual display separately. Currently this is the only kind of
+            // secondary display that can be rotated because of the single-display limitations in
+            // PhoneWindowManager.
+            final DisplayContent vrDisplay = mService.mVr2dDisplayId != INVALID_DISPLAY
+                    ? getDisplayContent(mService.mVr2dDisplayId) : null;
+            if (vrDisplay != null && vrDisplay.updateRotationUnchecked(false /* inTransaction */)) {
+                mService.mH.obtainMessage(SEND_NEW_CONFIGURATION, mService.mVr2dDisplayId)
+                        .sendToTarget();
             }
         }
 

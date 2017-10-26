@@ -18,14 +18,12 @@ package android.app;
 
 import android.annotation.IntDef;
 import android.annotation.NonNull;
-import android.annotation.Nullable;
 import android.annotation.SdkConstant;
 import android.annotation.SystemService;
 import android.annotation.TestApi;
 import android.app.Notification.Builder;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.ParceledListSlice;
 import android.graphics.drawable.Icon;
 import android.net.Uri;
@@ -33,7 +31,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.os.Looper;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.os.RemoteException;
@@ -41,7 +38,6 @@ import android.os.ServiceManager;
 import android.os.StrictMode;
 import android.os.UserHandle;
 import android.provider.Settings.Global;
-import android.service.notification.NotificationListenerService.Ranking;
 import android.service.notification.StatusBarNotification;
 import android.service.notification.ZenModeConfig;
 import android.util.ArraySet;
@@ -312,6 +308,7 @@ public class NotificationManager {
             }
         }
         if (localLOGV) Log.v(TAG, pkg + ": notify(" + id + ", " + notification + ")");
+        notification.reduceImageSizes(mContext);
         final Notification copy = Builder.maybeCloneStrippedForDelivery(notification);
         try {
             service.enqueueNotificationWithTag(pkg, mContext.getOpPackageName(), tag, id,

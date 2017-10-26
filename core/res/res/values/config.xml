@@ -284,6 +284,18 @@
          Settings.Global.NETWORK_AVOID_BAD_WIFI. This is the default value of that setting. -->
     <integer translatable="false" name="config_networkAvoidBadWifi">1</integer>
 
+    <!-- If the hardware supports specially marking packets that caused a wakeup of the
+         main CPU, set this value to the mark used. -->
+    <integer name="config_networkWakeupPacketMark">0</integer>
+
+    <!-- Mask to use when checking skb mark defined in config_networkWakeupPacketMark above. -->
+    <integer name="config_networkWakeupPacketMask">0</integer>
+
+    <!-- Whether the APF Filter in the device should filter out IEEE 802.3 Frames
+         Those frames are identified by the field Eth-type having values
+         less than 0x600 -->
+    <bool translatable="false" name="config_apfDrop802_3Frames">true</bool>
+
     <!-- Default value for ConnectivityManager.getMultipathPreference() on metered networks. Actual
          device behaviour is controlled by Settings.Global.NETWORK_METERED_MULTIPATH_PREFERENCE.
          This is the default value of that setting. -->
@@ -431,9 +443,6 @@
     <!-- Boolean indicating whether the wifi chipset has dual frequency band support -->
     <bool translatable="false" name="config_wifi_dual_band_support">false</bool>
 
-    <!-- Boolean indicating whether Hotspot 2.0/Passpoint and ANQP queries is enabled -->
-    <bool translatable="false" name="config_wifi_hotspot2_enabled">false</bool>
-
     <!-- Boolean indicating whether 802.11r Fast BSS Transition is enabled on this platform -->
     <bool translatable="false" name="config_wifi_fast_bss_transition_enabled">false</bool>
 
@@ -478,6 +487,12 @@
     <integer translatable="false" name="config_wifi_framework_SECURITY_AWARD">80</integer>
     <!-- Integer specifying the base interval in seconds for the exponential backoff scan for autojoin -->
     <integer translatable="false" name="config_wifi_framework_exponential_backoff_scan_base_interval">20</integer>
+    <!-- Integers specifying the max packet Tx/Rx rates for full scan -->
+    <integer translatable="false" name="config_wifi_framework_max_tx_rate_for_full_scan">8</integer>
+    <integer translatable="false" name="config_wifi_framework_max_rx_rate_for_full_scan">16</integer>
+    <!-- Integers specifying the min packet Tx/Rx rates in packets per second for staying on the same network -->
+    <integer translatable="false" name="config_wifi_framework_min_tx_rate_for_staying_on_network">16</integer>
+    <integer translatable="false" name="config_wifi_framework_min_rx_rate_for_staying_on_network">16</integer>
     <!-- Integer parameters of the wifi to cellular handover feature
          wifi should not stick to bad networks -->
     <integer translatable="false" name="config_wifi_framework_wifi_score_bad_rssi_threshold_5GHz">-82</integer>
@@ -551,6 +566,10 @@
 
     <!-- Boolean indicating that wifi only link configuratios that have exact same credentials (i.e PSK) -->
     <bool translatable="false" name="config_wifi_only_link_same_credential_configurations">true</bool>
+
+    <!-- Boolean indicating whether framework needs to set the tx power limit for meeting SAR requirements
+         during voice calls -->
+    <bool translatable="false" name="config_wifi_framework_enable_voice_call_sar_tx_power_limit">false</bool>
 
     <!-- Wifi driver supports batched scan -->
     <bool translatable="false" name="config_wifi_batched_scan_supported">false</bool>
@@ -939,15 +958,7 @@
         <item>30</item>
     </integer-array>
 
-    <!-- Vibrator pattern for feedback about booting with safe mode disabled -->
-    <integer-array name="config_safeModeDisabledVibePattern">
-        <item>0</item>
-        <item>1</item>
-        <item>20</item>
-        <item>21</item>
-    </integer-array>
-
-    <!-- Vibrator pattern for feedback about booting with safe mode disabled -->
+    <!-- Vibrator pattern for feedback about booting with safe mode enabled -->
     <integer-array name="config_safeModeEnabledVibePattern">
         <item>0</item>
         <item>1</item>
@@ -963,14 +974,6 @@
         <item>15</item>
         <item>10</item>
         <item>10</item>
-    </integer-array>
-
-    <!-- Vibrator pattern for feedback about a context click -->
-    <integer-array name="config_contextClickVibePattern">
-        <item>0</item>
-        <item>1</item>
-        <item>20</item>
-        <item>21</item>
     </integer-array>
 
     <bool name="config_use_strict_phone_number_comparation">false</bool>
@@ -1799,6 +1802,21 @@
     <!-- Type of the double tap sensor. Empty if double tap is not supported. -->
     <string name="config_dozeDoubleTapSensorType" translatable="false"></string>
 
+    <!-- Type of the long press sensor. Empty if long press is not supported. -->
+    <string name="config_dozeLongPressSensorType" translatable="false"></string>
+
+    <!-- Control whether the always on display mode is available. This should only be enabled on
+         devices where the display has be tuned to be power efficient in DOZE and/or DOZE_SUSPEND
+         states. -->
+    <bool name="config_dozeAlwaysOnDisplayAvailable">false</bool>
+
+    <!-- Whether the display blanks itself when transitioning from a doze to a non-doze state -->
+    <bool name="config_displayBlanksAfterDoze">false</bool>
+
+    <!-- True if the display hardware only has brightness buckets rather than a full range of
+         backlight values -->
+    <bool name="config_displayBrightnessBucketsInDoze">false</bool>
+
     <!-- Power Management: Specifies whether to decouple the auto-suspend state of the
          device from the display on/off state.
 
@@ -2372,9 +2390,13 @@
     <string-array translatable="false" name="config_gpsParameters">
         <item>SUPL_HOST=supl.google.com</item>
         <item>SUPL_PORT=7275</item>
-        <item>NTP_SERVER=north-america.pool.ntp.org</item>
         <item>SUPL_VER=0x20000</item>
         <item>SUPL_MODE=1</item>
+        <item>SUPL_ES=0</item>
+        <item>LPP_PROFILE=0</item>
+        <item>USE_EMERGENCY_PDN_FOR_EMERGENCY_SUPL=1</item>
+        <item>A_GLONASS_POS_PROTOCOL_SELECT=0</item>
+        <item>GPS_LOCK=0</item>
     </string-array>
 
     <!-- Sprint need a 70 ms delay for 3way call -->
@@ -2723,18 +2745,6 @@
     <!-- True if camera app should be pinned via Pinner Service -->
     <bool name="config_pinnerCameraApp">false</bool>
 
-    <!-- Component that is the default launcher when demo mode is enabled. -->
-    <string name="config_demoModeLauncherComponent">com.android.retaildemo/.DemoPlayer</string>
-
-    <!-- Hashed password (SHA-256) used to restrict carrier demo mode operation. -->
-    <string name="config_carrierDemoModePassword" translatable="false"></string>
-
-    <!-- Secure setting used to activate carrier demo mode. -->
-    <string name="config_carrierDemoModeSetting" translatable="false"></string>
-
-    <!-- List of packages to enable in carrier demo mode (comma separated). -->
-    <string name="config_carrierDemoModePackages" translatable="false"></string>
-
     <!-- Number of days preloaded file cache should be preserved on a device before it can be
          deleted -->
     <integer name="config_keepPreloadsMinDays">7</integer>
@@ -2841,6 +2851,11 @@
     <!-- TODO(b/35230407) complete the link field -->
     <bool name="config_allowEscrowTokenForTrustAgent">false</bool>
 
+    <!-- A flattened ComponentName which corresponds to the only trust agent that should be enabled
+         by default. If the default value is used, or set to an empty string, the restriction will
+         not be applied. -->
+    <string name="config_defaultTrustAgent" translatable="false"></string>
+
     <!-- Colon separated list of package names that should be granted Notification Listener access -->
     <string name="config_defaultListenerAccessPackages" translatable="false"></string>
 
@@ -2861,6 +2876,11 @@
 
     <!-- Whether the device uses the default focus highlight when focus state isn't specified. -->
     <bool name="config_useDefaultFocusHighlight">true</bool>
+
+    <!-- Flag indicating that the entire notification header can be clicked to expand the
+         notification. If false, then the expand icon has to be clicked in order for the expand
+         to occur. The expand button will have increased touch boundaries to accomodate this. -->
+    <bool name="config_notificationHeaderClickableForExpand">false</bool>
 
     <!-- Configuration for automotive -->
     <bool name="enable_pbap_pce_profile">false</bool>
@@ -2913,6 +2933,22 @@
          relative to the overall voice call stream volume [0..100] -->
     <integer name="config_inCallNotificationVolumeRelative">67</integer>
 
+    <!-- The OEM specified sensor type for the lift trigger to launch the camera app. -->
+    <integer name="config_cameraLiftTriggerSensorType">-1</integer>
+    <!-- The OEM specified sensor string type for the gesture to launch camera app, this value
+        must match the value of config_cameraLiftTriggerSensorType in OEM's HAL -->
+    <string translatable="false" name="config_cameraLiftTriggerSensorStringType"></string>
+
+    <!-- Default number of days to retain for the automatic storage manager. -->
+    <integer translatable="false" name="config_storageManagerDaystoRetainDefault">90</integer>
+
+    <!-- Name of a font family to use for headlines. If empty, falls back to platform default -->
+    <string name="config_headlineFontFamily" translatable="false"></string>
+    <!-- Name of a font family to use for headlines. Defaults to sans-serif-light -->
+    <string name="config_headlineFontFamilyLight" translatable="false">sans-serif-light</string>
+    <!-- Allows setting custom fontFeatureSettings on specific text. -->
+    <string name="config_headlineFontFeatureSettings" translatable="false"></string>
+
     <!-- An array of packages that need to be treated as type system in battery settings -->
     <string-array translatable="false" name="config_batteryPackageTypeSystem">
         <item>com.android.providers.calendar</item>
@@ -2923,18 +2959,12 @@
     <!-- An array of packages that need to be treated as type service in battery settings -->
     <string-array translatable="false" name="config_batteryPackageTypeService"/>
 
-    <!-- Older rotation sensors are not setting event.timestamp correctly. Setting to
-         true will use SystemClock.elapsedRealtimeNanos() to set timestamp. -->
-    <bool name="config_useSystemClockforRotationSensor">false</bool>
+    <!-- Show area update info settings in CellBroadcastReceiver and information in SIM status in Settings app -->
+    <bool name="config_showAreaUpdateInfoSettings">false</bool>
 
-    <!-- Whether to persist the notification for when a usb drive device is plugged in -->
-    <bool name="config_persistUsbDriveNotification">false</bool>
+    <!-- Enable the RingtonePickerActivity in 'com.android.providers.media'. -->
+    <bool name="config_defaultRingtonePickerEnabled">true</bool>
 
-    <!-- Default value for proximity check on screen wake
-         NOTE ! - Enable for devices that have a fast response proximity sensor (ideally < 300ms)
-    -->
-    <bool name="config_proximityCheckOnWake">false</bool>
-    <integer name="config_proximityCheckTimeout">250</integer>
-    <bool name="config_proximityCheckOnWakeEnabledByDefault">false</bool>
-
+    <!-- Allow SystemUI to show the shutdown dialog -->
+    <bool name="config_showSysuiShutdown">true</bool>
 </resources>

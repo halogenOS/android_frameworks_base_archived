@@ -17,11 +17,10 @@
 package android.hardware.display;
 
 import android.content.Context;
-import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.hardware.display.DisplayManager.DisplayListener;
-import android.media.projection.MediaProjection;
 import android.media.projection.IMediaProjection;
+import android.media.projection.MediaProjection;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
@@ -31,8 +30,8 @@ import android.os.ServiceManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseArray;
-import android.view.DisplayAdjustments;
 import android.view.Display;
+import android.view.DisplayAdjustments;
 import android.view.DisplayInfo;
 import android.view.Surface;
 

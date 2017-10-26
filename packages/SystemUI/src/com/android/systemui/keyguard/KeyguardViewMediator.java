@@ -364,7 +364,10 @@ public class KeyguardViewMediator extends SystemUI {
         public void onUserSwitchComplete(int userId) {
             if (userId != UserHandle.USER_SYSTEM) {
                 UserInfo info = UserManager.get(mContext).getUserInfo(userId);
-                if (info != null && (info.isGuest() || info.isDemo())) {
+                // Don't try to dismiss if the user has Pin/Patter/Password set
+                if (info == null || mLockPatternUtils.isSecure(userId)) {
+                    return;
+                } else if (info.isGuest() || info.isDemo()) {
                     // If we just switched to a guest, try to dismiss keyguard.
                     dismiss(null /* callback */);
                 }
@@ -656,7 +659,7 @@ public class KeyguardViewMediator extends SystemUI {
     }
 
     boolean mustNotUnlockCurrentUser() {
-        return (UserManager.isSplitSystemUser() || UserManager.isDeviceInDemoMode(mContext))
+        return UserManager.isSplitSystemUser()
                 && KeyguardUpdateMonitor.getCurrentUser() == UserHandle.USER_SYSTEM;
     }
 
@@ -808,6 +811,7 @@ public class KeyguardViewMediator extends SystemUI {
         synchronized (this) {
             mDeviceInteractive = false;
             mGoingToSleep = false;
+            mWakeAndUnlocking = false;
 
             resetKeyguardDonePendingLocked();
             mHideAnimationRun = false;
@@ -1173,6 +1177,7 @@ public class KeyguardViewMediator extends SystemUI {
 
             if (mOccluded != isOccluded) {
                 mOccluded = isOccluded;
+                mUpdateMonitor.setKeyguardOccluded(isOccluded);
                 mStatusBarKeyguardViewManager.setOccluded(isOccluded, animate
                         && mDeviceInteractive);
                 adjustStatusBarLocked();
@@ -1955,7 +1960,6 @@ public class KeyguardViewMediator extends SystemUI {
             if (DEBUG) Log.d(TAG, "handleNotifyScreenTurnedOff");
             mStatusBarKeyguardViewManager.onScreenTurnedOff();
             mDrawnCallback = null;
-            mWakeAndUnlocking = false;
         }
     }
 

@@ -19,6 +19,9 @@
 #include "utils/Log.h"
 #include "utils/misc.h"
 
+#include "com_android_server_radio_RadioService.h"
+#include "com_android_server_radio_Tuner.h"
+
 namespace android {
 int register_android_server_AlarmManagerService(JNIEnv* env);
 int register_android_server_BatteryStatsService(JNIEnv* env);
@@ -39,6 +42,7 @@ int register_android_server_VibratorService(JNIEnv* env);
 int register_android_server_location_ContextHubService(JNIEnv* env);
 int register_android_server_location_GnssLocationProvider(JNIEnv* env);
 int register_android_server_connectivity_Vpn(JNIEnv* env);
+int register_android_server_connectivity_tethering_OffloadHardwareInterface(JNIEnv*);
 int register_android_server_hdmi_HdmiCecController(JNIEnv* env);
 int register_android_server_tv_TvUinputBridge(JNIEnv* env);
 int register_android_server_tv_TvInputHal(JNIEnv* env);
@@ -63,6 +67,8 @@ extern "C" jint JNI_OnLoad(JavaVM* vm, void* /* reserved */)
     }
     ALOG_ASSERT(env, "Could not retrieve the env!");
 
+    register_android_server_radio_RadioService(env);
+    register_android_server_radio_Tuner(vm, env);
     register_android_server_PowerManagerService(env);
     register_android_server_SerialService(env);
     register_android_server_InputApplicationHandle(env);
@@ -79,6 +85,7 @@ extern "C" jint JNI_OnLoad(JavaVM* vm, void* /* reserved */)
     register_android_server_location_ContextHubService(env);
     register_android_server_location_GnssLocationProvider(env);
     register_android_server_connectivity_Vpn(env);
+    register_android_server_connectivity_tethering_OffloadHardwareInterface(env);
     register_android_server_ConsumerIrService(env);
     register_android_server_BatteryStatsService(env);
     register_android_server_hdmi_HdmiCecController(env);

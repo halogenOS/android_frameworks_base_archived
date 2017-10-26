@@ -482,7 +482,7 @@ void SkiaCanvas::drawLines(const float* points, int count, const SkPaint& paint)
 void SkiaCanvas::drawRect(float left, float top, float right, float bottom,
         const SkPaint& paint) {
     if (CC_UNLIKELY(paint.nothingToDraw())) return;
-    mCanvas->drawRectCoords(left, top, right, bottom, paint);
+    mCanvas->drawRect({left, top, right, bottom}, paint);
 
 }
 
@@ -521,17 +521,8 @@ void SkiaCanvas::drawPath(const SkPath& path, const SkPaint& paint) {
     mCanvas->drawPath(path, paint);
 }
 
-void SkiaCanvas::drawVertices(SkCanvas::VertexMode vertexMode, int vertexCount,
-                              const float* verts, const float* texs, const int* colors,
-                              const uint16_t* indices, int indexCount, const SkPaint& paint) {
-#ifndef SK_SCALAR_IS_FLOAT
-    SkDEBUGFAIL("SkScalar must be a float for these conversions to be valid");
-#endif
-    const int ptCount = vertexCount >> 1;
-    mCanvas->drawVertices(SkVertices::MakeCopy(vertexMode, ptCount, (SkPoint*)verts,
-                                               (SkPoint*)texs, (SkColor*)colors,
-                                               indexCount, indices),
-                          SkBlendMode::kModulate, paint);
+void SkiaCanvas::drawVertices(const SkVertices* vertices, SkBlendMode mode, const SkPaint& paint) {
+    mCanvas->drawVertices(vertices, mode, paint);
 }
 
 // ----------------------------------------------------------------------------
@@ -572,7 +563,7 @@ void SkiaCanvas::drawBitmapMesh(Bitmap& hwuiBitmap, int meshWidth, int meshHeigh
     if (colors) {
         flags |= SkVertices::kHasColors_BuilderFlag;
     }
-    SkVertices::Builder builder(SkCanvas::kTriangles_VertexMode, ptCount, indexCount, flags);
+    SkVertices::Builder builder(SkVertices::kTriangles_VertexMode, ptCount, indexCount, flags);
     memcpy(builder.positions(), vertices, ptCount * sizeof(SkPoint));
     if (colors) {
         memcpy(builder.colors(), colors, ptCount * sizeof(SkColor));
@@ -685,11 +676,10 @@ void SkiaCanvas::drawVectorDrawable(VectorDrawableRoot* vectorDrawable) {
 // Canvas draw operations: Text
 // ----------------------------------------------------------------------------
 
-void SkiaCanvas::drawGlyphs(const uint16_t* text, const float* positions, int count,
-        const SkPaint& paint, float x, float y,
-        float boundsLeft, float boundsTop, float boundsRight, float boundsBottom,
+void SkiaCanvas::drawGlyphs(ReadGlyphFunc glyphFunc, int count, const SkPaint& paint, float x,
+        float y, float boundsLeft, float boundsTop, float boundsRight, float boundsBottom,
         float totalAdvance) {
-     if (!text || !positions || count <= 0 || paint.nothingToDraw()) return;
+    if (count <= 0 || paint.nothingToDraw()) return;
     // Set align to left for drawing, as we don't want individual
     // glyphs centered or right-aligned; the offset above takes
     // care of all alignment.
@@ -701,10 +691,7 @@ void SkiaCanvas::drawGlyphs(const uint16_t* text, const float* positions, int co
 
     SkTextBlobBuilder builder;
     const SkTextBlobBuilder::RunBuffer& buffer = builder.allocRunPos(paintCopy, count, &bounds);
-    // TODO: we could reduce the number of memcpy's if the this were exposed further up
-    //       in the architecture.
-    memcpy(buffer.glyphs, text, count * sizeof(uint16_t));
-    memcpy(buffer.pos, positions, (count << 1) * sizeof(float));
+    glyphFunc(buffer.glyphs, buffer.pos);
 
     sk_sp<SkTextBlob> textBlob(builder.make());
     mCanvas->drawTextBlob(textBlob, 0, 0, paintCopy);

@@ -310,6 +310,7 @@
     <string name="quick_settings_more_settings" msgid="326112621462813682">"更多設定"</string>
     <string name="quick_settings_done" msgid="3402999958839153376">"完成"</string>
     <string name="quick_settings_connected" msgid="1722253542984847487">"已連線"</string>
+    <string name="quick_settings_connected_battery_level" msgid="4136051440381328892">"已連線，電量為 <xliff:g id="BATTERY_LEVEL_AS_PERCENTAGE">%1$s</xliff:g>"</string>
     <string name="quick_settings_connecting" msgid="47623027419264404">"連線中..."</string>
     <string name="quick_settings_tethering_label" msgid="7153452060448575549">"網路共用"</string>
     <string name="quick_settings_hotspot_label" msgid="6046917934974004879">"無線基地台"</string>
@@ -467,6 +468,8 @@
     <string name="branded_monitoring_description_app_personal" msgid="2669518213949202599">"由於你已連結至「<xliff:g id="APPLICATION">%1$s</xliff:g>」，你的個人網路活動 (包括收發電子郵件、使用應用程式及瀏覽網站) 可能會受到這個應用程式監控。"</string>
     <string name="monitoring_description_app_work" msgid="4612997849787922906">"你的 Work 設定檔是由「<xliff:g id="ORGANIZATION">%1$s</xliff:g>」所管理。由於該設定檔已連結至「<xliff:g id="APPLICATION">%2$s</xliff:g>」，因此你的網路活動 (包括收發電子郵件、使用應用程式和瀏覽網站) 可能會受到這個應用程式監控。\n\n如要瞭解詳情，請與你的管理員聯絡。"</string>
     <string name="monitoring_description_app_personal_work" msgid="5664165460056859391">"你的 Work 設定檔是由「<xliff:g id="ORGANIZATION">%1$s</xliff:g>」所管理。由於該設定檔已連結至「<xliff:g id="APPLICATION_WORK">%2$s</xliff:g>」，因此你的網路活動 (包括收發電子郵件、使用應用程式和瀏覽網站) 可能會受到這個應用程式監控。\n\n此外，你還與「<xliff:g id="APPLICATION_PERSONAL">%3$s</xliff:g>」建立了連結，因此你的個人網路活動也可能會受到該應用程式監控。"</string>
+    <string name="keyguard_indication_trust_granted" msgid="4985003749105182372">"已為<xliff:g id="USER_NAME">%1$s</xliff:g>解鎖"</string>
+    <string name="keyguard_indication_trust_managed" msgid="8319646760022357585">"「<xliff:g id="TRUST_AGENT">%1$s</xliff:g>」執行中"</string>
     <string name="keyguard_indication_trust_disabled" msgid="7412534203633528135">"在你手動解鎖前，裝置將保持鎖定狀態"</string>
     <string name="hidden_notifications_title" msgid="7139628534207443290">"更快取得通知"</string>
     <string name="hidden_notifications_text" msgid="2326409389088668981">"解鎖前顯示"</string>
@@ -548,9 +551,10 @@
     <string name="tuner_full_importance_settings_off" msgid="8208165412614935229">"關閉"</string>
     <string name="power_notification_controls_description" msgid="4372459941671353358">"只要使用電源通知控制項，你就能為應用程式通知設定從 0 到 5 的重要性等級。\n\n"<b>"等級 5"</b>" \n- 顯示在通知清單頂端 \n- 允許全螢幕通知 \n- 一律允許短暫顯示通知 \n\n"<b>"等級 4"</b>" \n- 禁止全螢幕通知 \n- 一律允許短暫顯示通知 \n\n"<b>"等級 3"</b>" \n- 禁止全螢幕通知 \n- 一律不允許短暫顯示通知 \n\n"<b>"等級 2"</b>" \n- 禁止全螢幕通知 \n- 一律不允許短暫顯示通知 \n- 一律不發出音效或震動 \n\n"<b>"等級 1"</b>" \n- 禁止全螢幕通知 \n- 一律不允許短暫顯示通知 \n- 一律不發出音效或震動 \n- 在鎖定畫面和狀態列中隱藏 \n- 顯示在通知清單底端 \n\n"<b>"等級 0"</b>" \n- 封鎖應用程式的所有通知"</string>
     <string name="notification_header_default_channel" msgid="7506845022070889909">"通知"</string>
-    <string name="notification_channel_disabled" msgid="5805874247999578073">"你不會再收到這類通知。"</string>
+    <string name="notification_channel_disabled" msgid="2139193533791840539">"你不會再收到這類通知"</string>
     <string name="notification_num_channels" msgid="2048144408999179471">"<xliff:g id="NUMBER">%d</xliff:g> 個通知類別"</string>
     <string name="notification_default_channel_desc" msgid="2506053815870808359">"這個應用程式沒有通知類別"</string>
+    <string name="notification_unblockable_desc" msgid="3561016061737896906">"無法關閉這個應用程式發出的通知"</string>
     <plurals name="notification_num_channels_desc" formatted="false" msgid="5492793452274077663">
       <item quantity="other">在 <xliff:g id="NUMBER_1">%d</xliff:g> 個通知類別中，有 1 個類別是來自這個應用程式</item>
       <item quantity="one">在 <xliff:g id="NUMBER_0">%d</xliff:g> 個通知類別中，有 1 個類別是來自這個應用程式</item>
@@ -570,12 +574,16 @@
     <string name="notification_menu_accessibility" msgid="2046162834248888553">"<xliff:g id="APP_NAME">%1$s</xliff:g> <xliff:g id="MENU_DESCRIPTION">%2$s</xliff:g>"</string>
     <string name="notification_menu_gear_description" msgid="2204480013726775108">"通知控制項"</string>
     <string name="notification_menu_snooze_description" msgid="3653669438131034525">"通知延後選項"</string>
-    <string name="snooze_option_15_min" msgid="1068727451405610715">"15 分鐘"</string>
-    <string name="snooze_option_30_min" msgid="867081342535195788">"30 分鐘"</string>
-    <string name="snooze_option_1_hour" msgid="1098086401880077154">"1 小時"</string>
-    <string name="snooze_option_2_hour" msgid="8332218255658969475">"2 小時"</string>
     <string name="snooze_undo" msgid="6074877317002985129">"復原"</string>
     <string name="snoozed_for_time" msgid="2390718332980204462">"已延後 <xliff:g id="TIME_AMOUNT">%1$s</xliff:g>"</string>
+    <plurals name="snoozeHourOptions" formatted="false" msgid="2124335842674413030">
+      <item quantity="other">%d 小時</item>
+      <item quantity="one">%d 小時</item>
+    </plurals>
+    <plurals name="snoozeMinuteOptions" formatted="false" msgid="4127251700591510196">
+      <item quantity="other">%d 分鐘</item>
+      <item quantity="one">%d 分鐘</item>
+    </plurals>
     <string name="battery_panel_title" msgid="7944156115535366613">"電池用量"</string>
     <string name="battery_detail_charging_summary" msgid="1279095653533044008">"充電時無法使用節約耗電量模式"</string>
     <string name="battery_detail_switch_title" msgid="6285872470260795421">"節約耗電量"</string>
@@ -765,4 +773,5 @@
     <string name="qs_dnd_replace" msgid="8019520786644276623">"取代"</string>
     <string name="running_foreground_services_title" msgid="381024150898615683">"在背景執行的應用程式"</string>
     <string name="running_foreground_services_msg" msgid="6326247670075574355">"輕觸即可查看電池和數據用量詳情"</string>
+    <string name="data_usage_disable_mobile" msgid="5116269981510015864">"要關閉行動數據嗎？"</string>
 </resources>

@@ -18,6 +18,7 @@ package com.android.server.pm;
 
 import static android.Manifest.permission.DELETE_PACKAGES;
 import static android.Manifest.permission.INSTALL_PACKAGES;
+import static android.Manifest.permission.MANAGE_PROFILE_AND_DEVICE_OWNERS;
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 import static android.Manifest.permission.REQUEST_DELETE_PACKAGES;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
@@ -131,6 +132,7 @@ import android.content.pm.AuxiliaryResolveInfo;
 import android.content.pm.ChangedPackages;
 import android.content.pm.FallbackCategoryProvider;
 import android.content.pm.FeatureInfo;
+import android.content.pm.IDexModuleRegisterCallback;
 import android.content.pm.IOnPermissionsChangeListener;
 import android.content.pm.IPackageDataObserver;
 import android.content.pm.IPackageDeleteObserver;
@@ -2975,7 +2977,6 @@ public class PackageManagerService extends IPackageManager.Stub
             Trace.traceBegin(TRACE_TAG_PACKAGE_MANAGER, "write settings");
             mSettings.writeLPr();
             Trace.traceEnd(TRACE_TAG_PACKAGE_MANAGER);
-
             EventLog.writeEvent(EventLogTags.BOOT_PROGRESS_PMS_READY,
                     SystemClock.uptimeMillis());
 
@@ -4112,6 +4113,48 @@ public class PackageManagerService extends IPackageManager.Stub
         return protectionLevel;
     }
 
+    private int adjustPermissionProtectionFlagsLPr(int protectionLevel,
+            String packageName, int uid) {
+        // Signature permission flags area always reported
+        final int protectionLevelMasked = protectionLevel
+                & (PermissionInfo.PROTECTION_NORMAL
+                | PermissionInfo.PROTECTION_DANGEROUS
+                | PermissionInfo.PROTECTION_SIGNATURE);
+        if (protectionLevelMasked == PermissionInfo.PROTECTION_SIGNATURE) {
+            return protectionLevel;
+        }
+
+        // System sees all flags.
+        final int appId = UserHandle.getAppId(uid);
+        if (appId == Process.SYSTEM_UID || appId == Process.ROOT_UID
+                || appId == Process.SHELL_UID) {
+            return protectionLevel;
+        }
+
+        // Normalize package name to handle renamed packages and static libs
+        packageName = resolveInternalPackageNameLPr(packageName,
+                PackageManager.VERSION_CODE_HIGHEST);
+
+        // Apps that target O see flags for all protection levels.
+        final PackageSetting ps = mSettings.mPackages.get(packageName);
+        if (ps == null) {
+            return protectionLevel;
+        }
+        if (ps.appId != appId) {
+            return protectionLevel;
+        }
+
+        final PackageParser.Package pkg = mPackages.get(packageName);
+        if (pkg == null) {
+            return protectionLevel;
+        }
+        if (pkg.applicationInfo.targetSdkVersion < Build.VERSION_CODES.O) {
+            return protectionLevelMasked;
+        }
+
+        return protectionLevel;
+    }
+
     @Override
     public @Nullable ParceledListSlice<PermissionInfo> queryPermissionsByGroup(String group,
             int flags) {
@@ -4330,10 +4373,7 @@ public class PackageManagerService extends IPackageManager.Stub
                     volumeUuid);
             final boolean aggressive = (storageFlags
                     & StorageManager.FLAG_ALLOCATE_AGGRESSIVE) != 0;
-            final boolean defyReserved = (storageFlags
-                    & StorageManager.FLAG_ALLOCATE_DEFY_RESERVED) != 0;
-            final long reservedBytes = (aggressive || defyReserved) ? 0
-                    : storage.getStorageCacheBytes(file);
+            final long reservedBytes = storage.getStorageCacheBytes(file, storageFlags);
 
             // 1. Pre-flight to determine if we have any chance to succeed
             // 2. Consider preloaded data (after 1w honeymoon, unless aggressive)
@@ -8993,9 +9033,12 @@ public class PackageManagerService extends IPackageManager.Stub
             }
         }
 
-        boolean updatedPkgBetter = false;
+        final boolean isUpdatedPkg = updatedPkg != null;
+        final boolean isUpdatedSystemPkg = isUpdatedPkg
+                && (policyFlags & PackageParser.PARSE_IS_SYSTEM) != 0;
+        boolean isUpdatedPkgBetter = false;
         // First check if this is a system package that may involve an update
-        if (updatedPkg != null && (policyFlags & PackageParser.PARSE_IS_SYSTEM) != 0) {
+        if (isUpdatedSystemPkg) {
             // If new package is not located in "/system/priv-app" (e.g. due to an OTA),
             // it needs to drop FLAG_PRIVILEGED.
             if (locationIsPrivileged(scanFile)) {
@@ -9039,10 +9082,6 @@ public class PackageManagerService extends IPackageManager.Stub
                             updatedChildPkg.versionCode = pkg.mVersionCode;
                         }
                     }
-
-                    throw new PackageManagerException(Log.WARN, "Package " + ps.name + " at "
-                            + scanFile + " ignored: updated version " + ps.versionCode
-                            + " better than this " + pkg.mVersionCode);
                 } else {
                     // The current app on the system partition is better than
                     // what we have updated to on the data partition; switch
@@ -9069,12 +9108,44 @@ public class PackageManagerService extends IPackageManager.Stub
                     synchronized (mPackages) {
                         mSettings.enableSystemPackageLPw(ps.name);
                     }
-                    updatedPkgBetter = true;
+                    isUpdatedPkgBetter = true;
                 }
             }
         }
 
-        if (updatedPkg != null) {
+        String resourcePath = null;
+        String baseResourcePath = null;
+        if ((policyFlags & PackageParser.PARSE_FORWARD_LOCK) != 0 && !isUpdatedPkgBetter) {
+            if (ps != null && ps.resourcePathString != null) {
+                resourcePath = ps.resourcePathString;
+                baseResourcePath = ps.resourcePathString;
+            } else {
+                // Should not happen at all. Just log an error.
+                Slog.e(TAG, "Resource path not set for package " + pkg.packageName);
+            }
+        } else {
+            resourcePath = pkg.codePath;
+            baseResourcePath = pkg.baseCodePath;
+        }
+
+        // Set application objects path explicitly.
+        pkg.setApplicationVolumeUuid(pkg.volumeUuid);
+        pkg.setApplicationInfoCodePath(pkg.codePath);
+        pkg.setApplicationInfoBaseCodePath(pkg.baseCodePath);
+        pkg.setApplicationInfoSplitCodePaths(pkg.splitCodePaths);
+        pkg.setApplicationInfoResourcePath(resourcePath);
+        pkg.setApplicationInfoBaseResourcePath(baseResourcePath);
+        pkg.setApplicationInfoSplitResourcePaths(pkg.splitCodePaths);
+
+        // throw an exception if we have an update to a system application, but, it's not more
+        // recent than the package we've already scanned
+        if (isUpdatedSystemPkg && !isUpdatedPkgBetter) {
+            throw new PackageManagerException(Log.WARN, "Package " + ps.name + " at "
+                    + scanFile + " ignored: updated version " + ps.versionCode
+                    + " better than this " + pkg.mVersionCode);
+        }
+
+        if (isUpdatedPkg) {
             // An updated system app will not have the PARSE_IS_SYSTEM flag set
             // initially
             policyFlags |= PackageParser.PARSE_IS_SYSTEM;
@@ -9094,7 +9165,7 @@ public class PackageManagerService extends IPackageManager.Stub
          * same name installed earlier.
          */
         boolean shouldHideSystemApp = false;
-        if (updatedPkg == null && ps != null
+        if (!isUpdatedPkg && ps != null
                 && (policyFlags & PackageParser.PARSE_IS_SYSTEM_DIR) != 0 && !isSystemApp(ps)) {
             /*
              * Check to make sure the signatures match first. If they don't,
@@ -9148,31 +9219,6 @@ public class PackageManagerService extends IPackageManager.Stub
                 policyFlags |= PackageParser.PARSE_FORWARD_LOCK;
             }
         }
-
-        // TODO: extend to support forward-locked splits
-        String resourcePath = null;
-        String baseResourcePath = null;
-        if ((policyFlags & PackageParser.PARSE_FORWARD_LOCK) != 0 && !updatedPkgBetter) {
-            if (ps != null && ps.resourcePathString != null) {
-                resourcePath = ps.resourcePathString;
-                baseResourcePath = ps.resourcePathString;
-            } else {
-                // Should not happen at all. Just log an error.
-                Slog.e(TAG, "Resource path not set for package " + pkg.packageName);
-            }
-        } else {
-            resourcePath = pkg.codePath;
-            baseResourcePath = pkg.baseCodePath;
-        }
-
-        // Set application objects path explicitly.
-        pkg.setApplicationVolumeUuid(pkg.volumeUuid);
-        pkg.setApplicationInfoCodePath(pkg.codePath);
-        pkg.setApplicationInfoBaseCodePath(pkg.baseCodePath);
-        pkg.setApplicationInfoSplitCodePaths(pkg.splitCodePaths);
-        pkg.setApplicationInfoResourcePath(resourcePath);
-        pkg.setApplicationInfoBaseResourcePath(baseResourcePath);
-        pkg.setApplicationInfoSplitResourcePaths(pkg.splitCodePaths);
 
         final int userId = ((user == null) ? 0 : user.getIdentifier());
         if (ps != null && ps.getInstantApp(userId)) {
@@ -9338,7 +9384,8 @@ public class PackageManagerService extends IPackageManager.Stub
 
         final long startTime = System.nanoTime();
         final int[] stats = performDexOptUpgrade(pkgs, mIsPreNUpgrade /* showDialog */,
-                    getCompilerFilterForReason(causeFirstBoot ? REASON_FIRST_BOOT : REASON_BOOT));
+                    getCompilerFilterForReason(causeFirstBoot ? REASON_FIRST_BOOT : REASON_BOOT),
+                    false /* bootComplete */);
 
         final int elapsedTimeSeconds =
                 (int) TimeUnit.NANOSECONDS.toSeconds(System.nanoTime() - startTime);
@@ -9350,6 +9397,13 @@ public class PackageManagerService extends IPackageManager.Stub
         MetricsLogger.histogram(mContext, "opt_dialog_time_s", elapsedTimeSeconds);
     }
 
+    /*
+     * Return the prebuilt profile path given a package base code path.
+     */
+    private static String getPrebuildProfilePath(PackageParser.Package pkg) {
+        return pkg.baseCodePath + ".prof";
+    }
+
     /**
      * Performs dexopt on the set of packages in {@code packages} and returns an int array
      * containing statistics about the invocation. The array consists of three elements,
@@ -9357,7 +9411,7 @@ public class PackageManagerService extends IPackageManager.Stub
      * and {@code numberOfPackagesFailed}.
      */
     private int[] performDexOptUpgrade(List<PackageParser.Package> pkgs, boolean showDialog,
-            String compilerFilter) {
+            String compilerFilter, boolean bootComplete) {
 
         int numberOfPackagesVisited = 0;
         int numberOfPackagesOptimized = 0;
@@ -9367,6 +9421,27 @@ public class PackageManagerService extends IPackageManager.Stub
 
         for (PackageParser.Package pkg : pkgs) {
             numberOfPackagesVisited++;
+
+            if ((isFirstBoot() || isUpgrade()) && isSystemApp(pkg)) {
+                // Copy over initial preopt profiles since we won't get any JIT samples for methods
+                // that are already compiled.
+                File profileFile = new File(getPrebuildProfilePath(pkg));
+                // Copy profile if it exists.
+                if (profileFile.exists()) {
+                    try {
+                        // We could also do this lazily before calling dexopt in
+                        // PackageDexOptimizer to prevent this happening on first boot. The issue
+                        // is that we don't have a good way to say "do this only once".
+                        if (!mInstaller.copySystemProfile(profileFile.getAbsolutePath(),
+                                pkg.applicationInfo.uid, pkg.packageName)) {
+                            Log.e(TAG, "Installer failed to copy system profile!");
+                        }
+                    } catch (Exception e) {
+                        Log.e(TAG, "Failed to copy profile " + profileFile.getAbsolutePath() + " ",
+                                e);
+                    }
+                }
+            }
 
             if (!PackageDexOptimizer.canOptimizePackage(pkg)) {
                 if (DEBUG_DEXOPT) {
@@ -9414,7 +9489,8 @@ public class PackageManagerService extends IPackageManager.Stub
             int dexOptStatus = performDexOptTraced(pkg.packageName,
                     false /* checkProfiles */,
                     compilerFilter,
-                    false /* force */);
+                    false /* force */,
+                    bootComplete);
             switch (dexOptStatus) {
                 case PackageDexOptimizer.DEX_OPT_PERFORMED:
                     numberOfPackagesOptimized++;
@@ -9470,15 +9546,41 @@ public class PackageManagerService extends IPackageManager.Stub
     }
 
     @Override
+    public void registerDexModule(String packageName, String dexModulePath, boolean isSharedModule,
+            IDexModuleRegisterCallback callback) {
+        int userId = UserHandle.getCallingUserId();
+        ApplicationInfo ai = getApplicationInfo(packageName, /*flags*/ 0, userId);
+        DexManager.RegisterDexModuleResult result;
+        if (ai == null) {
+            Slog.w(TAG, "Registering a dex module for a package that does not exist for the" +
+                     " calling user. package=" + packageName + ", user=" + userId);
+            result = new DexManager.RegisterDexModuleResult(false, "Package not installed");
+        } else {
+            result = mDexManager.registerDexModule(ai, dexModulePath, isSharedModule, userId);
+        }
+
+        if (callback != null) {
+            mHandler.post(() -> {
+                try {
+                    callback.onDexModuleRegistered(dexModulePath, result.success, result.message);
+                } catch (RemoteException e) {
+                    Slog.w(TAG, "Failed to callback after module registration " + dexModulePath, e);
+                }
+            });
+        }
+    }
+
+    @Override
     public boolean performDexOpt(String packageName,
-            boolean checkProfiles, int compileReason, boolean force) {
+            boolean checkProfiles, int compileReason, boolean force, boolean bootComplete) {
         if (getInstantAppPackageName(Binder.getCallingUid()) != null) {
             return false;
         } else if (isInstantApp(packageName, UserHandle.getCallingUserId())) {
             return false;
         }
-        return performDexOptWithStatus(packageName, checkProfiles, compileReason, force) !=
-                PackageDexOptimizer.DEX_OPT_FAILED;
+        int dexoptStatus = performDexOptWithStatus(
+              packageName, checkProfiles, compileReason, force, bootComplete);
+        return dexoptStatus != PackageDexOptimizer.DEX_OPT_FAILED;
     }
 
     /**
@@ -9488,30 +9590,32 @@ public class PackageManagerService extends IPackageManager.Stub
      *  {@link PackageDexOptimizer#DEX_OPT_FAILED}
      */
     /* package */ int performDexOptWithStatus(String packageName,
-            boolean checkProfiles, int compileReason, boolean force) {
+            boolean checkProfiles, int compileReason, boolean force, boolean bootComplete) {
         return performDexOptTraced(packageName, checkProfiles,
-                getCompilerFilterForReason(compileReason), force);
+                getCompilerFilterForReason(compileReason), force, bootComplete);
     }
 
     @Override
     public boolean performDexOptMode(String packageName,
-            boolean checkProfiles, String targetCompilerFilter, boolean force) {
+            boolean checkProfiles, String targetCompilerFilter, boolean force,
+            boolean bootComplete) {
         if (getInstantAppPackageName(Binder.getCallingUid()) != null) {
             return false;
         } else if (isInstantApp(packageName, UserHandle.getCallingUserId())) {
             return false;
         }
         int dexOptStatus = performDexOptTraced(packageName, checkProfiles,
-                targetCompilerFilter, force);
+                targetCompilerFilter, force, bootComplete);
         return dexOptStatus != PackageDexOptimizer.DEX_OPT_FAILED;
     }
 
     private int performDexOptTraced(String packageName,
-                boolean checkProfiles, String targetCompilerFilter, boolean force) {
+                boolean checkProfiles, String targetCompilerFilter, boolean force,
+                boolean bootComplete) {
         Trace.traceBegin(TRACE_TAG_PACKAGE_MANAGER, "dexopt");
         try {
             return performDexOptInternal(packageName, checkProfiles,
-                    targetCompilerFilter, force);
+                    targetCompilerFilter, force, bootComplete);
         } finally {
             Trace.traceEnd(TRACE_TAG_PACKAGE_MANAGER);
         }
@@ -9520,7 +9624,8 @@ public class PackageManagerService extends IPackageManager.Stub
     // Run dexopt on a given package. Returns true if dexopt did not fail, i.e.
     // if the package can now be considered up to date for the given filter.
     private int performDexOptInternal(String packageName,
-                boolean checkProfiles, String targetCompilerFilter, boolean force) {
+                boolean checkProfiles, String targetCompilerFilter, boolean force,
+                boolean bootComplete) {
         PackageParser.Package p;
         synchronized (mPackages) {
             p = mPackages.get(packageName);
@@ -9535,7 +9640,7 @@ public class PackageManagerService extends IPackageManager.Stub
         try {
             synchronized (mInstallLock) {
                 return performDexOptInternalWithDependenciesLI(p, checkProfiles,
-                        targetCompilerFilter, force);
+                        targetCompilerFilter, force, bootComplete);
             }
         } finally {
             Binder.restoreCallingIdentity(callingId);
@@ -9556,7 +9661,7 @@ public class PackageManagerService extends IPackageManager.Stub
 
     private int performDexOptInternalWithDependenciesLI(PackageParser.Package p,
             boolean checkProfiles, String targetCompilerFilter,
-            boolean force) {
+            boolean force, boolean bootComplete) {
         // Select the dex optimizer based on the force parameter.
         // Note: The force option is rarely used (cmdline input for testing, mostly), so it's OK to
         //       allocate an object here.
@@ -9580,12 +9685,13 @@ public class PackageManagerService extends IPackageManager.Stub
                         false /* checkProfiles */,
                         targetCompilerFilter,
                         getOrCreateCompilerPackageStats(depPackage),
-                        true /* isUsedByOtherApps */);
+                        true /* isUsedByOtherApps */,
+                        bootComplete);
             }
         }
         return pdo.performDexOpt(p, p.usesLibraryFiles, instructionSets, checkProfiles,
                 targetCompilerFilter, getOrCreateCompilerPackageStats(p),
-                mDexManager.isUsedByOtherApps(p.packageName));
+                mDexManager.isUsedByOtherApps(p.packageName), bootComplete);
     }
 
     // Performs dexopt on the used secondary dex files belonging to the given package.
@@ -9783,7 +9889,8 @@ public class PackageManagerService extends IPackageManager.Stub
             // Don't use profiles since that may cause compilation to be skipped.
             final int res = performDexOptInternalWithDependenciesLI(pkg,
                     false /* checkProfiles */, getDefaultCompilerFilter(),
-                    true /* force */);
+                    true /* force */,
+                    true /* bootComplete */);
 
             Trace.traceEnd(TRACE_TAG_PACKAGE_MANAGER);
             if (res != PackageDexOptimizer.DEX_OPT_PERFORMED) {
@@ -18239,7 +18346,8 @@ public class PackageManagerService extends IPackageManager.Stub
                         null /* instructionSets */, false /* checkProfiles */,
                         getCompilerFilterForReason(REASON_INSTALL),
                         getOrCreateCompilerPackageStats(pkg),
-                        mDexManager.isUsedByOtherApps(pkg.packageName));
+                        mDexManager.isUsedByOtherApps(pkg.packageName),
+                        true /* bootComplete */);
                 Trace.traceEnd(TRACE_TAG_PACKAGE_MANAGER);
             }
 
@@ -18740,6 +18848,14 @@ public class PackageManagerService extends IPackageManager.Stub
                 callingUid == getPackageUid(mStorageManagerPackage, 0, callingUserId)) {
             return true;
         }
+
+        // Allow caller having MANAGE_PROFILE_AND_DEVICE_OWNERS permission to silently
+        // uninstall for device owner provisioning.
+        if (checkUidPermission(MANAGE_PROFILE_AND_DEVICE_OWNERS, callingUid)
+                == PERMISSION_GRANTED) {
+            return true;
+        }
+
         return false;
     }
 
@@ -19033,8 +19149,9 @@ public class PackageManagerService extends IPackageManager.Stub
                 }
             }
             if (removedAppId >= 0) {
-                packageSender.sendPackageBroadcast(Intent.ACTION_UID_REMOVED, null, extras,
-                        Intent.FLAG_RECEIVER_INCLUDE_BACKGROUND, null, null, broadcastUsers);
+                packageSender.sendPackageBroadcast(Intent.ACTION_UID_REMOVED,
+                    null, extras, Intent.FLAG_RECEIVER_INCLUDE_BACKGROUND,
+                    null, null, broadcastUsers);
             }
         }
 
@@ -23594,7 +23711,10 @@ Slog.v(TAG, ":: stepped forward, applying functor at tag " + parser.getName());
         @Override
         protected void finalize() throws Throwable {
             try {
-                mCloseGuard.warnIfOpen();
+                if (mCloseGuard != null) {
+                    mCloseGuard.warnIfOpen();
+                }
+
                 close();
             } finally {
                 super.finalize();

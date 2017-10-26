@@ -456,15 +456,11 @@ android::Bitmap* GraphicsJNI::mapAshmemBitmap(JNIEnv* env, SkBitmap* bitmap,
     // attempting to compute our own.
     const size_t rowBytes = bitmap->rowBytes();
 
-    auto wrapper = new android::Bitmap(addr, fd, size, info, rowBytes, ctable);
+    auto wrapper = new android::Bitmap(addr, fd, size, info, rowBytes, sk_ref_sp(ctable));
     wrapper->getSkBitmap(bitmap);
     if (readOnly) {
         bitmap->pixelRef()->setImmutable();
     }
-    // since we're already allocated, we lockPixels right away
-    // HeapAllocator behaves this way too
-    bitmap->lockPixels();
-
     return wrapper;
 }
 
@@ -614,7 +610,7 @@ jobject GraphicsJNI::getColorSpace(JNIEnv* env, sk_sp<SkColorSpace>& decodeColor
 
 ///////////////////////////////////////////////////////////////////////////////
 bool HeapAllocator::allocPixelRef(SkBitmap* bitmap, SkColorTable* ctable) {
-    mStorage = android::Bitmap::allocateHeapBitmap(bitmap, ctable);
+    mStorage = android::Bitmap::allocateHeapBitmap(bitmap, sk_ref_sp(ctable));
     return !!mStorage;
 }
 
@@ -662,20 +658,18 @@ bool RecyclingClippingPixelAllocator::allocPixelRef(SkBitmap* bitmap, SkColorTab
         // storage needs
         mRecycledBitmap->reconfigure(
                 mRecycledBitmap->info().makeColorSpace(bitmap->refColorSpace()),
-                rowBytes, ctable);
+                rowBytes, sk_ref_sp(ctable));
 
         // Give the bitmap the same pixelRef as mRecycledBitmap.
         // skbug.com/4538: We also need to make sure that the rowBytes on the pixel ref
         //                 match the rowBytes on the bitmap.
         bitmap->setInfo(bitmap->info(), rowBytes);
-        mRecycledBitmap->ref();
-        bitmap->setPixelRef(mRecycledBitmap)->unref();
+        bitmap->setPixelRef(sk_ref_sp(mRecycledBitmap), 0, 0);
 
         // Make sure that the recycled bitmap has the correct alpha type.
         mRecycledBitmap->setAlphaType(bitmap->alphaType());
 
         bitmap->notifyPixelsChanged();
-        bitmap->lockPixels();
         mNeedsCopy = false;
 
         // TODO: If the dimensions of the SkBitmap are smaller than those of
@@ -723,7 +717,7 @@ AshmemPixelAllocator::AshmemPixelAllocator(JNIEnv *env) {
 }
 
 bool AshmemPixelAllocator::allocPixelRef(SkBitmap* bitmap, SkColorTable* ctable) {
-    mStorage = android::Bitmap::allocateAshmemBitmap(bitmap, ctable);
+    mStorage = android::Bitmap::allocateAshmemBitmap(bitmap, sk_ref_sp(ctable));
     return !!mStorage;
 }
 

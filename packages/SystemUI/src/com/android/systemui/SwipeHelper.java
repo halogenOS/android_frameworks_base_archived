@@ -22,6 +22,7 @@ import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.animation.ValueAnimator.AnimatorUpdateListener;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.RectF;
 import android.os.Handler;
 import android.util.Log;
@@ -30,7 +31,6 @@ import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.accessibility.AccessibilityEvent;
-
 import com.android.systemui.classifier.FalsingManager;
 import com.android.systemui.plugins.statusbar.NotificationMenuRowPlugin;
 import com.android.systemui.plugins.statusbar.NotificationMenuRowPlugin.MenuItem;
@@ -82,6 +82,7 @@ public class SwipeHelper implements Gefingerpoken {
     private float mDensityScale;
     private float mTranslation = 0;
 
+    private boolean mMenuRowIntercepting;
     private boolean mLongPressSent;
     private LongPressListener mLongPressListener;
     private Runnable mWatchLongPress;
@@ -91,6 +92,7 @@ public class SwipeHelper implements Gefingerpoken {
     private int mFalsingThreshold;
     private boolean mTouchAboveFalsingThreshold;
     private boolean mDisableHwLayers;
+    private boolean mFadeDependingOnAmountSwiped;
     private Context mContext;
 
     private HashMap<View, Animator> mDismissPendingMap = new HashMap<>();
@@ -101,12 +103,15 @@ public class SwipeHelper implements Gefingerpoken {
         mHandler = new Handler();
         mSwipeDirection = swipeDirection;
         mVelocityTracker = VelocityTracker.obtain();
-        mDensityScale =  context.getResources().getDisplayMetrics().density;
         mPagingTouchSlop = ViewConfiguration.get(context).getScaledPagingTouchSlop();
 
-        mLongPressTimeout = (long) (ViewConfiguration.getLongPressTimeout() * 1.5f); // extra long-press!
-        mFalsingThreshold = context.getResources().getDimensionPixelSize(
-                R.dimen.swipe_helper_falsing_threshold);
+        // Extra long-press!
+        mLongPressTimeout = (long) (ViewConfiguration.getLongPressTimeout() * 1.5f);
+
+        Resources res = context.getResources();
+        mDensityScale =  res.getDisplayMetrics().density;
+        mFalsingThreshold = res.getDimensionPixelSize(R.dimen.swipe_helper_falsing_threshold);
+        mFadeDependingOnAmountSwiped = res.getBoolean(R.bool.config_fadeDependingOnAmountSwiped);
         mFalsingManager = FalsingManager.getInstance(context);
         mFlingAnimationUtils = new FlingAnimationUtils(context, getMaxEscapeAnimDuration() / 1000f);
     }
@@ -176,8 +181,7 @@ public class SwipeHelper implements Gefingerpoken {
     }
 
     protected float getSize(View v) {
-        return mSwipeDirection == X ? v.getMeasuredWidth() :
-                v.getMeasuredHeight();
+        return mSwipeDirection == X ? v.getMeasuredWidth() : v.getMeasuredHeight();
     }
 
     public void setMinSwipeProgress(float minSwipeProgress) {
@@ -195,6 +199,11 @@ public class SwipeHelper implements Gefingerpoken {
     }
 
     private float getSwipeAlpha(float progress) {
+        if (mFadeDependingOnAmountSwiped) {
+            // The more progress has been fade, the lower the alpha value so that the view fades.
+            return Math.max(1 - progress, 0);
+        }
+
         return Math.min(0, Math.max(1, progress / SWIPE_PROGRESS_FADE_END));
     }
 
@@ -207,9 +216,8 @@ public class SwipeHelper implements Gefingerpoken {
         float swipeProgress = getSwipeProgressForOffset(animView, translation);
         if (!mCallback.updateSwipeProgress(animView, dismissable, swipeProgress)) {
             if (FADE_OUT_DURING_SWIPE && dismissable) {
-                float alpha = swipeProgress;
                 if (!mDisableHwLayers) {
-                    if (alpha != 0f && alpha != 1f) {
+                    if (swipeProgress != 0f && swipeProgress != 1f) {
                         animView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
                     } else {
                         animView.setLayerType(View.LAYER_TYPE_NONE, null);
@@ -259,6 +267,10 @@ public class SwipeHelper implements Gefingerpoken {
 
     @Override
     public boolean onInterceptTouchEvent(final MotionEvent ev) {
+        if (mCurrView instanceof ExpandableNotificationRow) {
+            NotificationMenuRowPlugin nmr = ((ExpandableNotificationRow) mCurrView).getProvider();
+            mMenuRowIntercepting = nmr.onInterceptTouchEvent(mCurrView, ev);
+        }
         final int action = ev.getAction();
 
         switch (action) {
@@ -294,7 +306,10 @@ public class SwipeHelper implements Gefingerpoken {
                                             menuItem = ((ExpandableNotificationRow) mCurrView)
                                                     .getProvider().getLongpressMenuItem(mContext);
                                         }
-                                        mLongPressListener.onLongPress(mCurrView, x, y, menuItem);
+                                        if (menuItem != null) {
+                                            mLongPressListener.onLongPress(mCurrView, x, y,
+                                                    menuItem);
+                                        }
                                     }
                                 }
                             };
@@ -324,15 +339,16 @@ public class SwipeHelper implements Gefingerpoken {
 
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
-                final boolean captured = (mDragging || mLongPressSent);
+                final boolean captured = (mDragging || mLongPressSent || mMenuRowIntercepting);
                 mDragging = false;
                 mCurrView = null;
                 mLongPressSent = false;
+                mMenuRowIntercepting = false;
                 removeLongPressCallback();
                 if (captured) return true;
                 break;
         }
-        return mDragging || mLongPressSent;
+        return mDragging || mLongPressSent || mMenuRowIntercepting;
     }
 
     /**
@@ -551,11 +567,11 @@ public class SwipeHelper implements Gefingerpoken {
 
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
-        if (mLongPressSent) {
+        if (mLongPressSent && !mMenuRowIntercepting) {
             return true;
         }
 
-        if (!mDragging) {
+        if (!mDragging && !mMenuRowIntercepting) {
             if (mCallback.getChildAtPosition(ev) != null) {
 
                 // We are dragging directly over a card, make sure that we also catch the gesture

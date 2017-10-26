@@ -410,6 +410,21 @@ public final class Settings {
             "android.settings.BLUETOOTH_SETTINGS";
 
     /**
+     * Activity Action: Show settings to allow configuration of Assist Gesture.
+     * <p>
+     * In some cases, a matching Activity may not exist, so ensure you
+     * safeguard against this.
+     * <p>
+     * Input: Nothing.
+     * <p>
+     * Output: Nothing.
+     * @hide
+     */
+    @SdkConstant(SdkConstantType.ACTIVITY_INTENT_ACTION)
+    public static final String ACTION_ASSIST_GESTURE_SETTINGS =
+            "android.settings.ASSIST_GESTURE_SETTINGS";
+
+    /**
      * Activity Action: Show settings to allow configuration of cast endpoints.
      * <p>
      * In some cases, a matching Activity may not exist, so ensure you
@@ -1422,10 +1437,10 @@ public final class Settings {
      * to the caller package.
      *
      * <p>
-     * <b>NOTE: </b> applications should call
+     * <b>NOTE: </b> Applications should call
      * {@link android.view.autofill.AutofillManager#hasEnabledAutofillServices()} and
-     * {@link android.view.autofill.AutofillManager#isAutofillSupported()} first, and only
-     * broadcast this intent if they return {@code false} and {@code true} respectively.
+     * {@link android.view.autofill.AutofillManager#isAutofillSupported()}, and only use this action
+     * to start an activity if they return {@code false} and {@code true} respectively.
      */
     @SdkConstant(SdkConstantType.ACTIVITY_INTENT_ACTION)
     public static final String ACTION_REQUEST_SET_AUTOFILL_SERVICE =
@@ -1783,6 +1798,12 @@ public final class Settings {
                 return mContentProvider;
             }
         }
+
+        public void clearProviderForTest() {
+            synchronized (mLock) {
+                mContentProvider = null;
+            }
+        }
     }
 
     // Thread-safe.
@@ -2008,6 +2029,16 @@ public final class Settings {
                 if (c != null) c.close();
             }
         }
+
+        public void clearGenerationTrackerForTest() {
+            synchronized (NameValueCache.this) {
+                if (mGenerationTracker != null) {
+                    mGenerationTracker.destroy();
+                }
+                mValues.clear();
+                mGenerationTracker = null;
+            }
+        }
     }
 
     /**
@@ -2194,6 +2225,12 @@ public final class Settings {
         /** @hide */
         public static void getNonLegacyMovedKeys(HashSet<String> outKeySet) {
             outKeySet.addAll(MOVED_TO_GLOBAL);
+        }
+
+        /** @hide */
+        public static void clearProviderForTest() {
+            sProviderHolder.clearProviderForTest();
+            sNameValueCache.clearGenerationTrackerForTest();
         }
 
         /**
@@ -4633,6 +4670,12 @@ public final class Settings {
             outKeySet.addAll(MOVED_TO_GLOBAL);
         }
 
+        /** @hide */
+        public static void clearProviderForTest() {
+            sProviderHolder.clearProviderForTest();
+            sNameValueCache.clearGenerationTrackerForTest();
+        }
+
         /**
          * Look up a name in the database.
          * @param resolver to access the database with
@@ -6510,6 +6553,12 @@ public final class Settings {
         public static final String DOZE_PULSE_ON_PICK_UP = "doze_pulse_on_pick_up";
 
         /**
+         * Whether the device should pulse on long press gesture.
+         * @hide
+         */
+        public static final String DOZE_PULSE_ON_LONG_PRESS = "doze_pulse_on_long_press";
+
+        /**
          * Whether the device should pulse on double tap gesture.
          * @hide
          */
@@ -6793,6 +6842,21 @@ public final class Settings {
                 "camera_double_twist_to_flip_enabled";
 
         /**
+         * Whether or not the smart camera lift trigger that launches the camera when the user moves
+         * the phone into a position for taking photos should be enabled.
+         *
+         * @hide
+         */
+        public static final String CAMERA_LIFT_TRIGGER_ENABLED = "camera_lift_trigger_enabled";
+
+        /**
+         * The default enable state of the camera lift trigger.
+         *
+         * @hide
+         */
+        public static final int CAMERA_LIFT_TRIGGER_ENABLED_DEFAULT = 1;
+
+        /**
          * Whether the assist gesture should be enabled.
          *
          * @hide
@@ -6805,6 +6869,29 @@ public final class Settings {
          * @hide
          */
         public static final String ASSIST_GESTURE_SENSITIVITY = "assist_gesture_sensitivity";
+
+        /**
+         * Whether the assist gesture should silence alerts.
+         *
+         * @hide
+         */
+        public static final String ASSIST_GESTURE_SILENCE_ALERTS_ENABLED =
+                "assist_gesture_silence_alerts_enabled";
+
+        /**
+         * Whether the assist gesture should wake the phone.
+         *
+         * @hide
+         */
+        public static final String ASSIST_GESTURE_WAKE_ENABLED =
+                "assist_gesture_wake_enabled";
+
+        /**
+         * Whether Assist Gesture Deferred Setup has been completed
+         *
+         * @hide
+         */
+        public static final String ASSIST_GESTURE_SETUP_COMPLETE = "assist_gesture_setup_complete";
 
         /**
          * Control whether Night display is currently activated.
@@ -6954,6 +7041,16 @@ public final class Settings {
                 "automatic_storage_manager_last_run";
 
         /**
+         * If the automatic storage manager has been disabled by policy. Note that this doesn't
+         * mean that the automatic storage manager is prevented from being re-enabled -- this only
+         * means that it was turned off by policy at least once.
+         *
+         * @hide
+         */
+        public static final String AUTOMATIC_STORAGE_MANAGER_TURNED_OFF_BY_POLICY =
+                "automatic_storage_manager_turned_off_by_policy";
+
+        /**
          * Whether SystemUI navigation keys is enabled.
          * @hide
          */
@@ -7007,6 +7104,12 @@ public final class Settings {
          * @hide
          */
         public static final String NOTIFICATION_BADGING = "notification_badging";
+
+        /**
+         * Comma separated list of QS tiles that have been auto-added already.
+         * @hide
+         */
+        public static final String QS_AUTO_ADDED_TILES = "qs_auto_tiles";
 
         /**
          * This are the settings to be backed up.
@@ -7089,8 +7192,6 @@ public final class Settings {
             NIGHT_DISPLAY_CUSTOM_END_TIME,
             NIGHT_DISPLAY_COLOR_TEMPERATURE,
             NIGHT_DISPLAY_AUTO_MODE,
-            NIGHT_DISPLAY_LAST_ACTIVATED_TIME,
-            NIGHT_DISPLAY_ACTIVATED,
             SYNC_PARENT_SOUNDS,
             CAMERA_DOUBLE_TWIST_TO_FLIP_ENABLED,
             CAMERA_DOUBLE_TAP_POWER_GESTURE_DISABLED,
@@ -7103,8 +7204,16 @@ public final class Settings {
             AUTOMATIC_STORAGE_MANAGER_DAYS_TO_RETAIN,
             ASSIST_GESTURE_ENABLED,
             ASSIST_GESTURE_SENSITIVITY,
+            ASSIST_GESTURE_SETUP_COMPLETE,
+            ASSIST_GESTURE_SILENCE_ALERTS_ENABLED,
+            ASSIST_GESTURE_WAKE_ENABLED,
             VR_DISPLAY_MODE,
-            NOTIFICATION_BADGING
+            NOTIFICATION_BADGING,
+            QS_AUTO_ADDED_TILES,
+            SCREENSAVER_ENABLED,
+            SCREENSAVER_COMPONENTS,
+            SCREENSAVER_ACTIVATE_ON_DOCK,
+            SCREENSAVER_ACTIVATE_ON_SLEEP,
         };
 
         /**
@@ -7686,6 +7795,31 @@ public final class Settings {
        public static final String FORCE_ALLOW_ON_EXTERNAL = "force_allow_on_external";
 
         /**
+         * The default SM-DP+ configured for this device.
+         *
+         * <p>An SM-DP+ is used by an LPA (see {@link android.service.euicc.EuiccService}) to
+         * download profiles. If this value is set, the LPA will query this server for any profiles
+         * available to this device. If any are available, they may be downloaded during device
+         * provisioning or in settings without needing the user to enter an activation code.
+         *
+         * @see android.service.euicc.EuiccService
+         * @hide
+         *
+         * TODO(b/35851809): Make this a SystemApi.
+         */
+        public static final String DEFAULT_SM_DP_PLUS = "default_sm_dp_plus";
+
+        /**
+         * Whether any profile has ever been downloaded onto a eUICC on the device.
+         *
+         * <p>Used to hide eUICC UI from users who have never made use of it and would only be
+         * confused by seeing references to it in settings.
+         * (0 = false, 1 = true)
+         * @hide
+         */
+        public static final String EUICC_PROVISIONED = "euicc_provisioned";
+
+        /**
          * Whether any activity can be resized. When this is true, any
          * activity, regardless of manifest values, can be resized for multi-window.
          * (0 = false, 1 = true)
@@ -8171,6 +8305,15 @@ public final class Settings {
         * @hide
         */
        public static final String TETHER_DUN_APN = "tether_dun_apn";
+
+        /**
+         * Used to disable trying to talk to any available tethering offload HAL.
+         *
+         * Integer values are interpreted as boolean, and the absence of an explicit setting
+         * is interpreted as |false|.
+         * @hide
+         */
+        public static final String TETHER_OFFLOAD_DISABLED = "tether_offload_disabled";
 
        /**
         * List of carrier apps which are whitelisted to prompt the user for install when
@@ -9179,6 +9322,23 @@ public final class Settings {
         public static final String BATTERY_SAVER_CONSTANTS = "battery_saver_constants";
 
         /**
+         * Battery anomaly detection specific settings
+         * This is encoded as a key=value list, separated by commas. Ex:
+         *
+         * "anomaly_detection_enabled=true,wakelock_threshold=2000"
+         *
+         * The following keys are supported:
+         *
+         * <pre>
+         * anomaly_detection_enabled       (boolean)
+         * wakelock_enabled                (boolean)
+         * wakelock_threshold              (long)
+         * </pre>
+         * @hide
+         */
+        public static final String ANOMALY_DETECTION_CONSTANTS = "anomaly_detection_constants";
+
+        /**
          * App standby (app idle) specific settings.
          * This is encoded as a key=value list, separated by commas. Ex:
          *
@@ -9966,22 +10126,6 @@ public final class Settings {
         public static final String DEVICE_DEMO_MODE = "device_demo_mode";
 
         /**
-         * Retail mode specific settings. This is encoded as a key=value list, separated by commas.
-         * Ex: "user_inactivity_timeout_ms=30000,warning_dialog_timeout_ms=10000". The following
-         * keys are supported:
-         *
-         * <pre>
-         * user_inactivity_timeout_ms  (long)
-         * warning_dialog_timeout_ms   (long)
-         * </pre>
-         * <p>
-         * Type: string
-         *
-         * @hide
-         */
-        public static final String RETAIL_DEMO_MODE_CONSTANTS = "retail_demo_mode_constants";
-
-        /**
          * Indicates the maximum time that an app is blocked for the network rules to get updated.
          *
          * Type: long
@@ -10025,6 +10169,23 @@ public final class Settings {
          */
         public static final String LOCATION_SETTINGS_LINK_TO_PERMISSIONS_ENABLED =
                 "location_settings_link_to_permissions_enabled";
+
+        /**
+         * Flag to enable use of RefactoredBackupManagerService.
+         *
+         * @hide
+         */
+        public static final String BACKUP_REFACTORED_SERVICE_DISABLED =
+            "backup_refactored_service_disabled";
+
+        /**
+         * Flag to set the waiting time for euicc factory reset inside System > Settings
+         * Type: long
+         *
+         * @hide
+         */
+        public static final String EUICC_FACTORY_RESET_TIMEOUT_MILLIS =
+                "euicc_factory_reset_timeout_millis";
 
         /**
          * Settings to backup. This is here so that it's in the same place as the settings
@@ -10084,6 +10245,12 @@ public final class Settings {
         /** @hide */
         public static void getMovedToSecureSettings(Set<String> outKeySet) {
             outKeySet.addAll(MOVED_TO_SECURE);
+        }
+
+        /** @hide */
+        public static void clearProviderForTest() {
+            sProviderHolder.clearProviderForTest();
+            sNameValueCache.clearGenerationTrackerForTest();
         }
 
         /**
@@ -10543,7 +10710,7 @@ public final class Settings {
         /**
          * The maximum allowed notification enqueue rate in Hertz.
          *
-         * Should be a float, and includes both posts and updates.
+         * Should be a float, and includes updates only.
          * @hide
          */
         public static final String MAX_NOTIFICATION_ENQUEUE_RATE = "max_notification_enqueue_rate";
@@ -10606,6 +10773,13 @@ public final class Settings {
          */
         public static final String ENABLE_CACHE_QUOTA_CALCULATION =
                 "enable_cache_quota_calculation";
+
+        /**
+         * Whether the Deletion Helper no threshold toggle is available.
+         * @hide
+         */
+        public static final String ENABLE_DELETION_HELPER_NO_THRESHOLD_TOGGLE =
+                "enable_deletion_helper_no_threshold_toggle";
     }
 
     /**

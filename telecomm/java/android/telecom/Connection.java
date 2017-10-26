@@ -24,6 +24,7 @@ import android.annotation.IntDef;
 import android.annotation.NonNull;
 import android.annotation.Nullable;
 import android.annotation.SystemApi;
+import android.annotation.TestApi;
 import android.app.Notification;
 import android.content.Intent;
 import android.hardware.camera2.CameraManager;
@@ -395,9 +396,11 @@ public abstract class Connection extends Conferenceable {
     public static final int PROPERTY_SELF_MANAGED = 1<<7;
 
     /**
-     * When set, indicates that a connection has an active RTT session associated with it.
+     * Set by the framework to indicate that a connection has an active RTT session associated with
+     * it.
      * @hide
      */
+    @TestApi
     public static final int PROPERTY_IS_RTT = 1 << 8;
 
     //**********************************************************************************************
@@ -567,6 +570,24 @@ public abstract class Connection extends Conferenceable {
      */
     public static final String EVENT_CALL_REMOTELY_UNHELD =
             "android.telecom.event.CALL_REMOTELY_UNHELD";
+
+    /**
+     * Connection event used to inform an {@link InCallService} which initiated a call handover via
+     * {@link Call#EVENT_REQUEST_HANDOVER} that the handover from this {@link Connection} has
+     * successfully completed.
+     * @hide
+     */
+    public static final String EVENT_HANDOVER_COMPLETE =
+            "android.telecom.event.HANDOVER_COMPLETE";
+
+    /**
+     * Connection event used to inform an {@link InCallService} which initiated a call handover via
+     * {@link Call#EVENT_REQUEST_HANDOVER} that the handover from this {@link Connection} has failed
+     * to complete.
+     * @hide
+     */
+    public static final String EVENT_HANDOVER_FAILED =
+            "android.telecom.event.HANDOVER_FAILED";
 
     // Flag controlling whether PII is emitted into the logs
     private static final boolean PII_DEBUG = Log.isLoggable(android.util.Log.DEBUG);
@@ -811,6 +832,7 @@ public abstract class Connection extends Conferenceable {
      * Provides methods to read and write RTT data to/from the in-call app.
      * @hide
      */
+    @TestApi
     public static final class RttTextStream {
         private static final int READ_BUFFER_SIZE = 1000;
         private final InputStreamReader mPipeFromInCall;
@@ -856,15 +878,24 @@ public abstract class Connection extends Conferenceable {
          * @return A string containing text entered by the user, or {@code null} if the
          * conversation has been terminated or if there was an error while reading.
          */
-        public String read() {
-            try {
-                int numRead = mPipeFromInCall.read(mReadBuffer, 0, READ_BUFFER_SIZE);
-                if (numRead < 0) {
-                    return null;
-                }
-                return new String(mReadBuffer, 0, numRead);
-            } catch (IOException e) {
-                Log.w(this, "Exception encountered when reading from InputStreamReader: %s", e);
+        public String read() throws IOException {
+            int numRead = mPipeFromInCall.read(mReadBuffer, 0, READ_BUFFER_SIZE);
+            if (numRead < 0) {
+                return null;
+            }
+            return new String(mReadBuffer, 0, numRead);
+        }
+
+        /**
+         * Non-blocking version of {@link #read()}. Returns {@code null} if there is nothing to
+         * be read.
+         * @return A string containing text entered by the user, or {@code null} if the user has
+         * not entered any new text yet.
+         */
+        public String readImmediately() throws IOException {
+            if (mPipeFromInCall.ready()) {
+                return read();
+            } else {
                 return null;
             }
         }
@@ -2524,7 +2555,9 @@ public abstract class Connection extends Conferenceable {
      * {@link #onStartRtt(ParcelFileDescriptor, ParcelFileDescriptor)} has succeeded.
      * @hide
      */
+    @TestApi
     public final void sendRttInitiationSuccess() {
+        setRttProperty();
         mListeners.forEach((l) -> l.onRttInitiationSuccess(Connection.this));
     }
 
@@ -2537,7 +2570,9 @@ public abstract class Connection extends Conferenceable {
      *               exception of {@link RttModifyStatus#SESSION_MODIFY_REQUEST_SUCCESS}.
      * @hide
      */
+    @TestApi
     public final void sendRttInitiationFailure(int reason) {
+        unsetRttProperty();
         mListeners.forEach((l) -> l.onRttInitiationFailure(Connection.this, reason));
     }
 
@@ -2546,6 +2581,7 @@ public abstract class Connection extends Conferenceable {
      * side of the coll.
      * @hide
      */
+    @TestApi
     public final void sendRttSessionRemotelyTerminated() {
         mListeners.forEach((l) -> l.onRttSessionRemotelyTerminated(Connection.this));
     }
@@ -2555,6 +2591,7 @@ public abstract class Connection extends Conferenceable {
      * RTT session in the call.
      * @hide
      */
+    @TestApi
     public final void sendRemoteRttRequest() {
         mListeners.forEach((l) -> l.onRemoteRttRequest(Connection.this));
     }
@@ -2773,6 +2810,7 @@ public abstract class Connection extends Conferenceable {
      *                      the in-call app.
      * @hide
      */
+    @TestApi
     public void onStartRtt(@NonNull RttTextStream rttTextStream) {}
 
     /**
@@ -2780,6 +2818,7 @@ public abstract class Connection extends Conferenceable {
      * channel. No response to Telecom is needed for this method.
      * @hide
      */
+    @TestApi
     public void onStopRtt() {}
 
     /**
@@ -2791,7 +2830,24 @@ public abstract class Connection extends Conferenceable {
      * @param rttTextStream The object that should be used to send text to or receive text from
      *                      the in-call app.
      */
+    @TestApi
     public void handleRttUpgradeResponse(@Nullable RttTextStream rttTextStream) {}
+
+    /**
+     * Internal method to set {@link #PROPERTY_IS_RTT}.
+     * @hide
+     */
+    void setRttProperty() {
+        setConnectionProperties(getConnectionProperties() | PROPERTY_IS_RTT);
+    }
+
+    /**
+     * Internal method to un-set {@link #PROPERTY_IS_RTT}.
+     * @hide
+     */
+    void unsetRttProperty() {
+        setConnectionProperties(getConnectionProperties() & (~PROPERTY_IS_RTT));
+    }
 
     static String toLogSafePhoneNumber(String number) {
         // For unknown number, log empty string.

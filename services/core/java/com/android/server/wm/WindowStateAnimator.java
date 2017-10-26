@@ -20,6 +20,7 @@ import static android.app.ActivityManager.StackId;
 import static android.view.Display.DEFAULT_DISPLAY;
 import static android.view.WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED;
 import static android.view.WindowManager.LayoutParams.FLAG_SCALED;
+import static android.view.WindowManager.LayoutParams.PRIVATE_FLAG_IS_ROUNDED_CORNERS_OVERLAY;
 import static android.view.WindowManager.LayoutParams.TYPE_APPLICATION_STARTING;
 import static android.view.WindowManager.LayoutParams.TYPE_INPUT_METHOD;
 import static android.view.WindowManager.LayoutParams.TYPE_WALLPAPER;
@@ -368,7 +369,7 @@ class WindowStateAnimator {
         // we just started or just stopped animating by comparing mWasAnimating with isAnimationSet().
         mWasAnimating = mAnimating;
         final DisplayContent displayContent = mWin.getDisplayContent();
-        if (displayContent != null && mService.okToDisplay()) {
+        if (displayContent != null && mService.okToAnimate()) {
             // We will run animations as long as the display isn't frozen.
 
             if (mWin.isDrawnLw() && mAnimation != null) {
@@ -629,6 +630,10 @@ class WindowStateAnimator {
 
         if (mSurfaceController != null) {
             return mSurfaceController;
+        }
+
+        if ((mWin.mAttrs.privateFlags & PRIVATE_FLAG_IS_ROUNDED_CORNERS_OVERLAY) != 0) {
+            windowType = SurfaceControl.WINDOW_TYPE_DONT_SCREENSHOT;
         }
 
         w.setHasSurface(false);
@@ -1190,7 +1195,8 @@ class WindowStateAnimator {
         if (DEBUG_WINDOW_CROP) Slog.d(TAG, "Applying decor to crop win=" + w + " mDecorFrame="
                 + w.mDecorFrame + " mSystemDecorRect=" + mSystemDecorRect);
 
-        final boolean fullscreen = w.fillsDisplay();
+        final Task task = w.getTask();
+        final boolean fullscreen = w.fillsDisplay() || (task != null && task.isFullscreen());
         final boolean isFreeformResizing =
                 w.isDragResizing() && w.getResizeMode() == DRAG_RESIZE_MODE_FREEFORM;
 
@@ -1516,17 +1522,30 @@ class WindowStateAnimator {
         }
     }
 
+    /**
+     * Get rect of the task this window is currently in. If there is no task, rect will be set to
+     * empty.
+     */
+    void getContainerRect(Rect rect) {
+        final Task task = mWin.getTask();
+        if (task != null) {
+            task.getDimBounds(rect);
+        } else {
+            rect.left = rect.top = rect.right = rect.bottom = 0;
+        }
+    }
+
     void prepareSurfaceLocked(final boolean recoveringMemory) {
         final WindowState w = mWin;
         if (!hasSurface()) {
 
             // There is no need to wait for an animation change if our window is gone for layout
             // already as we'll never be visible.
-            if (w.mOrientationChanging && w.isGoneForLayoutLw()) {
+            if (w.getOrientationChanging() && w.isGoneForLayoutLw()) {
                 if (DEBUG_ORIENTATION) {
                     Slog.v(TAG, "Orientation change skips hidden " + w);
                 }
-                w.mOrientationChanging = false;
+                w.setOrientationChanging(false);
             }
             return;
         }
@@ -1559,8 +1578,8 @@ class WindowStateAnimator {
             // really hidden (gone for layout), there is no point in still waiting for it.
             // Note that this does introduce a potential glitch if the window becomes unhidden
             // before it has drawn for the new orientation.
-            if (w.mOrientationChanging && w.isGoneForLayoutLw()) {
-                w.mOrientationChanging = false;
+            if (w.getOrientationChanging() && w.isGoneForLayoutLw()) {
+                w.setOrientationChanging(false);
                 if (DEBUG_ORIENTATION) Slog.v(TAG,
                         "Orientation change skips hidden " + w);
             }
@@ -1599,21 +1618,38 @@ class WindowStateAnimator {
                         recoveringMemory);
             mSurfaceController.setLayer(mAnimLayer);
 
-            if (prepared && mLastHidden && mDrawState == HAS_DRAWN) {
-                if (showSurfaceRobustlyLocked()) {
-                    markPreservedSurfaceForDestroy();
-                    mAnimator.requestRemovalOfReplacedWindows(w);
-                    mLastHidden = false;
-                    if (mIsWallpaper) {
-                        w.dispatchWallpaperVisibility(true);
+            if (prepared && mDrawState == HAS_DRAWN) {
+                if (mLastHidden) {
+                    if (showSurfaceRobustlyLocked()) {
+                        markPreservedSurfaceForDestroy();
+                        mAnimator.requestRemovalOfReplacedWindows(w);
+                        mLastHidden = false;
+                        if (mIsWallpaper) {
+                            w.dispatchWallpaperVisibility(true);
+                        }
+                        // This draw means the difference between unique content and mirroring.
+                        // Run another pass through performLayout to set mHasContent in the
+                        // LogicalDisplay.
+                        mAnimator.setPendingLayoutChanges(w.getDisplayId(),
+                                WindowManagerPolicy.FINISH_LAYOUT_REDO_ANIM);
+                    } else {
+                        w.setOrientationChanging(false);
                     }
-                    // This draw means the difference between unique content and mirroring.
-                    // Run another pass through performLayout to set mHasContent in the
-                    // LogicalDisplay.
-                    mAnimator.setPendingLayoutChanges(w.getDisplayId(),
-                            WindowManagerPolicy.FINISH_LAYOUT_REDO_ANIM);
-                } else {
-                    w.mOrientationChanging = false;
+                }
+                // We process mTurnOnScreen even for windows which have already
+                // been shown, to handle cases where windows are not necessarily
+                // hidden while the screen is turning off.
+                // TODO(b/63773439): These cases should be eliminated, though we probably still
+                // want to process mTurnOnScreen in this way for clarity.
+                if (mWin.mTurnOnScreen && mWin.mAppToken.canTurnScreenOn()) {
+                    if (DEBUG_VISIBILITY) Slog.v(TAG, "Show surface turning screen on: " + mWin);
+                    mWin.mTurnOnScreen = false;
+
+                    // The window should only turn the screen on once per resume, but
+                    // prepareSurfaceLocked can be called multiple times. Set canTurnScreenOn to
+                    // false so the window doesn't turn the screen on again during this resume.
+                    mWin.mAppToken.setCanTurnScreenOn(false);
+                    mAnimator.mBulkUpdateParams |= SET_TURN_ON_SCREEN;
                 }
             }
             if (hasSurface()) {
@@ -1626,14 +1662,14 @@ class WindowStateAnimator {
             displayed = true;
         }
 
-        if (w.mOrientationChanging) {
+        if (w.getOrientationChanging()) {
             if (!w.isDrawnLw()) {
                 mAnimator.mBulkUpdateParams &= ~SET_ORIENTATION_CHANGE_COMPLETE;
                 mAnimator.mLastWindowFreezeSource = w;
                 if (DEBUG_ORIENTATION) Slog.v(TAG,
                         "Orientation continue waiting for draw in " + w);
             } else {
-                w.mOrientationChanging = false;
+                w.setOrientationChanging(false);
                 if (DEBUG_ORIENTATION) Slog.v(TAG, "Orientation change complete in " + w);
             }
         }
@@ -1725,11 +1761,6 @@ class WindowStateAnimator {
         if (!shown)
             return false;
 
-        if (mWin.mTurnOnScreen) {
-            if (DEBUG_VISIBILITY) Slog.v(TAG, "Show surface turning screen on: " + mWin);
-            mWin.mTurnOnScreen = false;
-            mAnimator.mBulkUpdateParams |= SET_TURN_ON_SCREEN;
-        }
         return true;
     }
 
@@ -1776,7 +1807,7 @@ class WindowStateAnimator {
         // artifacts when we unfreeze the display if some different animation
         // is running.
         Trace.traceBegin(Trace.TRACE_TAG_WINDOW_MANAGER, "WSA#applyAnimationLocked");
-        if (mService.okToDisplay()) {
+        if (mService.okToAnimate()) {
             int anim = mPolicy.selectAnimationLw(mWin, transit);
             int attr = -1;
             Animation a = null;

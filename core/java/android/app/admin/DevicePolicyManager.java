@@ -55,7 +55,6 @@ import android.os.RemoteException;
 import android.os.UserHandle;
 import android.os.UserManager;
 import android.provider.ContactsContract.Directory;
-import android.provider.Settings;
 import android.security.Credentials;
 import android.service.restrictions.RestrictionsReceiver;
 import android.telephony.TelephonyManager;
@@ -262,6 +261,25 @@ public class DevicePolicyManager {
     @SdkConstant(SdkConstantType.ACTIVITY_INTENT_ACTION)
     public static final String ACTION_PROVISION_MANAGED_DEVICE
         = "android.app.action.PROVISION_MANAGED_DEVICE";
+
+    /**
+     * Activity action: launch when user provisioning completed, i.e.
+     * {@link #getUserProvisioningState()} returns one of the complete state.
+     *
+     * <p> Please note that the API behavior is not necessarily consistent across various releases,
+     * and devices, as it's contract between SetupWizard and ManagedProvisioning. The default
+     * implementation is that ManagedProvisioning launches SetupWizard in NFC provisioning only.
+     *
+     * <p> The activity must be protected by permission
+     * {@link android.Manifest.permission#BIND_DEVICE_ADMIN}, and the process must hold
+     * {@link android.Manifest.permission#DISPATCH_PROVISIONING_MESSAGE} to be launched.
+     * Only one {@link ComponentName} in the entire system should be enabled, and the rest of the
+     * components are not started by this intent.
+     * @hide
+     */
+    @SdkConstant(SdkConstantType.ACTIVITY_INTENT_ACTION)
+    public static final String ACTION_STATE_USER_SETUP_COMPLETE =
+            "android.app.action.STATE_USER_SETUP_COMPLETE";
 
     /**
      * Activity action: Starts the provisioning flow which sets up a managed device.
@@ -3115,6 +3133,14 @@ public class DevicePolicyManager {
     public static final int WIPE_RESET_PROTECTION_DATA = 0x0002;
 
     /**
+     * Flag for {@link #wipeData(int)}: also erase the device's eUICC data.
+     *
+     * TODO(b/35851809): make this public.
+     * @hide
+     */
+    public static final int WIPE_EUICC = 0x0004;
+
+    /**
      * Ask that all user data be wiped. If called as a secondary user, the user will be removed and
      * other users will remain unaffected. Calling from the primary user will cause the device to
      * reboot, erasing all device data - including all the secondary users and their data - while
@@ -5954,6 +5980,13 @@ public class DevicePolicyManager {
      * @hide
      */
     public static final int MAKE_USER_EPHEMERAL = 0x0002;
+
+    /**
+     * Flag used by {@link #createAndManageUser} to specify that the user should be created as a
+     * demo user.
+     * @hide
+     */
+    public static final int MAKE_USER_DEMO = 0x0004;
 
     /**
      * Called by a device owner to create a user with the specified name and a given component of

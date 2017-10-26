@@ -163,6 +163,7 @@ applications that come with the platform
         <permission name="android.permission.UPDATE_LOCK"/>
         <permission name="android.permission.WRITE_APN_SETTINGS"/>
         <permission name="android.permission.WRITE_SECURE_SETTINGS"/>
+        <permission name="com.android.permission.WRITE_EMBEDDED_SUBSCRIPTIONS"/>
         <permission name="com.android.voicemail.permission.READ_VOICEMAIL"/>
         <permission name="com.android.voicemail.permission.WRITE_VOICEMAIL"/>
     </privapp-permissions>
@@ -229,6 +230,7 @@ applications that come with the platform
         <permission name="android.permission.MANAGE_FINGERPRINT"/>
         <permission name="android.permission.MANAGE_USB"/>
         <permission name="android.permission.MANAGE_USERS"/>
+        <permission name="android.permission.MANAGE_USER_OEM_UNLOCK_STATE" />
         <permission name="android.permission.MASTER_CLEAR"/>
         <permission name="android.permission.MODIFY_PHONE_STATE"/>
         <permission name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"/>
@@ -313,6 +315,7 @@ applications that come with the platform
         <permission name="android.permission.BLUETOOTH_PRIVILEGED"/>
         <permission name="android.permission.CHANGE_COMPONENT_ENABLED_STATE"/>
         <permission name="android.permission.CHANGE_DEVICE_IDLE_TEMP_WHITELIST"/>
+        <permission name="android.permission.CHANGE_OVERLAY_PACKAGES"/>
         <permission name="android.permission.CONNECTIVITY_INTERNAL"/>
         <permission name="android.permission.CONTROL_VPN"/>
         <permission name="android.permission.DUMP"/>

@@ -1112,6 +1112,19 @@ final class TaskRecord extends ConfigurationContainer implements TaskWindowConta
         return intent != null ? intent : affinityIntent;
     }
 
+    /**
+     * @return Whether there are only fullscreen activities in this task.
+     */
+    boolean containsOnlyFullscreenActivities() {
+        for (int i = 0; i < mActivities.size(); i++) {
+            final ActivityRecord r = mActivities.get(i);
+            if (!r.finishing && !r.fullscreen) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     /** Returns the first non-finishing activity from the root. */
     ActivityRecord getRootActivity() {
         for (int i = 0; i < mActivities.size(); i++) {
@@ -1145,6 +1158,17 @@ final class TaskRecord extends ConfigurationContainer implements TaskWindowConta
             }
         }
         return null;
+    }
+
+    void getAllRunningVisibleActivitiesLocked(ArrayList<ActivityRecord> outActivities) {
+        if (mStack != null) {
+            for (int activityNdx = mActivities.size() - 1; activityNdx >= 0; --activityNdx) {
+                ActivityRecord r = mActivities.get(activityNdx);
+                if (!r.finishing && r.okToShowLocked() && r.visibleIgnoringKeyguard) {
+                    outActivities.add(r);
+                }
+            }
+        }
     }
 
     ActivityRecord topRunningActivityWithStartingWindowLocked() {
@@ -1589,6 +1613,13 @@ final class TaskRecord extends ConfigurationContainer implements TaskWindowConta
         }
         return (mResizeMode != RESIZE_MODE_FORCE_RESIZABLE_PORTRAIT_ONLY || !landscape)
                 && (mResizeMode != RESIZE_MODE_FORCE_RESIZABLE_LANDSCAPE_ONLY || landscape);
+    }
+
+    /**
+     * @return {@code true} if the task is being cleared for the purposes of being reused.
+     */
+    boolean isClearingToReuseTask() {
+        return mReuseTask;
     }
 
     /**
@@ -2329,7 +2360,7 @@ final class TaskRecord extends ConfigurationContainer implements TaskWindowConta
                 pw.print(" mResizeMode=" + ActivityInfo.resizeModeToString(mResizeMode));
                 pw.print(" mSupportsPictureInPicture=" + mSupportsPictureInPicture);
                 pw.print(" isResizeable=" + isResizeable());
-                pw.print(" firstActiveTime=" + lastActiveTime);
+                pw.print(" firstActiveTime=" + firstActiveTime);
                 pw.print(" lastActiveTime=" + lastActiveTime);
                 pw.println(" (inactive for " + (getInactiveDuration() / 1000) + "s)");
     }

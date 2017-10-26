@@ -310,6 +310,7 @@
     <string name="quick_settings_more_settings" msgid="326112621462813682">"การตั้งค่าเพิ่มเติม"</string>
     <string name="quick_settings_done" msgid="3402999958839153376">"เสร็จสิ้น"</string>
     <string name="quick_settings_connected" msgid="1722253542984847487">"เชื่อมต่อ"</string>
+    <string name="quick_settings_connected_battery_level" msgid="4136051440381328892">"เชื่อมต่ออยู่ แบตเตอรี่ <xliff:g id="BATTERY_LEVEL_AS_PERCENTAGE">%1$s</xliff:g>"</string>
     <string name="quick_settings_connecting" msgid="47623027419264404">"กำลังเชื่อมต่อ..."</string>
     <string name="quick_settings_tethering_label" msgid="7153452060448575549">"การปล่อยสัญญาณ"</string>
     <string name="quick_settings_hotspot_label" msgid="6046917934974004879">"ฮอตสปอต"</string>
@@ -467,6 +468,8 @@
     <string name="branded_monitoring_description_app_personal" msgid="2669518213949202599">"คุณเชื่อมต่อกับ <xliff:g id="APPLICATION">%1$s</xliff:g> ซึ่งสามารถตรวจสอบกิจกรรมในเครือข่ายส่วนตัวของคุณ รวมถึงอีเมล แอป และเว็บไซต์ได้"</string>
     <string name="monitoring_description_app_work" msgid="4612997849787922906">"<xliff:g id="ORGANIZATION">%1$s</xliff:g> เป็นผู้จัดการโปรไฟล์งานของคุณ โปรไฟล์ดังกล่าวเชื่อมต่ออยู่กับ <xliff:g id="APPLICATION">%2$s</xliff:g> ซึ่งสามารถตรวจสอบกิจกรรมในเครือข่ายของคุณ รวมถึงอีเมล แอป และเว็บไซต์\n\nโปรดติดต่อผู้ดูแลระบบของคุณสำหรับข้อมูลเพิ่มเติม"</string>
     <string name="monitoring_description_app_personal_work" msgid="5664165460056859391">"<xliff:g id="ORGANIZATION">%1$s</xliff:g> เป็นผู้จัดการโปรไฟล์งานของคุณ โปรไฟล์ดังกล่าวเชื่อมต่ออยู่กับ <xliff:g id="APPLICATION_WORK">%2$s</xliff:g> ซึ่งสามารถตรวจสอบกิจกรรมในเครือข่ายของคุณ รวมถึงอีเมล แอป และเว็บไซต์\n\nคุณยังเชื่อมต่ออยู่กับ <xliff:g id="APPLICATION_PERSONAL">%3$s</xliff:g> ด้วย ซึ่งสามารถตรวจสอบกิจกรรมในเครือข่ายส่วนตัวของคุณ"</string>
+    <string name="keyguard_indication_trust_granted" msgid="4985003749105182372">"ปลดล็อกสำหรับ <xliff:g id="USER_NAME">%1$s</xliff:g> แล้ว"</string>
+    <string name="keyguard_indication_trust_managed" msgid="8319646760022357585">"<xliff:g id="TRUST_AGENT">%1$s</xliff:g> กำลังทำงาน"</string>
     <string name="keyguard_indication_trust_disabled" msgid="7412534203633528135">"อุปกรณ์จะล็อกจนกว่าคุณจะปลดล็อกด้วยตนเอง"</string>
     <string name="hidden_notifications_title" msgid="7139628534207443290">"รับการแจ้งเตือนเร็วขึ้น"</string>
     <string name="hidden_notifications_text" msgid="2326409389088668981">"ดูก่อนปลดล็อก"</string>
@@ -548,9 +551,10 @@
     <string name="tuner_full_importance_settings_off" msgid="8208165412614935229">"ปิด"</string>
     <string name="power_notification_controls_description" msgid="4372459941671353358">"ส่วนควบคุมการแจ้งเตือนแบบเปิด/ปิดช่วยให้คุณตั้งค่าระดับความสำคัญสำหรับการแจ้งเตือนของแอปได้ตั้งแต่ระดับ 0-5 \n\n"<b>"ระดับ 5"</b>" \n- แสดงที่ด้านบนของรายการแจ้งเตือน \n- อนุญาตให้รบกวนแบบเต็มหน้าจอ \n- อนุญาตให้แสดงชั่วครู่ \n\n"<b>"ระดับ 4"</b>" \n- ป้องกันการรบกวนแบบเต็มหน้าจอ \n- แสดงชั่วครู่เสมอ \n\n"<b>"ระดับ 3"</b>" \n- ป้องกันการรบกวนแบบเต็มหน้าจอ \n- ไม่แสดงชั่วครู่เลย \n\n"<b>"ระดับ 2"</b>" \n- ป้องกันการรบกวนแบบเต็มหน้าจอ \n- ไม่แสดงชั่วครู่เลย \n- ไม่ส่งเสียงหรือสั่นเลย \n\n"<b>"ระดับ 1"</b>" \n- ป้องกันการรบกวนแบบเต็มหน้าจอ \n- ไม่แสดงชั่วครู่เลย \n- ไม่ส่งเสียงหรือสั่นเลย \n- ซ่อนจากหน้าจอล็อกและแถบสถานะ \n- แสดงที่ด้านล่างของรายการแจ้งเตือน \n\n"<b>"ระดับ 0"</b>" \n- บล็อกการแจ้งเตือนทั้งหมดจากแอป"</string>
     <string name="notification_header_default_channel" msgid="7506845022070889909">"การแจ้งเตือน"</string>
-    <string name="notification_channel_disabled" msgid="5805874247999578073">"คุณจะไม่ได้รับการแจ้งเตือนเหล่านี้อีก"</string>
+    <string name="notification_channel_disabled" msgid="2139193533791840539">"คุณจะไม่ได้รับการแจ้งเตือนเหล่านี้อีก"</string>
     <string name="notification_num_channels" msgid="2048144408999179471">"หมวดหมู่การแจ้งเตือน <xliff:g id="NUMBER">%d</xliff:g> หมวด"</string>
     <string name="notification_default_channel_desc" msgid="2506053815870808359">"แอปนี้ไม่มีหมวดหมู่การแจ้งเตือน"</string>
+    <string name="notification_unblockable_desc" msgid="3561016061737896906">"ไม่สามารถปิดการแจ้งเตือนจากแอปนี้"</string>
     <plurals name="notification_num_channels_desc" formatted="false" msgid="5492793452274077663">
       <item quantity="other">การแจ้งเตือน 1 ใน <xliff:g id="NUMBER_1">%d</xliff:g> หมวดหมู่จากแอปนี้</item>
       <item quantity="one">การแจ้งเตือน 1 ใน <xliff:g id="NUMBER_0">%d</xliff:g> หมวดหมู่จากแอปนี้</item>
@@ -570,12 +574,16 @@
     <string name="notification_menu_accessibility" msgid="2046162834248888553">"<xliff:g id="APP_NAME">%1$s</xliff:g> <xliff:g id="MENU_DESCRIPTION">%2$s</xliff:g>"</string>
     <string name="notification_menu_gear_description" msgid="2204480013726775108">"ส่วนควบคุมการแจ้งเตือน"</string>
     <string name="notification_menu_snooze_description" msgid="3653669438131034525">"ตัวเลือกการปิดเสียงแจ้งเตือนชั่วคราว"</string>
-    <string name="snooze_option_15_min" msgid="1068727451405610715">"15 นาที"</string>
-    <string name="snooze_option_30_min" msgid="867081342535195788">"30 นาที"</string>
-    <string name="snooze_option_1_hour" msgid="1098086401880077154">"1 ชั่วโมง"</string>
-    <string name="snooze_option_2_hour" msgid="8332218255658969475">"2 ชั่วโมง"</string>
     <string name="snooze_undo" msgid="6074877317002985129">"เลิกทำ"</string>
     <string name="snoozed_for_time" msgid="2390718332980204462">"ปิดเสียงเตือนชั่วคราวไว้เป็นเวลา <xliff:g id="TIME_AMOUNT">%1$s</xliff:g>"</string>
+    <plurals name="snoozeHourOptions" formatted="false" msgid="2124335842674413030">
+      <item quantity="other">%d ชั่วโมง</item>
+      <item quantity="one">%d ชั่วโมง</item>
+    </plurals>
+    <plurals name="snoozeMinuteOptions" formatted="false" msgid="4127251700591510196">
+      <item quantity="other">%d นาที</item>
+      <item quantity="one">%d นาที</item>
+    </plurals>
     <string name="battery_panel_title" msgid="7944156115535366613">"การใช้งานแบตเตอรี่"</string>
     <string name="battery_detail_charging_summary" msgid="1279095653533044008">"ไม่สามารถใช้โหมดประหยัดแบตเตอรี่ระหว่างการชาร์จ"</string>
     <string name="battery_detail_switch_title" msgid="6285872470260795421">"โหมดประหยัดแบตเตอรี่"</string>
@@ -718,8 +726,8 @@
     <string name="pip_phone_minimize" msgid="1079119422589131792">"ย่อเล็กสุด"</string>
     <string name="pip_phone_close" msgid="8416647892889710330">"ปิด"</string>
     <string name="pip_phone_dismiss_hint" msgid="6351678169095923899">"ลากลงเพื่อปิด"</string>
-    <string name="pip_menu_title" msgid="3328510504196964712">"เมนูการแสดงผลหลายแหล่งพร้อมกัน"</string>
-    <string name="pip_notification_title" msgid="3204024940158161322">"<xliff:g id="NAME">%s</xliff:g> ใช้การแสดงผลหลายแหล่งพร้อมกัน"</string>
+    <string name="pip_menu_title" msgid="3328510504196964712">"เมนูการแสดงภาพซ้อนภาพ"</string>
+    <string name="pip_notification_title" msgid="3204024940158161322">"<xliff:g id="NAME">%s</xliff:g> ใช้การแสดงภาพซ้อนภาพ"</string>
     <string name="pip_notification_message" msgid="4171698133469539591">"หากคุณไม่ต้องการให้ <xliff:g id="NAME">%s</xliff:g> ใช้ฟีเจอร์นี้ ให้แตะเพื่อเปิดการตั้งค่าแล้วปิดฟีเจอร์"</string>
     <string name="pip_play" msgid="1417176722760265888">"เล่น"</string>
     <string name="pip_pause" msgid="8881063404466476571">"หยุดชั่วคราว"</string>
@@ -765,4 +773,5 @@
     <string name="qs_dnd_replace" msgid="8019520786644276623">"แทนที่"</string>
     <string name="running_foreground_services_title" msgid="381024150898615683">"แอปที่กำลังทำงานในเบื้องหลัง"</string>
     <string name="running_foreground_services_msg" msgid="6326247670075574355">"แตะเพื่อดูรายละเอียดเกี่ยวกับแบตเตอรี่และปริมาณการใช้อินเทอร์เน็ต"</string>
+    <string name="data_usage_disable_mobile" msgid="5116269981510015864">"ปิดอินเทอร์เน็ตมือถือไหม"</string>
 </resources>

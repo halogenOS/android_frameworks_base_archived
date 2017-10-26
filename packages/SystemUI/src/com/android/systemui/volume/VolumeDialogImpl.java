@@ -25,6 +25,7 @@ import android.annotation.NonNull;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.app.KeyguardManager;
+import android.app.WallpaperManager;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
@@ -32,6 +33,7 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
+import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.drawable.AnimatedVectorDrawable;
 import android.graphics.drawable.ColorDrawable;
@@ -51,6 +53,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.Slog;
 import android.util.SparseBooleanArray;
+import android.view.ContextThemeWrapper;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -149,7 +152,7 @@ public class VolumeDialogImpl implements VolumeDialog, TunerService.Tunable {
     private TunerZenModePanel mZenPanel;
 
     public VolumeDialogImpl(Context context) {
-        mContext = context;
+        mContext = new ContextThemeWrapper(context, com.android.systemui.R.style.qs_theme);
         mZenModeController = Dependency.get(ZenModeController.class);
         mController = Dependency.get(VolumeDialogController.class);
         mKeyguard = (KeyguardManager) mContext.getSystemService(Context.KEYGUARD_SERVICE);
@@ -178,7 +181,13 @@ public class VolumeDialogImpl implements VolumeDialog, TunerService.Tunable {
 
     @Override
     public void destroy() {
+        mAccessibility.destroy();
         mController.removeCallback(mControllerCallbackH);
+        if (mZenFooter != null) {
+            mZenFooter.cleanup();
+        }
+        Dependency.get(TunerService.class).removeTunable(this);
+        mHandler.removeCallbacksAndMessages(null);
     }
 
     private void initDialog() {
@@ -694,11 +703,12 @@ public class VolumeDialogImpl implements VolumeDialog, TunerService.Tunable {
         final boolean visible = mState.zenMode != Global.ZEN_MODE_OFF
                 && (mAudioManager.isStreamAffectedByRingerMode(mActiveStream) || mExpanded)
                 && !mZenPanel.isEditing();
-
-        if (wasVisible != visible) {
-            mZenFooter.update();
-            Util.setVisOrGone(mZenFooter, visible);
+        TransitionManager.beginDelayedTransition(mDialogView, getTransistion());
+        if (wasVisible != visible && !visible) {
+            prepareForCollapse();
         }
+        Util.setVisOrGone(mZenFooter, visible);
+        mZenFooter.update();
 
         final boolean fullWasVisible = mZenPanel.getVisibility() == View.VISIBLE;
         final boolean fullVisible = mShowFullZen && !visible;
@@ -1238,14 +1248,12 @@ public class VolumeDialogImpl implements VolumeDialog, TunerService.Tunable {
                 }
             });
             mDialogView.setAccessibilityDelegate(this);
-            mAccessibilityMgr.addAccessibilityStateChangeListener(
-                    new AccessibilityStateChangeListener() {
-                        @Override
-                        public void onAccessibilityStateChanged(boolean enabled) {
-                            updateFeedbackEnabled();
-                        }
-                    });
+            mAccessibilityMgr.addAccessibilityStateChangeListener(mListener);
             updateFeedbackEnabled();
+        }
+
+        public void destroy() {
+            mAccessibilityMgr.removeAccessibilityStateChangeListener(mListener);
         }
 
         @Override
@@ -1270,6 +1278,9 @@ public class VolumeDialogImpl implements VolumeDialog, TunerService.Tunable {
             }
             return false;
         }
+
+        private final AccessibilityStateChangeListener mListener =
+                enabled -> updateFeedbackEnabled();
     }
 
     private static class VolumeRow {

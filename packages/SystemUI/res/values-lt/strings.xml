@@ -314,6 +314,7 @@
     <string name="quick_settings_more_settings" msgid="326112621462813682">"Daugiau nustatymų"</string>
     <string name="quick_settings_done" msgid="3402999958839153376">"Atlikta"</string>
     <string name="quick_settings_connected" msgid="1722253542984847487">"Prijungtas"</string>
+    <string name="quick_settings_connected_battery_level" msgid="4136051440381328892">"Prijungta, akumuliatorius <xliff:g id="BATTERY_LEVEL_AS_PERCENTAGE">%1$s</xliff:g>"</string>
     <string name="quick_settings_connecting" msgid="47623027419264404">"Prisijungiama..."</string>
     <string name="quick_settings_tethering_label" msgid="7153452060448575549">"Susiejimas"</string>
     <string name="quick_settings_hotspot_label" msgid="6046917934974004879">"Viešosios interneto prieigos taškas"</string>
@@ -471,6 +472,8 @@
     <string name="branded_monitoring_description_app_personal" msgid="2669518213949202599">"Esate prisijungę prie programos „<xliff:g id="APPLICATION">%1$s</xliff:g>“, kuri gali stebėti asmeninio tinklo veiklą, įskaitant el. laiškus, programas ir svetaines."</string>
     <string name="monitoring_description_app_work" msgid="4612997849787922906">"Jūsų darbo profilį tvarko „<xliff:g id="ORGANIZATION">%1$s</xliff:g>“. Profilis susietas su programa „<xliff:g id="APPLICATION">%2$s</xliff:g>“, kuri gali stebėti jūsų tinklo veiklą, įskaitant el. laiškus, programas ir svetaines.\n\nJei reikia daugiau informacijos, susisiekite su administratoriumi."</string>
     <string name="monitoring_description_app_personal_work" msgid="5664165460056859391">"Jūsų darbo profilį tvarko „<xliff:g id="ORGANIZATION">%1$s</xliff:g>“. Profilis susietas su programa „<xliff:g id="APPLICATION_WORK">%2$s</xliff:g>“, kuri gali stebėti jūsų tinklo veiklą, įskaitant el. laiškus, programas ir svetaines.\n\nTaip pat esate prisijungę prie programos „<xliff:g id="APPLICATION_PERSONAL">%3$s</xliff:g>“, kuri gali stebėti asmeninio tinklo veiklą."</string>
+    <string name="keyguard_indication_trust_granted" msgid="4985003749105182372">"Atrakinta (<xliff:g id="USER_NAME">%1$s</xliff:g>)"</string>
+    <string name="keyguard_indication_trust_managed" msgid="8319646760022357585">"„<xliff:g id="TRUST_AGENT">%1$s</xliff:g>“ vykdoma"</string>
     <string name="keyguard_indication_trust_disabled" msgid="7412534203633528135">"Įrenginys liks užrakintas, kol neatrakinsite jo neautomatiniu būdu"</string>
     <string name="hidden_notifications_title" msgid="7139628534207443290">"Greičiau gaukite pranešimus"</string>
     <string name="hidden_notifications_text" msgid="2326409389088668981">"Peržiūrėti prieš atrakinant"</string>
@@ -552,9 +555,10 @@
     <string name="tuner_full_importance_settings_off" msgid="8208165412614935229">"Išjungta"</string>
     <string name="power_notification_controls_description" msgid="4372459941671353358">"Naudodami pranešimų valdiklius galite nustatyti programos pranešimų svarbos lygį nuo 0 iki 5. \n\n"<b>"5 lygis"</b>" \n– Rodyti pranešimų sąrašo viršuje \n– Leisti pertraukti, kai veikia viso ekrano režimas \n– Visada rodyti pranešimus \n\n"<b>"4 lygis"</b>" \n– Neleisti pertraukti viso ekrano režimo \n– Visada rodyti pranešimus \n\n"<b>"3 lygis"</b>" \n– Neleisti pertraukti viso ekrano režimo \n– Niekada nerodyti pranešimų \n\n"<b>"2 lygis"</b>" \n– Neleisti pertraukti viso ekrano režimo \n– Niekada nerodyti pranešimų \n– Niekada neleisti garso ir nevibruoti \n\n"<b>"1 lygis"</b>" \n– Neleisti pertraukti viso ekrano režimo \n– Niekada nerodyti pranešimų \n– Niekada neleisti garso ir nevibruoti \n– Slėpti užrakinimo ekrane ir būsenos juostoje \n– Rodyti pranešimų sąrašo apačioje \n\n"<b>"0 lygis"</b>" \n– Blokuoti visus programos pranešimus"</string>
     <string name="notification_header_default_channel" msgid="7506845022070889909">"Pranešimai"</string>
-    <string name="notification_channel_disabled" msgid="5805874247999578073">"Nebegausite šių pranešimų."</string>
+    <string name="notification_channel_disabled" msgid="2139193533791840539">"Nebegausite šių pranešimų"</string>
     <string name="notification_num_channels" msgid="2048144408999179471">"Pranešimų kategorijų: <xliff:g id="NUMBER">%d</xliff:g>"</string>
     <string name="notification_default_channel_desc" msgid="2506053815870808359">"Šioje programoje nėra pranešimų kategorijų"</string>
+    <string name="notification_unblockable_desc" msgid="3561016061737896906">"Šios programos pranešimų negalima išjungti"</string>
     <plurals name="notification_num_channels_desc" formatted="false" msgid="5492793452274077663">
       <item quantity="one">1 iš <xliff:g id="NUMBER_1">%d</xliff:g> šios programos pranešimų kategorijos</item>
       <item quantity="few">1 iš <xliff:g id="NUMBER_1">%d</xliff:g> šios programos pranešimų kategorijų</item>
@@ -578,12 +582,20 @@
     <string name="notification_menu_accessibility" msgid="2046162834248888553">"„<xliff:g id="APP_NAME">%1$s</xliff:g>“ <xliff:g id="MENU_DESCRIPTION">%2$s</xliff:g>"</string>
     <string name="notification_menu_gear_description" msgid="2204480013726775108">"pranešimų valdikliai"</string>
     <string name="notification_menu_snooze_description" msgid="3653669438131034525">"pranešimų snaudimo parinktys"</string>
-    <string name="snooze_option_15_min" msgid="1068727451405610715">"15 min."</string>
-    <string name="snooze_option_30_min" msgid="867081342535195788">"30 min."</string>
-    <string name="snooze_option_1_hour" msgid="1098086401880077154">"1 val."</string>
-    <string name="snooze_option_2_hour" msgid="8332218255658969475">"2 val."</string>
     <string name="snooze_undo" msgid="6074877317002985129">"ANULIUOTI"</string>
     <string name="snoozed_for_time" msgid="2390718332980204462">"Nustatyta snausti <xliff:g id="TIME_AMOUNT">%1$s</xliff:g>"</string>
+    <plurals name="snoozeHourOptions" formatted="false" msgid="2124335842674413030">
+      <item quantity="one">%d valanda</item>
+      <item quantity="few">%d valandos</item>
+      <item quantity="many">%d valandos</item>
+      <item quantity="other">%d valandų</item>
+    </plurals>
+    <plurals name="snoozeMinuteOptions" formatted="false" msgid="4127251700591510196">
+      <item quantity="one">%d minutė</item>
+      <item quantity="few">%d minutės</item>
+      <item quantity="many">%d minutės</item>
+      <item quantity="other">%d minučių</item>
+    </plurals>
     <string name="battery_panel_title" msgid="7944156115535366613">"Akum. energ. vartoj."</string>
     <string name="battery_detail_charging_summary" msgid="1279095653533044008">"Akumuliatoriaus tausojimo priemonė nepasiekiama įkraunant"</string>
     <string name="battery_detail_switch_title" msgid="6285872470260795421">"Akumuliatoriaus tausojimo priemonė"</string>
@@ -773,4 +785,5 @@
     <string name="qs_dnd_replace" msgid="8019520786644276623">"Pakeisti"</string>
     <string name="running_foreground_services_title" msgid="381024150898615683">"Programos, veikiančios fone"</string>
     <string name="running_foreground_services_msg" msgid="6326247670075574355">"Palieskite ir sužinokite išsamios informacijos apie akumuliatoriaus bei duomenų naudojimą"</string>
+    <string name="data_usage_disable_mobile" msgid="5116269981510015864">"Išjungti mobiliojo ryšio duomenis?"</string>
 </resources>

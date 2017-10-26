@@ -17,6 +17,7 @@
 package com.android.server.am;
 
 import static android.app.Activity.RESULT_CANCELED;
+import static android.app.ActivityManager.START_ABORTED;
 import static android.app.ActivityManager.START_CANCELED;
 import static android.app.ActivityManager.START_CLASS_NOT_FOUND;
 import static android.app.ActivityManager.START_DELIVERED_TO_TOP;
@@ -279,7 +280,9 @@ class ActivityStarter {
             // mLastStartActivityRecord[0] is set in the call to startActivity above.
             outActivity[0] = mLastStartActivityRecord[0];
         }
-        return mLastStartActivityResult;
+
+        // Aborted results are treated as successes externally, but we must track them internally.
+        return mLastStartActivityResult != START_ABORTED ? mLastStartActivityResult : START_SUCCESS;
     }
 
     /** DO NOT call this method directly. Use {@link #startActivityLocked} instead. */
@@ -465,7 +468,7 @@ class ActivityStarter {
             // We pretend to the caller that it was really started, but
             // they will just get a cancel result.
             ActivityOptions.abort(options);
-            return START_SUCCESS;
+            return START_ABORTED;
         }
 
         // If permissions need a review before any of the app components can run, we
@@ -966,7 +969,7 @@ class ActivityStarter {
         return START_SUCCESS;
     }
 
-    void sendPowerHintForLaunchStartIfNeeded(boolean forceSend) {
+    void sendPowerHintForLaunchStartIfNeeded(boolean forceSend, ActivityRecord targetActivity) {
         boolean sendHint = forceSend;
 
         if (!sendHint) {
@@ -975,7 +978,7 @@ class ActivityStarter {
             final ActivityRecord resumedActivity = mSupervisor.getResumedActivityLocked();
             sendHint = resumedActivity == null
                 || resumedActivity.app == null
-                || !resumedActivity.app.equals(mStartActivity.app);
+                || !resumedActivity.app.equals(targetActivity.app);
         }
 
         if (sendHint && mService.mLocalPowerManager != null) {
@@ -1095,7 +1098,7 @@ class ActivityStarter {
                 }
             }
 
-            sendPowerHintForLaunchStartIfNeeded(false /* forceSend */);
+            sendPowerHintForLaunchStartIfNeeded(false /* forceSend */, reusedActivity);
 
             reusedActivity = setTargetStackAndMoveToFrontIfNeeded(reusedActivity);
 
@@ -1124,6 +1127,7 @@ class ActivityStarter {
                 if (outActivity != null && outActivity.length > 0) {
                     outActivity[0] = reusedActivity;
                 }
+
                 return START_TASK_TO_FRONT;
             }
         }
@@ -1215,7 +1219,7 @@ class ActivityStarter {
                 EventLogTags.AM_CREATE_ACTIVITY, mStartActivity, mStartActivity.getTask());
         mTargetStack.mLastPausedActivity = null;
 
-        sendPowerHintForLaunchStartIfNeeded(false /* forceSend */);
+        sendPowerHintForLaunchStartIfNeeded(false /* forceSend */, mStartActivity);
 
         mTargetStack.startActivityLocked(mStartActivity, topFocused, newTask, mKeepCurTransition,
                 mOptions);
@@ -1517,7 +1521,8 @@ class ActivityStarter {
             if (mLaunchSingleInstance) {
                 // There can be one and only one instance of single instance activity in the
                 // history, and it is always in its own unique task, so we do a special search.
-               intentActivity = mSupervisor.findActivityLocked(mIntent, mStartActivity.info, false);
+               intentActivity = mSupervisor.findActivityLocked(mIntent, mStartActivity.info,
+                       mStartActivity.isHomeActivity());
             } else if ((mLaunchFlags & FLAG_ACTIVITY_LAUNCH_ADJACENT) != 0) {
                 // For the launch adjacent case we only want to put the activity in an existing
                 // task if the activity already exists in the history.
@@ -1636,6 +1641,16 @@ class ActivityStarter {
                         intentActivity.getTask().reparent(launchStack.mStackId, ON_TOP,
                                 REPARENT_MOVE_STACK_TO_FRONT, ANIMATE, DEFER_RESUME,
                                 "reparentToDisplay");
+                        mMovedToFront = true;
+                    } else if (launchStack.getStackId() == StackId.HOME_STACK_ID
+                        && mTargetStack.getStackId() != StackId.HOME_STACK_ID) {
+                        // It is possible for the home activity to be in another stack initially.
+                        // For example, the activity may have been initially started with an intent
+                        // which placed it in the fullscreen stack. To ensure the proper handling of
+                        // the activity based on home stack assumptions, we must move it over.
+                        intentActivity.getTask().reparent(launchStack.mStackId, ON_TOP,
+                                REPARENT_MOVE_STACK_TO_FRONT, ANIMATE, DEFER_RESUME,
+                                "reparentingHome");
                         mMovedToFront = true;
                     }
                     mOptions = null;

@@ -424,7 +424,8 @@ public class AudioSystem
                                                   DEVICE_OUT_BLUETOOTH_SCO_HEADSET |
                                                   DEVICE_OUT_BLUETOOTH_SCO_CARKIT);
     public static final int DEVICE_OUT_ALL_USB = (DEVICE_OUT_USB_ACCESSORY |
-                                                  DEVICE_OUT_USB_DEVICE);
+                                                  DEVICE_OUT_USB_DEVICE |
+                                                  DEVICE_OUT_USB_HEADSET);
     public static final int DEVICE_OUT_ALL_HDMI_SYSTEM_AUDIO = (DEVICE_OUT_AUX_LINE |
                                                                 DEVICE_OUT_HDMI_ARC |
                                                                 DEVICE_OUT_SPDIF);
@@ -486,7 +487,8 @@ public class AudioSystem
                                              DEVICE_IN_DEFAULT);
     public static final int DEVICE_IN_ALL_SCO = DEVICE_IN_BLUETOOTH_SCO_HEADSET;
     public static final int DEVICE_IN_ALL_USB = (DEVICE_IN_USB_ACCESSORY |
-                                                 DEVICE_IN_USB_DEVICE);
+                                                 DEVICE_IN_USB_DEVICE |
+                                                 DEVICE_IN_USB_HEADSET);
 
     // device states, must match AudioSystem::device_connection_state
     public static final int DEVICE_STATE_UNAVAILABLE = 0;
@@ -758,6 +760,8 @@ public class AudioSystem
 
     public static native int systemReady();
 
+    public static native float getStreamVolumeDB(int stream, int index, int device);
+
     // Items shared with audio service
 
     /**
@@ -799,14 +803,14 @@ public class AudioSystem
         4,  // STREAM_VOICE_CALL
         7,  // STREAM_SYSTEM
         5,  // STREAM_RING
-        11, // STREAM_MUSIC
+        5, // STREAM_MUSIC
         6,  // STREAM_ALARM
         5,  // STREAM_NOTIFICATION
         7,  // STREAM_BLUETOOTH_SCO
         7,  // STREAM_SYSTEM_ENFORCED
-        11, // STREAM_DTMF
-        11, // STREAM_TTS
-        11, // STREAM_ACCESSIBILITY
+        5, // STREAM_DTMF
+        5, // STREAM_TTS
+        5, // STREAM_ACCESSIBILITY
     };
 
     public static String streamToString(int stream) {

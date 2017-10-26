@@ -16,6 +16,7 @@
 
 package com.android.systemui;
 
+import android.app.Activity;
 import android.app.ActivityThread;
 import android.app.Application;
 import android.content.BroadcastReceiver;
@@ -39,6 +40,7 @@ import com.android.systemui.pip.PipUI;
 import com.android.systemui.plugins.GlobalActions;
 import com.android.systemui.plugins.OverlayPlugin;
 import com.android.systemui.plugins.Plugin;
+import com.android.systemui.plugins.PluginActivityManager;
 import com.android.systemui.plugins.PluginListener;
 import com.android.systemui.plugins.PluginManager;
 import com.android.systemui.power.PowerUI;
@@ -87,6 +89,7 @@ public class SystemUIApplication extends Application implements SysUiServiceProv
             GarbageMonitor.Service.class,
             LatencyTester.class,
             GlobalActionsComponent.class,
+            RoundedCorners.class,
     };
 
     /**
@@ -113,7 +116,7 @@ public class SystemUIApplication extends Application implements SysUiServiceProv
         // Set the application theme that is inherited by all services. Note that setting the
         // application theme in the manifest does only work for activities. Keep this in sync with
         // the theme set there.
-        setTheme(R.style.systemui_theme);
+        setTheme(R.style.Theme_SystemUI);
 
         SystemUIFactory.createFromConfig(this);
 
@@ -264,5 +267,11 @@ public class SystemUIApplication extends Application implements SysUiServiceProv
 
     public SystemUI[] getServices() {
         return mServices;
+    }
+
+    @Override
+    public Activity instantiateActivity(ClassLoader cl, String className, Intent intent) {
+        if (!mServicesStarted) return null;
+        return Dependency.get(PluginActivityManager.class).instantiate(cl, className, intent);
     }
 }

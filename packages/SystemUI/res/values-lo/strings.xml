@@ -310,6 +310,7 @@
     <string name="quick_settings_more_settings" msgid="326112621462813682">"​ການ​ຕັ້ງ​ຄ່າ​ເພີ່ມ​ເຕີມ"</string>
     <string name="quick_settings_done" msgid="3402999958839153376">"ແລ້ວໆ"</string>
     <string name="quick_settings_connected" msgid="1722253542984847487">"ເຊື່ອມ​ຕໍ່ແລ້ວ"</string>
+    <string name="quick_settings_connected_battery_level" msgid="4136051440381328892">"ເຊື່ອມຕໍ່ແລ້ວ, ແບັດເຕີຣີ <xliff:g id="BATTERY_LEVEL_AS_PERCENTAGE">%1$s</xliff:g>"</string>
     <string name="quick_settings_connecting" msgid="47623027419264404">"ກຳລັງເຊື່ອມຕໍ່..."</string>
     <string name="quick_settings_tethering_label" msgid="7153452060448575549">"​ການ​ປ່ອນ​ສັນ​ຍານ"</string>
     <string name="quick_settings_hotspot_label" msgid="6046917934974004879">"​ຮັອດ​ສະ​ປອດ"</string>
@@ -467,6 +468,8 @@
     <string name="branded_monitoring_description_app_personal" msgid="2669518213949202599">"ທ່ານເຊື່ອມຕໍ່ກັບ <xliff:g id="APPLICATION">%1$s</xliff:g> ແລ້ວ, ເຊິ່ງສາມາດຕິດຕາມການເຄື່ອນໄຫວເຄືອຂ່າຍສ່ວນຕົວຂອງທ່ານ ຮວມທັງອີເມວ, ​ແອັບ ແລະເວັບໄຊໄດ້."</string>
     <string name="monitoring_description_app_work" msgid="4612997849787922906">"ໂປຣໄຟລ໌ບ່ອນເຮັດວຽກຂອງທ່ານແມ່ນຖືກຈັດການໂດຍ <xliff:g id="ORGANIZATION">%1$s</xliff:g>. ໂປຣໄຟລ໌ບ່ອນເຮັດວຽກດັ່ງກ່າວເຊື່ອມຕໍ່ຫາ <xliff:g id="APPLICATION">%2$s</xliff:g>, ເຊິ່ງສາມາດຕິດຕາມການເຄື່ອນໄຫວເຄືອຂ່າຍຂອງທ່ານ, ຮວມທັງອີເມວ, ແອັບ ແລະ ເວັບໄຊໄດ້.\nສຳລັບຂໍ້ມູນເພີ່ມເຕີມ, ໃຫ້ຕິດຕໍ່ຫາຜູ້ເບິ່ງແຍງລະບົບຂອງທ່ານ\n."</string>
     <string name="monitoring_description_app_personal_work" msgid="5664165460056859391">"ໂປຣໄຟລ໌ບ່ອນເຮັດວຽກຂອງທ່ານແມ່ນຖືກຈັດການໂດຍ <xliff:g id="ORGANIZATION">%1$s</xliff:g>. ໂປຣໄຟລ໌ບ່ອນເຮັດວຽກດັ່ງກ່າວເຊື່ອມຕໍ່ຫາ <xliff:g id="APPLICATION_WORK">%2$s</xliff:g>, ເຊິ່ງສາມາດຕິດຕາມການເຄື່ອນໄຫວເຄືອຂ່າຍຂອງທ່ານ, ຮວມທັງອີເມວ, ແອັບ ແລະ ເວັບໄຊໄດ້.\n\nນອກຈາກນັ້ນ, ທ່ານຍັງເຊື່ອມຕໍ່ຫາ <xliff:g id="APPLICATION_PERSONAL">%3$s</xliff:g>, ເຊິ່ງສາມາດຕິດຕາມການເຄື່ອນໄຫວເຄືອຂ່າຍສ່ວນຕົວຂອງທ່ານໄດ້."</string>
+    <string name="keyguard_indication_trust_granted" msgid="4985003749105182372">"ປົດລັອກສຳລັບ <xliff:g id="USER_NAME">%1$s</xliff:g> ແລ້ວ"</string>
+    <string name="keyguard_indication_trust_managed" msgid="8319646760022357585">"<xliff:g id="TRUST_AGENT">%1$s</xliff:g> ກຳລັງເຮັດວຽກຢູ່"</string>
     <string name="keyguard_indication_trust_disabled" msgid="7412534203633528135">"Device will stay locked until you manually unlock"</string>
     <string name="hidden_notifications_title" msgid="7139628534207443290">"ຮັບເອົາການ​ແຈ້ງເຕືອນ​ໄວຂຶ້ນ"</string>
     <string name="hidden_notifications_text" msgid="2326409389088668981">"ເບິ່ງພວກ​ມັນກ່ອນ​ທ່ານຈະ​ປົດລັອກ"</string>
@@ -548,9 +551,10 @@
     <string name="tuner_full_importance_settings_off" msgid="8208165412614935229">"ປິດ"</string>
     <string name="power_notification_controls_description" msgid="4372459941671353358">"ດ້ວຍການຄວບຄຸມການແຈ້ງເຕືອນ, ທ່ານສາມາດຕັ້ງລະດັບຄວາມສຳຄັນຈາກ 0 ຮອດ 5 ໃຫ້ກັບການແຈ້ງເຕືອນແອັບໃດໜຶ່ງໄດ້. \n\n"<b>"ລະດັບ 5"</b>" \n- ສະແດງຢູ່ເທິງສຸດຂອງລາຍການແຈ້ງເຕືອນ \n- ອະນຸຍາດໃຫ້ຂັດຈັງຫວະຕອນເປີດເຕັມຈໍ \n- ແນມເບິ່ງທຸກເທື່ອ \n\n"<b>"ລະດັບ 4"</b>" \n- ກັນບໍ່ໃຫ້ຂັດຈັງຫວະຕອນເປີດເຕັມຈໍ \n- ແນມເບິ່ງທຸກເທື່ອ \n\n"<b>"ລະດັບ 3"</b>" \n- ກັນບໍ່ໃຫ້ຂັດຈັງຫວະຕອນເປີດເຕັມຈໍ \n- ບໍ່ແນມເບິ່ງ \n\n"<b>"ລະດັບ 2"</b>" \n- ກັນບໍ່ໃຫ້ຂັດຈັງຫວະຕອນເປີດເຕັມຈໍ \n- ບໍ່ແນມເບິ່ງ \n- ບໍ່ມີສຽງ ແລະ ບໍ່ມີການສັ່ນເຕືອນ \n\n"<b>"ລະດັບ 1"</b>" \n- ກັນບໍ່ໃຫ້ຂັດຈັງຫວະຕອນເປີດເຕັມຈໍ \n- ບໍ່ແນມເບິ່ງ \n- ບໍ່ມີສຽງ ແລະ ບໍ່ມີການສັ່ນເຕືອນ \n- ເຊື່ອງຈາກໜ້າຈໍລັອກ ແລະ ແຖບສະຖານະ \n- ສະແດງຢູ່ລຸ່ມສຸດຂອງລາຍການແຈ້ງເຕືອນ \n\n"<b>"ລະດັບ 0"</b>" \n- ປິດກັ້ນການແຈ້ງເຕືອນທັງໝົດຈາກແອັບ"</string>
     <string name="notification_header_default_channel" msgid="7506845022070889909">"ການແຈ້ງເຕືອນ"</string>
-    <string name="notification_channel_disabled" msgid="5805874247999578073">"ທ່ານຈະບໍ່ໄດ້ຮັບການແຈ້ງເຕືອນເຫຼົ່ານີ້ອີກຕໍ່ໄປ."</string>
+    <string name="notification_channel_disabled" msgid="2139193533791840539">"ທ່ານຈະບໍ່ໄດ້ຮັບການແຈ້ງເຕືອນເຫຼົ່ານີ້ອີກຕໍ່ໄປ"</string>
     <string name="notification_num_channels" msgid="2048144408999179471">"<xliff:g id="NUMBER">%d</xliff:g> ໝວດໝູ່ການແຈ້ງເຕືອນ"</string>
     <string name="notification_default_channel_desc" msgid="2506053815870808359">"ແອັບນີ້ບໍ່ມີໝວດໝູ່ການແຈ້ງເຕືອນ"</string>
+    <string name="notification_unblockable_desc" msgid="3561016061737896906">"ການແຈ້ງເຕືອນຈາກແອັບນີ້ບໍ່ສາມາດປິດໄວ້ໄດ້"</string>
     <plurals name="notification_num_channels_desc" formatted="false" msgid="5492793452274077663">
       <item quantity="other">1 ຈາກທັງໝົດ <xliff:g id="NUMBER_1">%d</xliff:g> ໝວດໝູ່ການແຈ້ງເຕືອນຈາກແອັບນີ້</item>
       <item quantity="one">1 ຈາກທັງໝົດ <xliff:g id="NUMBER_0">%d</xliff:g> ໝວດໝູ່ການແຈ້ງເຕືອນຈາກແອັບນີ້</item>
@@ -570,12 +574,16 @@
     <string name="notification_menu_accessibility" msgid="2046162834248888553">"<xliff:g id="APP_NAME">%1$s</xliff:g> <xliff:g id="MENU_DESCRIPTION">%2$s</xliff:g>"</string>
     <string name="notification_menu_gear_description" msgid="2204480013726775108">"ການຄວບຄຸມການແຈ້ງເຕືອນ"</string>
     <string name="notification_menu_snooze_description" msgid="3653669438131034525">"ຕົວເລືອກການເລື່ອນການແຈ້ງເຕືອນ"</string>
-    <string name="snooze_option_15_min" msgid="1068727451405610715">"15 ນາທີ"</string>
-    <string name="snooze_option_30_min" msgid="867081342535195788">"30 ນາທີ"</string>
-    <string name="snooze_option_1_hour" msgid="1098086401880077154">"1 ຊົ່ວໂມງ"</string>
-    <string name="snooze_option_2_hour" msgid="8332218255658969475">"2 ຊົ່ວໂມງ"</string>
     <string name="snooze_undo" msgid="6074877317002985129">"ຍົກເລີກ"</string>
     <string name="snoozed_for_time" msgid="2390718332980204462">"ເລື່ອນໄປ <xliff:g id="TIME_AMOUNT">%1$s</xliff:g> ນາທີແລ້ວ"</string>
+    <plurals name="snoozeHourOptions" formatted="false" msgid="2124335842674413030">
+      <item quantity="other">%d ຊົ່ວໂມງ</item>
+      <item quantity="one">%d ຊົ່ວໂມງ</item>
+    </plurals>
+    <plurals name="snoozeMinuteOptions" formatted="false" msgid="4127251700591510196">
+      <item quantity="other">%d ນາທີ</item>
+      <item quantity="one">%d ນາທີ</item>
+    </plurals>
     <string name="battery_panel_title" msgid="7944156115535366613">"ການໃຊ້ແບັດເຕີຣີ"</string>
     <string name="battery_detail_charging_summary" msgid="1279095653533044008">"ຕົວປະຢັດແບັດເຕີຣີບໍ່ມີໃຫ້ນຳໃຊ້ໃນລະຫວ່າງການສາກ"</string>
     <string name="battery_detail_switch_title" msgid="6285872470260795421">"ຕົວປະຢັດ​ແບັດເຕີຣີ"</string>
@@ -765,4 +773,5 @@
     <string name="qs_dnd_replace" msgid="8019520786644276623">"ແທນທີ່"</string>
     <string name="running_foreground_services_title" msgid="381024150898615683">"ແອັບທີ່ກຳລັງເຮັດວຽກໃນພື້ນຫຼັງ"</string>
     <string name="running_foreground_services_msg" msgid="6326247670075574355">"ແຕະເພື່ອເບິ່ງລາຍລະອຽດການນຳໃຊ້ແບັດເຕີຣີ ແລະ ອິນເຕີເນັດ"</string>
+    <string name="data_usage_disable_mobile" msgid="5116269981510015864">"ປິດອິນເຕີເນັດມືຖືໄວ້ບໍ?"</string>
 </resources>

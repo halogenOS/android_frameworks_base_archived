@@ -115,41 +115,6 @@ public class AppWindowContainerController
         mListener.onWindowsGone();
     };
 
-    private final Runnable mRemoveStartingWindow = () -> {
-        StartingSurface surface = null;
-        synchronized (mWindowMap) {
-            if (mContainer == null) {
-                if (DEBUG_STARTING_WINDOW) Slog.v(TAG_WM, "mContainer was null while trying to"
-                        + " remove starting window");
-                return;
-            }
-            if (DEBUG_STARTING_WINDOW) Slog.v(TAG_WM, "Remove starting " + mContainer
-                    + ": startingWindow=" + mContainer.startingWindow
-                    + " startingView=" + mContainer.startingSurface);
-            if (mContainer.startingData != null) {
-                surface = mContainer.startingSurface;
-                mContainer.startingData = null;
-                mContainer.startingSurface = null;
-                mContainer.startingWindow = null;
-                mContainer.startingDisplayed = false;
-                if (surface == null && DEBUG_STARTING_WINDOW) {
-                    Slog.v(TAG_WM, "startingWindow was set but startingSurface==null, couldn't "
-                            + "remove");
-                }
-            } else if (DEBUG_STARTING_WINDOW) {
-                Slog.v(TAG_WM, "Tried to remove starting window but startingWindow was null:"
-                        + mContainer);
-            }
-        }
-        if (surface != null) {
-            try {
-                surface.remove();
-            } catch (Exception e) {
-                Slog.w(TAG_WM, "Exception when removing starting window", e);
-            }
-        }
-    };
-
     private final Runnable mAddStartingWindow = () -> {
         final StartingData startingData;
         final AppWindowToken container;
@@ -436,7 +401,7 @@ public class AppWindowContainerController
 
             // If we are preparing an app transition, then delay changing
             // the visibility of this token until we execute that transition.
-            if (mService.okToDisplay() && mService.mAppTransition.isTransitionSet()) {
+            if (mService.okToAnimate() && mService.mAppTransition.isTransitionSet()) {
                 // A dummy animation is a placeholder animation which informs others that an
                 // animation is going on (in this case an application transition). If the animation
                 // was transferred from another application/animator, no dummy animator should be
@@ -522,9 +487,8 @@ public class AppWindowContainerController
             }
 
             final WindowState mainWin = mContainer.findMainWindow();
-            if (mainWin != null && mainWin.isVisible() && mainWin.isDrawnLw()) {
-                // App already has a visible window that is drawn...why would you want a starting
-                // window?
+            if (mainWin != null && mainWin.mWinAnimator.getShown()) {
+                // App already has a visible window...why would you want a starting window?
                 return false;
             }
 
@@ -649,13 +613,6 @@ public class AppWindowContainerController
 
     public void removeStartingWindow() {
         synchronized (mWindowMap) {
-            if (mHandler.hasCallbacks(mRemoveStartingWindow)) {
-                // Already scheduled.
-                if (DEBUG_STARTING_WINDOW) Slog.v(TAG_WM, "Trying to remove starting window but "
-                        + "already scheduled");
-                return;
-            }
-
             if (mContainer.startingWindow == null) {
                 if (mContainer.startingData != null) {
                     // Starting window has not been added yet, but it is scheduled to be added.
@@ -667,9 +624,39 @@ public class AppWindowContainerController
                 return;
             }
 
+            final StartingSurface surface;
+            if (mContainer.startingData != null) {
+                surface = mContainer.startingSurface;
+                mContainer.startingData = null;
+                mContainer.startingSurface = null;
+                mContainer.startingWindow = null;
+                mContainer.startingDisplayed = false;
+                if (surface == null && DEBUG_STARTING_WINDOW) {
+                    Slog.v(TAG_WM, "startingWindow was set but startingSurface==null, couldn't "
+                            + "remove");
+                }
+            } else {
+                if (DEBUG_STARTING_WINDOW) {
+                    Slog.v(TAG_WM, "Tried to remove starting window but startingWindow was null:"
+                            + mContainer);
+                }
+                return;
+            }
+
             if (DEBUG_STARTING_WINDOW) Slog.v(TAG_WM, "Schedule remove starting " + mContainer
-                    + " startingWindow=" + mContainer.startingWindow);
-            mHandler.post(mRemoveStartingWindow);
+                    + " startingWindow=" + mContainer.startingWindow
+                    + " startingView=" + mContainer.startingSurface);
+
+            // Use the same thread to remove the window as we used to add it, as otherwise we end up
+            // with things in the view hierarchy being called from different threads.
+            mHandler.post(() -> {
+                if (DEBUG_STARTING_WINDOW) Slog.v(TAG_WM, "Removing startingView=" + surface);
+                try {
+                    surface.remove();
+                } catch (Exception e) {
+                    Slog.w(TAG_WM, "Exception when removing starting window", e);
+                }
+            });
         }
     }
 

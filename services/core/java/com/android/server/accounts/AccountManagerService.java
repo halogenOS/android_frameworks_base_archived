@@ -1372,6 +1372,7 @@ public class AccountManagerService
         if (accounts != null) {
             synchronized (accounts.dbLock) {
                 synchronized (accounts.cacheLock) {
+                    accounts.statementForLogging.close();
                     accounts.accountsDb.close();
                 }
             }
@@ -5074,6 +5075,7 @@ public class AccountManagerService
                 this.userDebugDbInsertionPoint = userDebugDbInsertionPoint;
             }
 
+            @Override
             public void run() {
                 SQLiteStatement logStatement = userAccount.statementForLogging;
                 logStatement.bindLong(1, accountId);
@@ -5301,25 +5303,25 @@ public class AccountManagerService
         long identityToken = Binder.clearCallingIdentity();
         try {
             packages = mPackageManager.getPackagesForUid(callingUid);
-        } finally {
-            Binder.restoreCallingIdentity(identityToken);
-        }
-        if (packages == null) {
-            Log.d(TAG, "No packages for callingUid " + callingUid);
-            return false;
-        }
-        for (String name : packages) {
-            try {
-                PackageInfo packageInfo = mPackageManager.getPackageInfo(name, 0 /* flags */);
-                if (packageInfo != null
-                        && (packageInfo.applicationInfo.privateFlags
-                                & ApplicationInfo.PRIVATE_FLAG_PRIVILEGED) != 0) {
-                    return true;
-                }
-            } catch (PackageManager.NameNotFoundException e) {
-                Log.d(TAG, "Package not found " + e.getMessage());
+            if (packages == null) {
+                Log.d(TAG, "No packages for callingUid " + callingUid);
                 return false;
             }
+            for (String name : packages) {
+                try {
+                    PackageInfo packageInfo =
+                        mPackageManager.getPackageInfo(name, 0 /* flags */);
+                    if (packageInfo != null
+                        && (packageInfo.applicationInfo.privateFlags
+                            & ApplicationInfo.PRIVATE_FLAG_PRIVILEGED) != 0) {
+                        return true;
+                    }
+                } catch (PackageManager.NameNotFoundException e) {
+                    Log.d(TAG, "Package not found " + e.getMessage());
+                }
+            }
+        } finally {
+            Binder.restoreCallingIdentity(identityToken);
         }
         return false;
     }
@@ -6190,7 +6192,7 @@ public class AccountManagerService
         }
     }
 
-    private class NotificationId {
+    private static class NotificationId {
         final String mTag;
         private final int mId;
 

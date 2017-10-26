@@ -48,6 +48,7 @@ import android.os.VibrationEffect;
 import android.os.WorkSource;
 import android.provider.Settings;
 import android.provider.Settings.SettingNotFoundException;
+import android.util.DebugUtils;
 import android.util.Slog;
 import android.view.InputDevice;
 import android.media.AudioAttributes;
@@ -60,10 +61,7 @@ import com.android.server.power.BatterySaverPolicy.ServiceType;
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.ListIterator;
 
 public class VibratorService extends IVibratorService.Stub
         implements InputManager.InputDeviceListener {
@@ -225,19 +223,24 @@ public class VibratorService extends IVibratorService.Stub
 
         long[] clickEffectTimings = getLongIntArray(context.getResources(),
                 com.android.internal.R.array.config_virtualKeyVibePattern);
-        VibrationEffect clickEffect;
-        if (clickEffectTimings.length == 0) {
-            clickEffect = null;
-        } else if (clickEffectTimings.length == 1) {
-            clickEffect = VibrationEffect.createOneShot(
-                    clickEffectTimings[0], VibrationEffect.DEFAULT_AMPLITUDE);
-        } else {
-            clickEffect = VibrationEffect.createWaveform(clickEffectTimings, -1);
-        }
+        VibrationEffect clickEffect = createEffect(clickEffectTimings);
         VibrationEffect doubleClickEffect = VibrationEffect.createWaveform(
                 new long[] {0, 30, 100, 30} /*timings*/, -1);
+        long[] tickEffectTimings = getLongIntArray(context.getResources(),
+                com.android.internal.R.array.config_clockTickVibePattern);
+        VibrationEffect tickEffect = createEffect(tickEffectTimings);
 
-        mFallbackEffects = new VibrationEffect[] { clickEffect, doubleClickEffect };
+        mFallbackEffects = new VibrationEffect[] { clickEffect, doubleClickEffect, tickEffect };
+    }
+
+    private static VibrationEffect createEffect(long[] timings) {
+        if (timings == null || timings.length == 0) {
+            return null;
+        } else if (timings.length == 1) {
+            return VibrationEffect.createOneShot(timings[0], VibrationEffect.DEFAULT_AMPLITUDE);
+        } else {
+            return VibrationEffect.createWaveform(timings, -1);
+        }
     }
 
     public void systemReady() {
@@ -943,6 +946,21 @@ public class VibratorService extends IVibratorService.Stub
         }
 
         private int runVibrate() {
+            try {
+                final int zenMode = Settings.Global.getInt(mContext.getContentResolver(),
+                        Settings.Global.ZEN_MODE);
+                if (zenMode != Settings.Global.ZEN_MODE_OFF) {
+                    try (PrintWriter pw = getOutPrintWriter();) {
+                        pw.print("Ignoring because device is on DND mode ");
+                        pw.println(DebugUtils.flagsToString(Settings.Global.class, "ZEN_MODE_",
+                                zenMode));
+                        return 0;
+                    }
+                }
+            } catch (SettingNotFoundException e) {
+                // ignore
+            }
+
             final long duration = Long.parseLong(getNextArgRequired());
             if (duration > MAX_VIBRATION_MS) {
                 throw new IllegalArgumentException("maximum duration is " + MAX_VIBRATION_MS);
@@ -967,7 +985,8 @@ public class VibratorService extends IVibratorService.Stub
                 pw.println("    Prints this help text.");
                 pw.println("");
                 pw.println("  vibrate duration [description]");
-                pw.println("    Vibrates for duration milliseconds.");
+                pw.println("    Vibrates for duration milliseconds; ignored when device is on DND ");
+                pw.println("    (Do Not Disturb) mode.");
                 pw.println("");
             }
         }
