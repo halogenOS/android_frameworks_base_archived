@@ -26,6 +26,7 @@ import com.android.systemui.doze.DozeHost;
 import com.android.systemui.doze.DozeLog;
 import com.android.systemui.plugins.statusbar.StatusBarStateController;
 import com.android.systemui.plugins.statusbar.StatusBarStateController.StateListener;
+import com.android.systemui.statusbar.VisualizerViewWrapper;
 
 /**
  * Controller which handles all the doze animations of the scrims.
@@ -36,6 +37,7 @@ public class DozeScrimController implements StateListener {
 
     private final DozeParameters mDozeParameters;
     private final Handler mHandler = new Handler();
+    private final VisualizerViewWrapper mVisualizerView;
 
     private boolean mDozing;
     private DozeHost.PulseCallback mPulseCallback;
@@ -94,8 +96,9 @@ public class DozeScrimController implements StateListener {
         }
     };
 
-    public DozeScrimController(DozeParameters dozeParameters) {
+    public DozeScrimController(DozeParameters dozeParameters, VisualizerViewWrapper visualizerView) {
         mDozeParameters = dozeParameters;
+        mVisualizerView = visualizerView;
         //Never expected to be destroyed
         Dependency.get(StatusBarStateController.class).addCallback(this);
     }
@@ -107,6 +110,7 @@ public class DozeScrimController implements StateListener {
         if (!mDozing) {
             cancelPulsing();
         }
+        mVisualizerView.onAlwaysOn(mDozing && mDozeParameters.getAlwaysOn());
     }
 
     /** When dozing, fade screen contents in and out using the front scrim. */
