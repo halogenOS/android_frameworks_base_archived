@@ -1060,7 +1060,7 @@ public class StatusBar extends SystemUI implements DemoMode, TunerService.Tunabl
         }
         mStackScroller.setScrimController(mScrimController);
         mDozeScrimController = new DozeScrimController(mScrimController, context,
-                DozeParameters.getInstance(context));
+                DozeParameters.getInstance(context), getKeyguardBottomAreaView().mVisualizerView);
 
         // Other icons
         mVolumeComponent = getComponent(VolumeComponent.class);

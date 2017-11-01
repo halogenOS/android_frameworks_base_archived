@@ -23,6 +23,7 @@ import android.util.Log;
 
 import com.android.systemui.doze.DozeHost;
 import com.android.systemui.doze.DozeLog;
+import com.android.systemui.statusbar.VisualizerViewWrapper;
 
 /**
  * Controller which handles all the doze animations of the scrims.
@@ -34,6 +35,7 @@ public class DozeScrimController {
     private final DozeParameters mDozeParameters;
     private final Handler mHandler = new Handler();
     private final ScrimController mScrimController;
+    private final VisualizerViewWrapper mVisualizerView;
 
     private boolean mDozing;
     private DozeHost.PulseCallback mPulseCallback;
@@ -79,9 +81,10 @@ public class DozeScrimController {
     };
 
     public DozeScrimController(ScrimController scrimController, Context context,
-            DozeParameters dozeParameters) {
+            DozeParameters dozeParameters, VisualizerViewWrapper visualizerView) {
         mScrimController = scrimController;
         mDozeParameters = dozeParameters;
+        mVisualizerView = visualizerView;
     }
 
     public void setDozing(boolean dozing) {
@@ -90,6 +93,7 @@ public class DozeScrimController {
         if (!mDozing) {
             cancelPulsing();
         }
+        mVisualizerView.onAlwaysOn(mDozing && mDozeParameters.getAlwaysOn());
     }
 
     /** When dozing, fade screen contents in and out using the front scrim. */
