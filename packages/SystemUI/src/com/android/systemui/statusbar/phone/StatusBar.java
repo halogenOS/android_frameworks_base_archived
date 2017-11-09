@@ -7586,7 +7586,7 @@ public class StatusBar extends SystemUI implements DemoMode,
 
         }
 
-        if (!mUseHeadsUp || isDeviceInVrMode() || (mLessBoringHeadsUp &&
+        if (!mUseHeadsUp && !isDozing() || isDeviceInVrMode() || (mLessBoringHeadsUp &&
                 (!alwaysHeadsUpForDialer && !alwaysHeadsUpForMessaging))) {
             if (DEBUG) Log.d(TAG, "No peeking: no huns or vr mode or less boring headsup enabled");
             return false;
