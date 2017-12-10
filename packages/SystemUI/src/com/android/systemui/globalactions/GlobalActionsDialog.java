@@ -23,6 +23,7 @@ import com.android.internal.util.EmergencyAffordanceManager;
 import com.android.internal.telephony.TelephonyIntents;
 import com.android.internal.telephony.TelephonyProperties;
 import com.android.internal.widget.LockPatternUtils;
+import com.android.keyguard.KeyguardUpdateMonitor;
 import com.android.systemui.Dependency;
 import com.android.systemui.HardwareUiLayout;
 import com.android.systemui.Interpolators;
@@ -140,6 +141,7 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener, DialogIn
     private boolean mHasVibrator;
     private final boolean mShowSilentToggle;
     private final EmergencyAffordanceManager mEmergencyAffordanceManager;
+    private final LockPatternUtils mLockPatternUtils;
 
     /**
      * @param context everything needs a context :(
@@ -176,6 +178,8 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener, DialogIn
                 R.bool.config_useFixedVolume);
 
         mEmergencyAffordanceManager = new EmergencyAffordanceManager(context);
+
+        mLockPatternUtils = new LockPatternUtils(context);
     }
 
     /**
@@ -291,7 +295,8 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener, DialogIn
                 mWindowManagerFuncs, mHandler) {
 
             public boolean showDuringKeyguard() {
-                return true;
+                // Don't show on keyguard if lockscreen is secure
+                return !mLockPatternUtils.isSecure(KeyguardUpdateMonitor.getCurrentUser());
             }
 
             public boolean showBeforeProvisioning() {
@@ -592,7 +597,7 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener, DialogIn
 
             @Override
             public void onPress() {
-                new LockPatternUtils(mContext).requireCredentialEntry(UserHandle.USER_ALL);
+                mLockPatternUtils.requireCredentialEntry(UserHandle.USER_ALL);
                 try {
                     WindowManagerGlobal.getWindowManagerService().lockNow(null);
                 } catch (RemoteException e) {
