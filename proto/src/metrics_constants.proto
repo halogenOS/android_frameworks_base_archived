@@ -4571,11 +4571,7 @@ message MetricsEvent {
 
     // Add new aosp constants above this line.
     // END OF AOSP CONSTANTS
-
-    // GZOSP custom constants
-    GZOSP = 1500;
-
     // XOS custom constants
-    XOS = 1501;
+    XOS = 1500;
   }
 }
