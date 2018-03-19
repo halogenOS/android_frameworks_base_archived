@@ -160,7 +160,7 @@ public class QSFooterImpl extends FrameLayout implements QSFooter,
                 .addFloat(mSettingsButton, "rotation", -120, 0)
                 .build();
         if (mAlarmShowing) {
-            int translate = isLayoutRtl() ? mDate.getWidth() : -mDate.getWidth();            
+            int translate = isLayoutRtl() ? mDate.getWidth() : -mDate.getWidth();
             mAlarmAnimator = new Builder().addFloat(mDate, "alpha", 1, 0)
                     .addFloat(mDateTimeGroup, "translationX", 0, translate)
                     .addFloat(mAlarmStatus, "alpha", 0, 1)
@@ -354,20 +354,7 @@ public class QSFooterImpl extends FrameLayout implements QSFooter,
                     mExpanded ? MetricsProto.MetricsEvent.ACTION_QS_EXPANDED_SETTINGS_LAUNCH
                             : MetricsProto.MetricsEvent.ACTION_QS_COLLAPSED_SETTINGS_LAUNCH);
             if (mSettingsButton.isTunerClick()) {
-                Dependency.get(ActivityStarter.class).postQSRunnableDismissingKeyguard(() -> {
-                    if (TunerService.isTunerEnabled(mContext)) {
-                        TunerService.showResetRequest(mContext, () -> {
-                            // Relaunch settings so that the tuner disappears.
-                            startSettingsActivity();
-                        });
-                    } else {
-                        Toast.makeText(getContext(), R.string.tuner_toast,
-                                Toast.LENGTH_LONG).show();
-                        TunerService.setTunerEnabled(mContext, true);
-                    }
-                    startSettingsActivity();
-
-                });
+                Dependency.get(ActivityStarter.class).postQSRunnableDismissingKeyguard(() -> startSettingsActivity());
             } else {
                 startSettingsActivity();
             }
