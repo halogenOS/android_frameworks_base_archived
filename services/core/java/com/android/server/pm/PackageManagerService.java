@@ -2431,7 +2431,7 @@ public class PackageManagerService extends IPackageManager.Stub
                 R.bool.config_permissionReviewRequired);
 
         mVendorPlatformSignatures = createSignatures(context.getResources().getStringArray(
-                    org.lineageos.platform.internal.R.array.config_vendorPlatformSignatures));
+                    com.android.internal.R.array.config_vendorPlatformSignatures));
 
         mFactoryTest = factoryTest;
         mOnlyCore = onlyCore;
