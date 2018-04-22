@@ -1021,11 +1021,9 @@ public final class PowerManagerService extends SystemService
         mProximityWakeEnabled = Settings.System.getInt(resolver,
                 Settings.System.PROXIMITY_ON_WAKE,
                 mProximityWakeEnabledByDefaultConfig ? 1 : 0) == 1;
-
         mButtonTimeout = Settings.System.getIntForUser(resolver,
                 Settings.System.BUTTON_BACKLIGHT_TIMEOUT,
                 DEFAULT_BUTTON_ON_DURATION, UserHandle.USER_CURRENT);
-
         mButtonBrightness = Settings.System.getIntForUser(resolver,
                 Settings.System.BUTTON_BRIGHTNESS, mButtonBrightnessSettingDefault,
                 UserHandle.USER_CURRENT);
@@ -2016,25 +2014,22 @@ public final class PowerManagerService extends SystemService
                             + screenOffTimeout - screenDimDuration;
                     if (now < nextTimeout) {
                         mUserActivitySummary = USER_ACTIVITY_SCREEN_BRIGHT;
+                        int buttonBrightness = 0;
                         if (mWakefulness == WAKEFULNESS_AWAKE) {
-                            int buttonBrightness;
                             if (mButtonBrightnessOverrideFromWindowManager >= 0) {
                                 buttonBrightness = mButtonBrightnessOverrideFromWindowManager;
                             } else {
                                 buttonBrightness = mButtonBrightness;
                             }
-
-                            if (mButtonTimeout != 0
-                                    && now > mLastUserActivityTime + mButtonTimeout) {
-                                mButtonsLight.setBrightness(0);
-                            } else {
-                                if (!mProximityPositive) {
-                                    mButtonsLight.setBrightness(buttonBrightness);
-                                    if (buttonBrightness != 0 && mButtonTimeout != 0) {
-                                        nextTimeout = now + mButtonTimeout;
-                                    }
-                                }
+                        }
+                        if (mButtonTimeout == 0 ||
+                                now >= mLastUserActivityTime + mButtonTimeout) {
+                            mButtonsLight.setBrightness(0);
+                        } else {
+                            if (mButtonTimeout > 0 && buttonBrightness > 0) {
+                                nextTimeout = Math.min(nextTimeout, now + mButtonTimeout);
                             }
+                            mButtonsLight.setBrightness(buttonBrightness);
                         }
                     } else {
                         nextTimeout = mLastUserActivityTime + screenOffTimeout;
@@ -2046,12 +2041,12 @@ public final class PowerManagerService extends SystemService
                         }
                     }
                 }
-
                 if (mUserActivitySummary == 0
                         && mLastUserActivityTimeNoChangeLights >= mLastWakeTime) {
                     nextTimeout = mLastUserActivityTimeNoChangeLights + screenOffTimeout;
                     if (now < nextTimeout) {
-                        if (mDisplayPowerRequest.policy == DisplayPowerRequest.POLICY_BRIGHT) {
+                        if (mDisplayPowerRequest.policy == DisplayPowerRequest.POLICY_BRIGHT
+                                || mDisplayPowerRequest.policy == DisplayPowerRequest.POLICY_VR) {
                             mUserActivitySummary = USER_ACTIVITY_SCREEN_BRIGHT;
                         } else if (mDisplayPowerRequest.policy == DisplayPowerRequest.POLICY_DIM) {
                             mUserActivitySummary = USER_ACTIVITY_SCREEN_DIM;
@@ -4831,7 +4826,6 @@ public final class PowerManagerService extends SystemService
             }
             setDozeOverrideFromDreamManagerInternal(screenState, screenBrightness);
         }
-
 
         @Override
         public void setUserInactiveOverrideFromWindowManager() {
