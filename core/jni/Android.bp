@@ -12,6 +12,7 @@ cc_library_shared {
     name: "libandroid_runtime",
 
     cflags: [
+        "-O3",
         "-Wno-unused-parameter",
         "-Wno-non-virtual-dtor",
         "-Wno-maybe-uninitialized",
@@ -33,7 +34,7 @@ cc_library_shared {
         //"-DANDROID_ENABLE_LINEAR_BLENDING",
     ],
 
-    cppflags: ["-Wno-conversion-null"],
+    cppflags: ["-O3", "-Wno-conversion-null"],
     cpp_std: "c++17",
 
     srcs: [
