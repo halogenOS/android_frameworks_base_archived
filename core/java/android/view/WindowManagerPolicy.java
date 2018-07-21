@@ -1746,4 +1746,18 @@ public interface WindowManagerPolicy {
      * @return true if ready; false otherwise.
      */
     boolean canDismissBootAnimation();
+
+    /**
+     * Check if gesture navigation is enabled.
+     *
+     * @return true if enabled; false otherwise.
+     */
+    boolean isGestureButtonEnabled();
+
+    /**
+     * Check if current touch move is in gesture.
+     *
+     * @return true if enabled; false otherwise.
+     */
+    boolean isGestureButtonRegion(int i, int i2);
 }
