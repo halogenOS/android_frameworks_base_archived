@@ -40,6 +40,8 @@ import android.text.style.TextAppearanceSpan;
 import android.util.Log;
 import android.util.Pair;
 
+import com.android.internal.R;
+
 import java.util.Arrays;
 import java.util.WeakHashMap;
 
@@ -457,8 +459,10 @@ public class NotificationColorUtil {
      */
     public static int resolveContrastColor(Context context, int notificationColor,
             int backgroundColor) {
+        boolean isDark = context.getResources()
+                .getBoolean(R.bool.config_useDarkBgNotificationIconTextTinting);
         return NotificationColorUtil.resolveContrastColor(context, notificationColor,
-                backgroundColor, false /* isDark */);
+                backgroundColor, isDark);
     }
 
     /**
@@ -515,7 +519,12 @@ public class NotificationColorUtil {
         final int resolvedColor = resolveColor(context, notificationColor);
 
         int color = resolvedColor;
-        color = NotificationColorUtil.ensureTextContrastOnBlack(color);
+
+        if (!context.getResources().getBoolean(R.bool.config_allowNotificationIconTextTinting)) {
+            color = context.getColor(R.color.notification_ambient_default_color);
+        } else {
+            color = NotificationColorUtil.ensureTextContrastOnBlack(color);
+        }
 
         if (color != resolvedColor) {
             if (DEBUG){
