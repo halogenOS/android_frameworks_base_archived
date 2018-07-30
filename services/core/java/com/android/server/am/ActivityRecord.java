@@ -2383,16 +2383,6 @@ final class ActivityRecord extends ConfigurationContainer implements AppWindowCo
         int maxActivityWidth = containingAppWidth;
         int maxActivityHeight = containingAppHeight;
 
-        if (containingAppWidth < containingAppHeight) {
-            // Width is the shorter side, so we use that to figure-out what the max. height
-            // should be given the aspect ratio.
-            maxActivityHeight = (int) ((maxActivityWidth * maxAspectRatio) + 0.5f);
-        } else {
-            // Height is the shorter side, so we use that to figure-out what the max. width
-            // should be given the aspect ratio.
-            maxActivityWidth = (int) ((maxActivityHeight * maxAspectRatio) + 0.5f);
-        }
-
         if (containingAppWidth <= maxActivityWidth && containingAppHeight <= maxActivityHeight) {
             // The display matches or is less than the activity aspect ratio, so nothing else to do.
             // Return the existing bounds. If this method is running for the first time,
