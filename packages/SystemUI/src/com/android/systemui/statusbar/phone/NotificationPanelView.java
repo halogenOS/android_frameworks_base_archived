@@ -96,7 +96,7 @@ public class NotificationPanelView extends PanelView implements
 
     private static final Rect mDummyDirtyRect = new Rect(0, 0, 1, 1);
 
-    public static final long DOZE_ANIMATION_DURATION = 640;
+    public static final long DOZE_ANIMATION_DURATION = 600;
 
     private static final FloatProperty<NotificationPanelView> SET_DARK_AMOUNT_PROPERTY =
             new FloatProperty<NotificationPanelView>("mDarkAmount") {
@@ -423,7 +423,7 @@ public class NotificationPanelView extends PanelView implements
             mQsSizeChangeAnimator.cancel();
         }
         mQsSizeChangeAnimator = ValueAnimator.ofInt(oldHeight, newHeight);
-        mQsSizeChangeAnimator.setDuration(280);
+        mQsSizeChangeAnimator.setDuration(240);
         mQsSizeChangeAnimator.setInterpolator(Interpolators.FAST_OUT_SLOW_IN);
         mQsSizeChangeAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
@@ -1236,7 +1236,7 @@ public class NotificationPanelView extends PanelView implements
             mKeyguardStatusView.animate()
                     .alpha(0f)
                     .setStartDelay(0)
-                    .setDuration(160)
+                    .setDuration(120)
                     .setInterpolator(Interpolators.ALPHA_OUT)
                     .withEndAction(mAnimateKeyguardStatusViewInvisibleEndRunnable);
             if (keyguardFadingAway) {
@@ -1254,7 +1254,7 @@ public class NotificationPanelView extends PanelView implements
             mKeyguardStatusView.animate()
                     .alpha(1f)
                     .setStartDelay(0)
-                    .setDuration(320)
+                    .setDuration(300)
                     .setInterpolator(Interpolators.ALPHA_IN)
                     .withEndAction(mAnimateKeyguardStatusViewVisibleEndRunnable);
         } else if (statusBarState == StatusBarState.KEYGUARD) {
@@ -1442,12 +1442,12 @@ public class NotificationPanelView extends PanelView implements
         ValueAnimator animator = ValueAnimator.ofFloat(mQsExpansionHeight, target);
         if (isClick) {
             animator.setInterpolator(Interpolators.TOUCH_RESPONSE);
-            animator.setDuration(368);
+            animator.setDuration(344);
         } else {
             mFlingAnimationUtils.apply(animator, mQsExpansionHeight, target, vel);
         }
         if (oppositeDirection) {
-            animator.setDuration(350);
+            animator.setDuration(340);
         }
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override

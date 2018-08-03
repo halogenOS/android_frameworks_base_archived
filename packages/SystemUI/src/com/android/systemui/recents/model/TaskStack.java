@@ -397,7 +397,7 @@ public class TaskStack {
                     if (animateAlpha) {
                         anim = ObjectAnimator.ofInt(this, HINT_ALPHA, mHintTextAlpha,
                                 hintAlpha);
-                        anim.setDuration(150);
+                        anim.setDuration(140);
                         anim.setInterpolator(hintAlpha > mHintTextAlpha
                                 ? Interpolators.ALPHA_IN
                                 : Interpolators.ALPHA_OUT);

@@ -61,8 +61,8 @@ import java.io.PrintWriter;
 public abstract class PanelView extends FrameLayout {
     public static final boolean DEBUG = PanelBar.DEBUG;
     public static final String TAG = PanelView.class.getSimpleName();
-    private static final int INITIAL_OPENING_PEEK_DURATION = 200;
-    private static final int PEEK_ANIMATION_DURATION = 360;
+    private static final int INITIAL_OPENING_PEEK_DURATION = 240;
+    private static final int PEEK_ANIMATION_DURATION = 320;
     private long mDownTime;
     private float mMinExpandHeight;
     private LockscreenGestureLogger mLockscreenGestureLogger = new LockscreenGestureLogger();
@@ -770,13 +770,13 @@ public abstract class PanelView extends FrameLayout {
             }
             mFlingAnimationUtils.apply(animator, mExpandedHeight, target, vel, getHeight());
             if (vel == 0) {
-                animator.setDuration(350);
+                animator.setDuration(320);
             }
         } else {
             if (shouldUseDismissingAnimation()) {
                 if (vel == 0) {
                     animator.setInterpolator(Interpolators.PANEL_CLOSE_ACCELERATED);
-                    long duration = (long) (200 + mExpandedHeight / getHeight() * 100);
+                    long duration = (long) (140 + mExpandedHeight / getHeight() * 100);
                     animator.setDuration(duration);
                 } else {
                     mFlingAnimationUtilsDismissing.apply(animator, mExpandedHeight, target, vel,
@@ -1109,7 +1109,7 @@ public abstract class PanelView extends FrameLayout {
     private void startUnlockHintAnimationPhase1(final Runnable onAnimationFinished) {
         float target = Math.max(0, getMaxPanelHeight() - mHintDistance);
         ValueAnimator animator = createHeightAnimator(target);
-        animator.setDuration(250);
+        animator.setDuration(220);
         animator.setInterpolator(Interpolators.FAST_OUT_SLOW_IN);
         animator.addListener(new AnimatorListenerAdapter() {
             private boolean mCancelled;
@@ -1141,11 +1141,11 @@ public abstract class PanelView extends FrameLayout {
             }
             v.animate()
                     .translationY(-mHintDistance)
-                    .setDuration(250)
+                    .setDuration(220)
                     .setInterpolator(Interpolators.FAST_OUT_SLOW_IN)
                     .withEndAction(() -> v.animate()
                             .translationY(0)
-                            .setDuration(450)
+                            .setDuration(420)
                             .setInterpolator(mBounceInterpolator)
                             .start())
                     .start();
@@ -1165,7 +1165,7 @@ public abstract class PanelView extends FrameLayout {
      */
     private void startUnlockHintAnimationPhase2(final Runnable onAnimationFinished) {
         ValueAnimator animator = createHeightAnimator(getMaxPanelHeight());
-        animator.setDuration(450);
+        animator.setDuration(420);
         animator.setInterpolator(mBounceInterpolator);
         animator.addListener(new AnimatorListenerAdapter() {
             @Override

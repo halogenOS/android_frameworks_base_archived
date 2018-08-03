@@ -66,7 +66,7 @@ public class NotificationIconContainer extends AlphaOptimizedFrameLayout {
         public AnimationFilter getAnimationFilter() {
             return mAnimationFilter;
         }
-    }.setDuration(200);
+    }.setDuration(160);
 
     private static final AnimationProperties ICON_ANIMATION_PROPERTIES = new AnimationProperties() {
         private AnimationFilter mAnimationFilter = new AnimationFilter().animateY().animateAlpha()
@@ -99,7 +99,7 @@ public class NotificationIconContainer extends AlphaOptimizedFrameLayout {
         public AnimationFilter getAnimationFilter() {
             return mAnimationFilter;
         }
-    }.setDuration(200).setDelay(50);
+    }.setDuration(160).setDelay(44);
 
     public static final int MAX_VISIBLE_ICONS_WHEN_DARK = 5;
 

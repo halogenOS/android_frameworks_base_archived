@@ -102,7 +102,7 @@ public class RecentsView extends FrameLayout {
 
     private static final int DEFAULT_UPDATE_SCRIM_DURATION = 200;
 
-    private static final int SHOW_STACK_ACTION_BUTTON_DURATION = 134;
+    private static final int SHOW_STACK_ACTION_BUTTON_DURATION = 130;
     private static final int HIDE_STACK_ACTION_BUTTON_DURATION = 100;
 
     private static final int BUSY_RECENTS_TASK_COUNT = 3;
@@ -874,7 +874,7 @@ public class RecentsView extends FrameLayout {
         mEmptyView.setTranslationY(show ? start : 0);
         mEmptyView.setAlpha(show ? 0f : 1f);
         ViewPropertyAnimator animator = mEmptyView.animate()
-                .setDuration(150)
+                .setDuration(140)
                 .setInterpolator(Interpolators.FAST_OUT_SLOW_IN)
                 .translationY(show ? 0 : start)
                 .alpha(show ? 1f : 0f);

@@ -66,7 +66,7 @@ public class StatusBarIconView extends AnimatedImageView {
      * everything above 30% to 50%, making it appear on 1bit color depths.
      */
     private static final float DARK_ALPHA_BOOST = 0.67f;
-    private final int ANIMATION_DURATION_FAST = 100;
+    private final int ANIMATION_DURATION_FAST = 80;
 
     public static final int STATE_ICON = 0;
     public static final int STATE_DOT = 1;

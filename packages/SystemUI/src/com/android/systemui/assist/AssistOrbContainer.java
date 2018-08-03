@@ -27,7 +27,7 @@ import com.android.systemui.R;
 
 public class AssistOrbContainer extends FrameLayout {
 
-    private static final long EXIT_START_DELAY = 150;
+    private static final long EXIT_START_DELAY = 140;
 
     private View mScrim;
     private View mNavbarScrim;
@@ -99,12 +99,12 @@ public class AssistOrbContainer extends FrameLayout {
             public void run() {
                 mScrim.animate()
                         .alpha(1f)
-                        .setDuration(300)
+                        .setDuration(240)
                         .setStartDelay(0)
                         .setInterpolator(Interpolators.LINEAR_OUT_SLOW_IN);
                 mNavbarScrim.animate()
                         .alpha(1f)
-                        .setDuration(300)
+                        .setDuration(240)
                         .setStartDelay(0)
                         .setInterpolator(Interpolators.LINEAR_OUT_SLOW_IN);
             }
@@ -122,12 +122,12 @@ public class AssistOrbContainer extends FrameLayout {
         mOrb.startExitAnimation(EXIT_START_DELAY);
         mScrim.animate()
                 .alpha(0f)
-                .setDuration(250)
+                .setDuration(240)
                 .setStartDelay(EXIT_START_DELAY)
                 .setInterpolator(Interpolators.FAST_OUT_SLOW_IN);
         mNavbarScrim.animate()
                 .alpha(0f)
-                .setDuration(250)
+                .setDuration(240)
                 .setStartDelay(EXIT_START_DELAY)
                 .setInterpolator(Interpolators.FAST_OUT_SLOW_IN)
                 .withEndAction(endRunnable);

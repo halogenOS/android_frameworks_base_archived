@@ -51,10 +51,10 @@ import java.util.Stack;
 public class PasswordTextView extends View {
 
     private static final float DOT_OVERSHOOT_FACTOR = 1.5f;
-    private static final long DOT_APPEAR_DURATION_OVERSHOOT = 320;
-    private static final long APPEAR_DURATION = 160;
-    private static final long DISAPPEAR_DURATION = 160;
-    private static final long RESET_DELAY_PER_ELEMENT = 40;
+    private static final long DOT_APPEAR_DURATION_OVERSHOOT = 300;
+    private static final long APPEAR_DURATION = 150;
+    private static final long DISAPPEAR_DURATION = 150;
+    private static final long RESET_DELAY_PER_ELEMENT = 34;
     private static final long RESET_MAX_DELAY = 200;
 
     /**

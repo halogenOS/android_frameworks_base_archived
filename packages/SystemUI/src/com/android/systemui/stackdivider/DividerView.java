@@ -81,8 +81,8 @@ import com.android.systemui.statusbar.phone.NavigationBarGestureHelper;
 public class DividerView extends FrameLayout implements OnTouchListener,
         OnComputeInternalInsetsListener {
 
-    static final long TOUCH_ANIMATION_DURATION = 140;
-    static final long TOUCH_RELEASE_ANIMATION_DURATION = 180;
+    static final long TOUCH_ANIMATION_DURATION = 120;
+    static final long TOUCH_RELEASE_ANIMATION_DURATION = 160;
 
     public static final int INVALID_RECENTS_GROW_TARGET = -1;
 

@@ -75,7 +75,7 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
 
                     mValueAnimators[i].setFloatValues(mFFTPoints[i * 4 + 1],
                             mFFTPoints[3] - (dbValue * 16f));
-                    mValueAnimators[i].setDuration(92);
+                    mValueAnimators[i].setDuration(90);
                     mValueAnimators[i].start();
                 }
                 calculatorLock = false;
@@ -173,7 +173,7 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
         for (int i = 0; i < 32; i++) {
             final int j = i * 4 + 1;
             mValueAnimators[i] = new ValueAnimator();
-            mValueAnimators[i].setDuration(92);
+            mValueAnimators[i].setDuration(90);
             mValueAnimators[i].addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public void onAnimationUpdate(ValueAnimator animation) {
@@ -343,8 +343,8 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
 
                 mVisualizerColorAnimator = ObjectAnimator.ofArgb(mPaint, "color",
                         mPaint.getColor(), mState.mColor);
-                mVisualizerColorAnimator.setStartDelay(100);
-                mVisualizerColorAnimator.setDuration(1000);
+                mVisualizerColorAnimator.setStartDelay(80);
+                mVisualizerColorAnimator.setDuration(860);
                 mVisualizerColorAnimator.start();
             } else {
                 mPaint.setColor(mState.mColor);
@@ -375,7 +375,7 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
                 animate()
                         .alpha(1f)
                         .withEndAction(null)
-                        .setDuration(720);
+                        .setDuration(640);
             }
         } else {
             hideVisualizer();
@@ -390,7 +390,7 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
             animate()
                     .alpha(0f)
                     .withEndAction(mAsyncUnlinkVisualizer)
-                    .setDuration(600);
+                    .setDuration(540);
         }
     }
 

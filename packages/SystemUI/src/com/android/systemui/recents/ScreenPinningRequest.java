@@ -175,7 +175,7 @@ public class ScreenPinningRequest implements View.OnClickListener {
                         .alpha(1f)
                         .translationX(0)
                         .translationY(0)
-                        .setDuration(300)
+                        .setDuration(240)
                         .setInterpolator(new DecelerateInterpolator())
                         .start();
 

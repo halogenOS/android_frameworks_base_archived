@@ -1468,7 +1468,7 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener, DialogIn
             mHardwareLayout.animate()
                     .alpha(1)
                     .translationX(0)
-                    .setDuration(300)
+                    .setDuration(240)
                     .setInterpolator(Interpolators.FAST_OUT_SLOW_IN)
                     .setUpdateListener(animation -> {
                         int alpha = (int) ((Float) animation.getAnimatedValue()
@@ -1486,7 +1486,7 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener, DialogIn
             mHardwareLayout.animate()
                     .alpha(0)
                     .translationX(getAnimTranslation())
-                    .setDuration(300)
+                    .setDuration(240)
                     .withEndAction(() -> super.dismiss())
                     .setInterpolator(new LogAccelerateInterpolator())
                     .setUpdateListener(animation -> {

@@ -84,16 +84,16 @@ public class TaskStackAnimationHelper {
 
     private static final int ENTER_EXIT_NUM_ANIMATING_TASKS = 5;
 
-    private static final int ENTER_FROM_HOME_ALPHA_DURATION = 100;
-    public static final int ENTER_FROM_HOME_TRANSLATION_DURATION = 300;
+    private static final int ENTER_FROM_HOME_ALPHA_DURATION = 92;
+    public static final int ENTER_FROM_HOME_TRANSLATION_DURATION = 240;
     private static final Interpolator ENTER_FROM_HOME_ALPHA_INTERPOLATOR = Interpolators.LINEAR;
 
-    public static final int EXIT_TO_HOME_TRANSLATION_DURATION = 200;
+    public static final int EXIT_TO_HOME_TRANSLATION_DURATION = 160;
     private static final Interpolator EXIT_TO_HOME_TRANSLATION_INTERPOLATOR =
             new PathInterpolator(0.4f, 0, 0.6f, 1f);
 
-    private static final int DISMISS_TASK_DURATION = 175;
-    private static final int DISMISS_ALL_TASKS_DURATION = 200;
+    private static final int DISMISS_TASK_DURATION = 160;
+    private static final int DISMISS_ALL_TASKS_DURATION = 190;
     private static final Interpolator DISMISS_ALL_TRANSLATION_INTERPOLATOR =
             new PathInterpolator(0.4f, 0, 1f, 1f);
 
@@ -681,7 +681,7 @@ public class TaskStackAnimationHelper {
         postAnimationTrigger.addLastDecrementRunnable(() -> {
             mStackView.getTouchHandler().onChildDismissed(deleteTaskView);
         });
-        deleteTaskView.animate().setDuration(300).scaleX(0.9f).scaleY(0.9f).alpha(0).setListener(
+        deleteTaskView.animate().setDuration(260).scaleX(0.9f).scaleY(0.9f).alpha(0).setListener(
                 new AnimatorListenerAdapter() {
                     @Override
                     public void onAnimationEnd(Animator animation) {
@@ -701,7 +701,7 @@ public class TaskStackAnimationHelper {
 
         final float dismissSize = touchHandler.getScaledDismissSize();
         ValueAnimator animator = ValueAnimator.ofFloat(0f, 1f);
-        animator.setDuration(400);
+        animator.setDuration(320);
         animator.addUpdateListener((animation) -> {
             float progress = (Float) animation.getAnimatedValue();
             deleteTaskView.setTranslationX(progress * dismissSize);

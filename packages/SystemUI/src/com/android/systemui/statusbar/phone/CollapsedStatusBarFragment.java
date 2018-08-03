@@ -219,7 +219,7 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
         }
         v.animate()
                 .alpha(0f)
-                .setDuration(160)
+                .setDuration(140)
                 .setStartDelay(0)
                 .setInterpolator(Interpolators.ALPHA_OUT)
                 .withEndAction(() -> v.setVisibility(View.INVISIBLE));
@@ -237,9 +237,9 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
         }
         v.animate()
                 .alpha(1f)
-                .setDuration(320)
+                .setDuration(300)
                 .setInterpolator(Interpolators.ALPHA_IN)
-                .setStartDelay(50)
+                .setStartDelay(40)
 
                 // We need to clean up any pending end action from animateHide if we call
                 // both hide and show in the same frame before the animation actually gets started.

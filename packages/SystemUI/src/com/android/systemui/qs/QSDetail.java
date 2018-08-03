@@ -46,7 +46,7 @@ import com.android.systemui.statusbar.CommandQueue;
 public class QSDetail extends LinearLayout {
 
     private static final String TAG = "QSDetail";
-    private static final long FADE_DURATION = 300;
+    private static final long FADE_DURATION = 260;
 
     private final SparseArray<View> mDetailViews = new SparseArray<>();
 

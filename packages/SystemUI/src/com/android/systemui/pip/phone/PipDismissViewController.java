@@ -40,8 +40,8 @@ public class PipDismissViewController {
     // This delay controls how long to wait before we show the target when the user first moves
     // the PIP, to prevent the target from animating if the user just wants to fling the PIP
     private static final int SHOW_TARGET_DELAY = 100;
-    private static final int SHOW_TARGET_DURATION = 350;
-    private static final int HIDE_TARGET_DURATION = 225;
+    private static final int SHOW_TARGET_DURATION = 340;
+    private static final int HIDE_TARGET_DURATION = 220;
 
     private Context mContext;
     private WindowManager mWindowManager;

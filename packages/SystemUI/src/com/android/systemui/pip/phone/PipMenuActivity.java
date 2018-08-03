@@ -88,7 +88,7 @@ public class PipMenuActivity extends Activity {
 
     private static final long INITIAL_DISMISS_DELAY = 3500;
     private static final long POST_INTERACTION_DISMISS_DELAY = 2000;
-    private static final long MENU_FADE_DURATION = 125;
+    private static final long MENU_FADE_DURATION = 120;
 
     private static final float MENU_BACKGROUND_ALPHA = 0.3f;
     private static final float DISMISS_BACKGROUND_ALPHA = 0.6f;

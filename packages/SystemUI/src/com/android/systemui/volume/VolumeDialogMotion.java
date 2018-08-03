@@ -130,7 +130,7 @@ public class VolumeDialogMotion {
         if (D.BUG) Log.d(TAG, "startShowAnimation");
         mDialogView.animate()
                 .translationY(0)
-                .setDuration(scaledDuration(300))
+                .setDuration(scaledDuration(200))
                 .setInterpolator(new LogDecelerateInterpolator())
                 .setListener(null)
                 .setUpdateListener(animation -> {
@@ -154,7 +154,7 @@ public class VolumeDialogMotion {
                 .start();
 
         mContentsPositionAnimator = ValueAnimator.ofFloat(-chevronDistance(), 0)
-                .setDuration(scaledDuration(400));
+                .setDuration(scaledDuration(300));
         mContentsPositionAnimator.addListener(new AnimatorListenerAdapter() {
             private boolean mCancelled;
 
@@ -183,7 +183,7 @@ public class VolumeDialogMotion {
         mContents.setAlpha(0);
         mContents.animate()
                 .alpha(1)
-                .setDuration(scaledDuration(150))
+                .setDuration(scaledDuration(120))
                 .setInterpolator(new PathInterpolator(0f, 0f, .2f, 1f))
                 .start();
 
@@ -195,8 +195,8 @@ public class VolumeDialogMotion {
         mChevron.setAlpha(0);
         mChevron.animate()
                 .alpha(1)
-                .setStartDelay(scaledDuration(50))
-                .setDuration(scaledDuration(150))
+                .setStartDelay(scaledDuration(40))
+                .setDuration(scaledDuration(100))
                 .setInterpolator(new PathInterpolator(.4f, 0f, 1f, 1f))
                 .start();
     }
@@ -219,7 +219,7 @@ public class VolumeDialogMotion {
         }
         mDialogView.animate()
                 .translationY(-mDialogView.getHeight())
-                .setDuration(scaledDuration(250))
+                .setDuration(scaledDuration(220))
                 .setInterpolator(new LogAccelerateInterpolator())
                 .setUpdateListener(new AnimatorUpdateListener() {
                     @Override

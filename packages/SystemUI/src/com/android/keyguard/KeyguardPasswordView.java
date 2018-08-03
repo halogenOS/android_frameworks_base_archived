@@ -310,7 +310,7 @@ public class KeyguardPasswordView extends KeyguardAbsKeyInputView
         animate()
                 .alpha(1)
                 .withLayer()
-                .setDuration(300)
+                .setDuration(220)
                 .setInterpolator(mLinearOutSlowInInterpolator);
     }
 
@@ -320,7 +320,7 @@ public class KeyguardPasswordView extends KeyguardAbsKeyInputView
                 .alpha(0f)
                 .translationY(mDisappearYTranslation)
                 .setInterpolator(mFastOutLinearInInterpolator)
-                .setDuration(100)
+                .setDuration(80)
                 .withEndAction(finishRunnable);
         return true;
     }
