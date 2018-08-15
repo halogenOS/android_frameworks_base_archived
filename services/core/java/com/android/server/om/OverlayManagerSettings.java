@@ -217,10 +217,15 @@ final class OverlayManagerSettings {
     }
 
     ArrayMap<String, List<OverlayInfo>> getOverlaysForUser(final int userId) {
-        return selectWhereUser(userId)
-                .map(SettingsItem::getOverlayInfo)
-                .collect(Collectors.groupingBy(info -> info.targetPackageName, ArrayMap::new,
-                        Collectors.toList()));
+        try {
+            return selectWhereUser(userId)
+                    .map(SettingsItem::getOverlayInfo)
+                    .collect(Collectors.groupingBy(info -> info == null ? null : info.targetPackageName, ArrayMap::new,
+                            Collectors.toList()));
+        } catch (Exception e) {
+            // Something wrong happened but don't let the system starve for this
+            return new ArrayMap<String, List<OverlayInfo>>();
+        }
     }
 
     int[] getUsers() {
