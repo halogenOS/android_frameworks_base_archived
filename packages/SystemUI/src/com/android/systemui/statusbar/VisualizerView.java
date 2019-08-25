@@ -53,6 +53,7 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
             new Visualizer.OnDataCaptureListener() {
         byte rfk, ifk;
         int dbValue;
+        float filteredValue;
         float magnitude;
 
         @Override
@@ -72,9 +73,20 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
                     ifk = fft[i * 2 + 3];
                     magnitude = rfk * rfk + ifk * ifk;
                     dbValue = magnitude > 0 ? (int) (10 * Math.log10(magnitude)) : 0;
+                    //\min\left(\frac{1}{240}\cdot\left(x-2\right)^{2.72},\ x-2\right)+\ 2
+                    // Filter the value so that we have less noise
+                    // the number which we devide 1 by (1.0f/xf)
+                    // defines the cutoff (at which level we should
+                    // stop decreasing the dbValue. The higher the number,
+                    // the higher the cutoff meaning it will result in more filtering
+                    // The second value (in the exponent in the Math.pow function) defines
+                    // how hard the volume should be turned down. Note that this will ALSO
+                    // affect cutoff significantly. Use a function graph calculator.
+                    filteredValue = ((float) Math.min( (float) (1.0f/240.0f) *
+			Math.pow(Math.max((float) dbValue - 2f, 0f), 2.72f), (float) dbValue - 2f)) + 2f;
 
                     mValueAnimators[i].setFloatValues(mFFTPoints[i * 4 + 1],
-                            mFFTPoints[3] - (dbValue * 16f));
+                            mFFTPoints[3] - (filteredValue * 16f));
                     mValueAnimators[i].setDuration(92);
                     mValueAnimators[i].start();
                 }
