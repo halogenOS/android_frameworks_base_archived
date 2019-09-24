@@ -4479,79 +4479,91 @@ public final class Settings {
         private static final Validator ADVANCED_REBOOT_VALIDATOR = BOOLEAN_VALIDATOR;
 
         /**
+         *  Enable statusbar double tap gesture on to put device to sleep
+         * @hide
+         */
+        public static final String DOUBLE_TAP_SLEEP_GESTURE = "double_tap_sleep_gesture";
+
+        /** @hide */
+        private static final Validator DOUBLE_TAP_SLEEP_GESTURE_VALIDATOR =
+                BOOLEAN_VALIDATOR;
+
+        /**
          * IMPORTANT: If you add a new public settings you also have to add it to
          * PUBLIC_SETTINGS below. If the new setting is hidden you have to add
          * it to PRIVATE_SETTINGS below. Also add a validator that can validate
          * the setting value. See an example above.
          */
 
-        /**
-         * Settings to backup. This is here so that it's in the same place as the settings
-         * keys and easy to update.
-         *
-         * NOTE: Settings are backed up and restored in the order they appear
-         *       in this array. If you have one setting depending on another,
-         *       make sure that they are ordered appropriately.
-         *
-         * @hide
-         */
-        @UnsupportedAppUsage
-        public static final String[] SETTINGS_TO_BACKUP = {
-            STAY_ON_WHILE_PLUGGED_IN,   // moved to global
-            WIFI_USE_STATIC_IP,
-            WIFI_STATIC_IP,
-            WIFI_STATIC_GATEWAY,
-            WIFI_STATIC_NETMASK,
-            WIFI_STATIC_DNS1,
-            WIFI_STATIC_DNS2,
-            BLUETOOTH_DISCOVERABILITY,
-            BLUETOOTH_DISCOVERABILITY_TIMEOUT,
-            FONT_SCALE,
-            DIM_SCREEN,
-            SCREEN_OFF_TIMEOUT,
-            SCREEN_BRIGHTNESS_MODE,
-            SCREEN_AUTO_BRIGHTNESS_ADJ,
-            SCREEN_BRIGHTNESS_FOR_VR,
-            ADAPTIVE_SLEEP,
-            VIBRATE_INPUT_DEVICES,
-            MODE_RINGER_STREAMS_AFFECTED,
-            TEXT_AUTO_REPLACE,
-            TEXT_AUTO_CAPS,
-            TEXT_AUTO_PUNCTUATE,
-            TEXT_SHOW_PASSWORD,
-            AUTO_TIME,                  // moved to global
-            AUTO_TIME_ZONE,             // moved to global
-            TIME_12_24,
-            DATE_FORMAT,
-            DTMF_TONE_WHEN_DIALING,
-            DTMF_TONE_TYPE_WHEN_DIALING,
-            HEARING_AID,
-            TTY_MODE,
-            MASTER_MONO,
-            MASTER_BALANCE,
-            SOUND_EFFECTS_ENABLED,
-            HAPTIC_FEEDBACK_ENABLED,
-            POWER_SOUNDS_ENABLED,       // moved to global
-            DOCK_SOUNDS_ENABLED,        // moved to global
-            LOCKSCREEN_SOUNDS_ENABLED,
-            SHOW_WEB_SUGGESTIONS,
-            SIP_CALL_OPTIONS,
-            SIP_RECEIVE_CALLS,
-            POINTER_SPEED,
-            VIBRATE_WHEN_RINGING,
-            RINGTONE,
-            LOCK_TO_APP_ENABLED,
-            NOTIFICATION_SOUND,
-            ACCELEROMETER_ROTATION,
-            SHOW_BATTERY_PERCENT,
-            NOTIFICATION_VIBRATION_INTENSITY,
-            RING_VIBRATION_INTENSITY,
-            HAPTIC_FEEDBACK_INTENSITY,
-            DISPLAY_COLOR_MODE,
-            ALARM_ALERT,
-            NOTIFICATION_LIGHT_PULSE,
+
+    /**
+     * Settings to backup. This is here so that it's in the same place as the settings
+     * keys and easy to update.
+     *
+     * NOTE: Settings are backed up and restored in the order they appear
+     *       in this array. If you have one setting depending on another,
+     *       make sure that they are ordered appropriately.
+     *
+     * @hide
+     */
+    @UnsupportedAppUsage
+    public static final String[] SETTINGS_TO_BACKUP = {
+        STAY_ON_WHILE_PLUGGED_IN,   // moved to global
+        WIFI_USE_STATIC_IP,
+        WIFI_STATIC_IP,
+        WIFI_STATIC_GATEWAY,
+        WIFI_STATIC_NETMASK,
+        WIFI_STATIC_DNS1,
+        WIFI_STATIC_DNS2,
+        BLUETOOTH_DISCOVERABILITY,
+        BLUETOOTH_DISCOVERABILITY_TIMEOUT,
+        FONT_SCALE,
+        DIM_SCREEN,
+        SCREEN_OFF_TIMEOUT,
+        SCREEN_BRIGHTNESS_MODE,
+        SCREEN_AUTO_BRIGHTNESS_ADJ,
+        SCREEN_BRIGHTNESS_FOR_VR,
+        ADAPTIVE_SLEEP,
+        VIBRATE_INPUT_DEVICES,
+        MODE_RINGER_STREAMS_AFFECTED,
+        TEXT_AUTO_REPLACE,
+        TEXT_AUTO_CAPS,
+        TEXT_AUTO_PUNCTUATE,
+        TEXT_SHOW_PASSWORD,
+        AUTO_TIME,                  // moved to global
+        AUTO_TIME_ZONE,             // moved to global
+        TIME_12_24,
+        DATE_FORMAT,
+        DTMF_TONE_WHEN_DIALING,
+        DTMF_TONE_TYPE_WHEN_DIALING,
+        HEARING_AID,
+        TTY_MODE,
+        MASTER_MONO,
+        MASTER_BALANCE,
+        SOUND_EFFECTS_ENABLED,
+        HAPTIC_FEEDBACK_ENABLED,
+        POWER_SOUNDS_ENABLED,       // moved to global
+        DOCK_SOUNDS_ENABLED,        // moved to global
+        LOCKSCREEN_SOUNDS_ENABLED,
+        SHOW_WEB_SUGGESTIONS,
+        SIP_CALL_OPTIONS,
+        SIP_RECEIVE_CALLS,
+        POINTER_SPEED,
+        VIBRATE_WHEN_RINGING,
+        RINGTONE,
+        LOCK_TO_APP_ENABLED,
+        NOTIFICATION_SOUND,
+        ACCELEROMETER_ROTATION,
+        SHOW_BATTERY_PERCENT,
+        NOTIFICATION_VIBRATION_INTENSITY,
+        RING_VIBRATION_INTENSITY,
+        HAPTIC_FEEDBACK_INTENSITY,
+        DISPLAY_COLOR_MODE,
+        ALARM_ALERT,
+        NOTIFICATION_LIGHT_PULSE,
             SCREENSHOT_SHUTTER_SOUND,
-            ADVANCED_REBOOT
+            ADVANCED_REBOOT,
+        DOUBLE_TAP_SLEEP_GESTURE,
         };
 
         /**
@@ -4673,6 +4685,7 @@ public final class Settings {
             PRIVATE_SETTINGS.add(DISPLAY_COLOR_MODE);
             PRIVATE_SETTINGS.add(SCREENSHOT_SHUTTER_SOUND);
             PRIVATE_SETTINGS.add(ADVANCED_REBOOT);
+            PRIVATE_SETTINGS.add(DOUBLE_TAP_SLEEP_GESTURE);
         }
 
         /**
@@ -4769,6 +4782,7 @@ public final class Settings {
             VALIDATORS.put(SCREENSHOT_SHUTTER_SOUND,
                     SCREENSHOT_SHUTTER_SOUND_VALIDATOR);
             VALIDATORS.put(ADVANCED_REBOOT, ADVANCED_REBOOT_VALIDATOR);
+            VALIDATORS.put(DOUBLE_TAP_SLEEP_GESTURE, DOUBLE_TAP_SLEEP_GESTURE_VALIDATOR);
         }
 
         /**
