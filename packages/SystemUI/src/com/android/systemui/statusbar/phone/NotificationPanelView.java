@@ -605,7 +605,7 @@ public class NotificationPanelView extends PanelView implements
                 R.dimen.status_bar_icon_drawing_size_dark);
         mStatusBarHeaderHeight = getResources().getDimensionPixelSize(
                 com.android.internal.R.dimen.status_bar_height);
-        mHeadsUpInset = mStatusBarHeaderHeightHeight + getResources().getDimensionPixelSize(
+        mHeadsUpInset = mStatusBarHeaderHeight + getResources().getDimensionPixelSize(
                 R.dimen.heads_up_status_bar_padding);
     }
 
