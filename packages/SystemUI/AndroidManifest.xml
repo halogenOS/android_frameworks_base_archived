@@ -202,7 +202,8 @@
 
     <!-- Lockscreen Visualizer -->
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <!-- This permission is already granted further down this file -->
+    <!--uses-permission android:name="android.permission.RECORD_AUDIO" /-->
 
     <!-- shortcut manager -->
     <uses-permission android:name="android.permission.RESET_SHORTCUT_MANAGER_THROTTLING" />

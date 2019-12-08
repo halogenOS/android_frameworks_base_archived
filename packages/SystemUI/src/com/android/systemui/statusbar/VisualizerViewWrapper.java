@@ -57,7 +57,7 @@ public class VisualizerViewWrapper {
     }
 
     public synchronized void vanish() {
-        log("vanish");
+        Log.i("VisualizerView", "Visualizer vanished");
         if (!isNull()) {
             visualizerView.setVisible(false);
             if (isAttachedToWindow()) {
@@ -130,6 +130,9 @@ public class VisualizerViewWrapper {
 
     public synchronized void setBitmap(Bitmap bitmap) {
         log("setBitmap=[not null: " + (bitmap != null) + "]");
+        if (bitmap == state.mCurrentBitmap) {
+            return;
+        }
         if (!isNull()) {
             visualizerView.setBitmap(bitmap);
         } else {

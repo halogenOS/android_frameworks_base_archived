@@ -172,6 +172,7 @@ public class NotificationMediaManager implements Dumpable {
                     clearCurrentMediaNotification();
                 }
                 dispatchUpdateMediaMetaData(true /* changed */, true /* allowAnimation */);
+                mVisualizerViewBridge.getVisualizerView().setPlaying(mIsMediaPlaying);
             }
         }
 
@@ -308,6 +309,8 @@ public class NotificationMediaManager implements Dumpable {
                             }
                             mediaNotification = entry;
                             controller = aController;
+                            mIsMediaPlaying = true;
+                            mVisualizerViewBridge.getVisualizerView().setPlaying(true);
                             break;
                         }
                     }
@@ -647,8 +650,8 @@ public class NotificationMediaManager implements Dumpable {
         }
 
         final boolean keyguardVisible = (mStatusBarStateController.getState() != StatusBarState.SHADE);
-        if(mVisualizerViewBridge != null &&
-                !mKeyguardMonitor.isKeyguardFadingAway() && keyguardVisible) {
+        if (mVisualizerViewBridge != null) {
+            mVisualizerViewBridge.getVisualizerView().setKeyguardShowing(keyguardVisible);
             mVisualizerViewBridge.getVisualizerView().setPlaying(isMediaPlaybackActive());
         }
 

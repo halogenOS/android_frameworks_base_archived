@@ -715,9 +715,9 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
                 Settings.System.SHOW_LOCKSCREEN_VISUALIZER,
                 Settings.System.SHOW_LOCKSCREEN_VISUALIZER_DEFAULT,
                 UserHandle.USER_CURRENT) == 1;
-        if(mVisualizerEnabled && mVisualizerView == null) {
+        if (mVisualizerEnabled && mVisualizerView == null) {
             mVisualizerView = new VisualizerViewWrapper(getContext(), this);
-        } else if(!mVisualizerEnabled && mVisualizerView != null) {
+        } else if (!mVisualizerEnabled && mVisualizerView != null) {
             synchronized(mVisualizerView) {
                 mVisualizerView.vanish();
                 mVisualizerView = null;
