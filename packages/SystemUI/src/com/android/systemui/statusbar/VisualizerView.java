@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2015 The CyanogenMod Project
- * Copyright (C) 2016-2017 The halogenOS Project
+ * Copyright (C) 2016-2019 The halogenOS Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,7 +75,7 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
                     ifk = fft[i * 2 + 3];
                     magnitude = rfk * rfk + ifk * ifk;
                     dbValue = magnitude > 0 ? (int) (10 * Math.log10(magnitude)) : 0;
-                    //\min\left(\frac{1}{240}\cdot\left(x-2\right)^{2.72},\ x-2\right)+\ 2
+                    //\min\left(\frac{1}{480}\cdot\left(x-2\right)^{2.86},\ x-2\right)+\ 2
                     // Filter the value so that we have less noise.
                     // The number which we devide 1 by (1.0f/xf)
                     // defines the cutoff (at which level we should
@@ -84,8 +84,8 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
                     // The second value (in the exponent in the Math.pow function) defines
                     // how hard the volume should be turned down. Note that this will ALSO
                     // affect cutoff significantly. Use a function graph calculator.
-                    filteredValue = ((float) Math.min( (float) (1.0f/240.0f) *
-			            Math.pow(Math.max((float) dbValue - 2f, 0f), 2.72f), (float) dbValue - 2f)) + 2f;
+                    filteredValue = ((float) Math.min( (float) (1.0f/480.0f) *
+			            Math.pow(Math.max((float) dbValue - 2f, 0f), 2.86f), (float) dbValue - 2f)) + 2f;
 
                     mValueAnimators[i].setFloatValues(mFFTPoints[i * 4 + 1],
                             mFFTPoints[3] - (filteredValue * 16f));
