@@ -208,13 +208,6 @@ public class aosipUtils {
         FireActions.toggleCameraFlash();
     }
 
-    public static void toggleCameraFlashOn() {
-        FireActions.toggleCameraFlashOn();
-    }
-     public static void toggleCameraFlashOff() {
-        FireActions.toggleCameraFlashOff();
-    }
-
     public static void sendKeycode(int keycode) {
         long when = SystemClock.uptimeMillis();
         final KeyEvent evDown = new KeyEvent(when, when, KeyEvent.ACTION_DOWN, keycode, 0,
@@ -295,12 +288,7 @@ public class aosipUtils {
         }
 
         public static void setPartialScreenshot(boolean active) {
-            IStatusBarService service = getStatusBarService();
-            if (service != null) {
-                try {
-                    service.setPartialScreenshot(active);
-                } catch (RemoteException e) {}
-            }
+            // Stub
         }
     }
 
