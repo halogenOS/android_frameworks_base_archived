@@ -265,28 +265,6 @@ public class aosipUtils {
             }
         }
 
-        public static void toggleCameraFlashOn(){
-            IStatusBarService service = getStatusBarService();
-            if (service != null) {
-                try {
-                    service.toggleCameraFlashOn();
-                } catch (RemoteException e) {
-                    // do nothing.
-                }
-            }
-        }
-
-        public static void toggleCameraFlashOff(){
-            IStatusBarService service = getStatusBarService();
-            if (service != null) {
-                try {
-                    service.toggleCameraFlashOff();
-                } catch (RemoteException e) {
-                    // do nothing.
-                }
-            }
-        }
-
         public static void setPartialScreenshot(boolean active) {
             // Stub
         }
