@@ -502,7 +502,7 @@ public final class SystemServer {
             System.loadLibrary("android_servers");
 
             // Debug builds - allow heap profiling.
-            if (Build.IS_DEBUGGABLE) {
+            if (Build.IS_ENG) {
                 initZygoteChildHeapProfiling();
             }
 
