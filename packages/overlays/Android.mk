@@ -20,6 +20,7 @@ LOCAL_REQUIRED_MODULES := \
 	AccentColorBlackOverlay \
 	AccentColorCinnamonOverlay \
 	AccentColorHalogenOverlay \
+	AccentColorHalogenOriginalOverlay \
 	AccentColorOceanOverlay \
 	AccentColorOrchidOverlay \
 	AccentColorSpaceOverlay \
