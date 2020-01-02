@@ -573,7 +573,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     // Time for volume and power to be pressed to take a screenshot
     private static final long SCREENSHOT_CHORD_DELAY_TIMER = 0;
     // Increase the chord delay when taking a screenshot from the keyguard
-    private static final float KEYGUARD_SCREENSHOT_CHORD_DELAY_MULTIPLIER = 2.5f;
+    private static final float KEYGUARD_SCREENSHOT_CHORD_DELAY_MULTIPLIER = 1.5f;
     private boolean mScreenshotChordEnabled;
     private boolean mScreenshotChordVolumeDownKeyTriggered;
     private long mScreenshotChordVolumeDownKeyTime;
