@@ -26,5 +26,8 @@
         aod,caffeine
     </string>
 
+    <!-- Allow devices to use unordinary cutout overlays -->
+    <bool name="config_customCutout">false</bool>
+
 </resources>
 
