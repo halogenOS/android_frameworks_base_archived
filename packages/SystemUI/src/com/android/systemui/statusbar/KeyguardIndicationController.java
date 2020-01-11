@@ -512,23 +512,24 @@ public class KeyguardIndicationController implements StateListener,
 
         String percentage = NumberFormat.getPercentInstance()
                 .format(mBatteryLevel / 100f);
-        String batteryInfo = percentage + " - ";
+        String batteryInfo = percentage;
         boolean showbatteryInfo = Settings.System.getIntForUser(mContext.getContentResolver(),
             Settings.System.LOCKSCREEN_BATTERY_INFO, 0, UserHandle.USER_CURRENT) == 1;
 
         if (showbatteryInfo) {
+            batteryInfo += " • ";
             if (mChargingCurrent > 0) {
-                batteryInfo = batteryInfo + (mChargingCurrent < 5 ?
-                          (mChargingCurrent * 1000) : (mChargingCurrent < 4000 ?
-                          mChargingCurrent : (mChargingCurrent / 1000))) + "mA" ;
+                batteryInfo = batteryInfo + (mChargingCurrent < 1000 * 1000 ?
+                          (int)((float) mChargingCurrent / 1000.0f) + " mA" :
+                            String.format("%.2f A", (float) mChargingCurrent / 1000.0f / 1000.0f));
             }
             if (mChargingVoltage > 0) {
-                batteryInfo = (batteryInfo == "" ? "" : batteryInfo + " · ") +
-                        String.format("%.1f", (mChargingVoltage / 1000 / 1000)) + "V";
+                batteryInfo = (batteryInfo == "" ? "" : batteryInfo + " • ") +
+                        String.format("%.1f V", (mChargingVoltage / 1000 / 1000));
             }
             if (mTemperature > 0) {
-                batteryInfo = (batteryInfo == "" ? "" : batteryInfo + " · ") +
-                        mTemperature / 10 + "°C";
+                batteryInfo = (batteryInfo == "" ? "" : batteryInfo + " • ") +
+                        mTemperature / 10 + " °C";
             }
             if (batteryInfo != "") {
                 batteryInfo = "\n" + batteryInfo;
