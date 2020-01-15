@@ -293,7 +293,9 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
         KeyguardUpdateMonitor.getInstance(mContext).registerCallback(mUpdateMonitorCallback);
         mMediaManager.setOnArtworkChangeListener(new NotificationMediaManager.ArtworkChangedListener() {
             public void onArtworkChanged(boolean playbackActive) {
-                mVisualizerView.setPlaying(playbackActive);
+                if (mVisualizerView != null) {
+                    mVisualizerView.setPlaying(playbackActive);
+                }
             }
         });
         mMediaManager.setVisualizerViewBridge(new NotificationMediaManager.VisualizerViewBridge() {

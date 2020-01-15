@@ -172,7 +172,9 @@ public class NotificationMediaManager implements Dumpable {
                     clearCurrentMediaNotification();
                 }
                 dispatchUpdateMediaMetaData(true /* changed */, true /* allowAnimation */);
-                mVisualizerViewBridge.getVisualizerView().setPlaying(mIsMediaPlaying);
+                if (mVisualizerViewBridge.getVisualizerView() != null) {
+                    mVisualizerViewBridge.getVisualizerView().setPlaying(mIsMediaPlaying);
+                }
             }
         }
 
@@ -310,7 +312,9 @@ public class NotificationMediaManager implements Dumpable {
                             mediaNotification = entry;
                             controller = aController;
                             mIsMediaPlaying = true;
-                            mVisualizerViewBridge.getVisualizerView().setPlaying(true);
+                            if (mVisualizerViewBridge.getVisualizerView() != null) {
+                                mVisualizerViewBridge.getVisualizerView().setPlaying(true);
+                            }
                             break;
                         }
                     }
@@ -650,15 +654,13 @@ public class NotificationMediaManager implements Dumpable {
         }
 
         final boolean keyguardVisible = (mStatusBarStateController.getState() != StatusBarState.SHADE);
-        if (mVisualizerViewBridge != null) {
+        if (mVisualizerViewBridge != null && mVisualizerViewBridge.getVisualizerView() != null) {
             mVisualizerViewBridge.getVisualizerView().setKeyguardShowing(keyguardVisible);
             mVisualizerViewBridge.getVisualizerView().setPlaying(isMediaPlaybackActive());
-        }
-
-        if (hasArtwork && mVisualizerViewBridge != null &&
-                (artworkDrawable instanceof BitmapDrawable)) {
-            mVisualizerViewBridge.getVisualizerView()
-                .setBitmap(((BitmapDrawable)artworkDrawable).getBitmap());
+            if (hasArtwork && (artworkDrawable instanceof BitmapDrawable)) {
+                mVisualizerViewBridge.getVisualizerView()
+                    .setBitmap(((BitmapDrawable)artworkDrawable).getBitmap());
+            }
         }
     }
 
