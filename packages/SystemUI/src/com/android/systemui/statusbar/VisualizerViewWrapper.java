@@ -58,21 +58,25 @@ public class VisualizerViewWrapper {
 
     public synchronized void vanish() {
         Log.i("VisualizerView", "Visualizer vanished");
-        if (!isNull()) {
-            visualizerView.setVisible(false);
-            if (isAttachedToWindow()) {
-                ((ViewGroup)visualizerView.getParent())
-                        .removeView(visualizerView);
+        try {
+            if (!isNull()) {
+                visualizerView.setVisible(false);
+                if (isAttachedToWindow()) {
+                    ((ViewGroup)visualizerView.getParent())
+                            .removeView(visualizerView);
+                }
+                visualizerView.destroy();
+                visualizerView = null;
+                state.mDisplaying = false;
+                state.mHaveInstance = false;
             }
-            visualizerView.destroy();
-            visualizerView = null;
-            state.mDisplaying = false;
-            state.mHaveInstance = false;
+        } catch (Exception e) {
+            log("Looks like something went wrong here...");
         }
     }
 
     private boolean isAttachedToWindow() {
-        return visualizerView.getWindowToken() != null;
+        return visualizerView != null && visualizerView.getWindowToken() != null;
     }
 
     private boolean isNull() {
@@ -133,16 +137,20 @@ public class VisualizerViewWrapper {
         if (bitmap == state.mCurrentBitmap) {
             return;
         }
-        if (!isNull()) {
-            visualizerView.setBitmap(bitmap);
-        } else {
-            state.mColor = Color.TRANSPARENT;
-            state.mCurrentBitmap = bitmap;
-        }
-        if (mHandleExtra) {
-            for (VisualizerViewWrapper vis : mExtraVisualizers) {
-                vis.setBitmap(bitmap);
+        try {
+            if (!isNull()) {
+                visualizerView.setBitmap(bitmap);
+            } else {
+                state.mColor = Color.TRANSPARENT;
+                state.mCurrentBitmap = bitmap;
             }
+            if (mHandleExtra) {
+                for (VisualizerViewWrapper vis : mExtraVisualizers) {
+                    vis.setBitmap(bitmap);
+                }
+            }
+        } catch (Exception e) {
+            // Oopsie whoopsie
         }
     }
 
@@ -165,48 +173,52 @@ public class VisualizerViewWrapper {
 
     public synchronized void checkState() {
         if (!mHandleExtra && ignoreExtraEvents) return;
-        if (!state.mHaveInstance && state.mScreenOnInternal
-                && state.mKeyguardVisible && state.mPlaying) {
-            if (DEBUG) {
-                log("Current color: " + state.mColor);
-                log("Is bitmap null: " + (state.mCurrentBitmap == null));
-            }
-            if (mHandleExtra) {
-                ignoreExtraEvents = true;
-                for (VisualizerViewWrapper vis : mExtraVisualizers) {
-                    vis.setKeyguardShowing(false);
-                    vis.startOrStop(false);
+        try {
+            if (!state.mHaveInstance && state.mScreenOnInternal
+                    && state.mKeyguardVisible && state.mPlaying) {
+                if (DEBUG) {
+                    log("Current color: " + state.mColor);
+                    log("Is bitmap null: " + (state.mCurrentBitmap == null));
                 }
-            }
-            prepare();
-            if (!isNull() && !isAttachedToWindow()) {
-                log("Adding to view");
-                parent.addView(visualizerView);
-                for (int i = 0; i < parent.getChildCount(); i++) {
-                    if (parent.getChildAt(i) != visualizerView) {
-                        parent.getChildAt(i).bringToFront();
+                if (mHandleExtra) {
+                    ignoreExtraEvents = true;
+                    for (VisualizerViewWrapper vis : mExtraVisualizers) {
+                        vis.setKeyguardShowing(false);
+                        vis.startOrStop(false);
                     }
                 }
-                visualizerView.setTranslationZ(-2);
+                prepare();
+                if (!isNull() && !isAttachedToWindow()) {
+                    log("Adding to view");
+                    parent.addView(visualizerView);
+                    for (int i = 0; i < parent.getChildCount(); i++) {
+                        if (parent.getChildAt(i) != visualizerView) {
+                            parent.getChildAt(i).bringToFront();
+                        }
+                    }
+                    visualizerView.setTranslationZ(-2);
+                }
+                state.mVisible = true;
+                visualizerView.refreshColor();
+                visualizerView.checkStateChanged();
+            } else if (state.mHaveInstance &&
+                        (!state.mScreenOnInternal || !state.mKeyguardVisible)) {
+                vanish();
+                if (mHandleExtra) {
+                    ignoreExtraEvents = false;
+                }
+            } else if (state.mHaveInstance && state.mScreenOnInternal &&
+                        state.mKeyguardVisible) {
+                visualizerView.checkStateChanged();
             }
-            state.mVisible = true;
-            visualizerView.refreshColor();
-            visualizerView.checkStateChanged();
-        } else if (state.mHaveInstance &&
-                    (!state.mScreenOnInternal || !state.mKeyguardVisible)) {
-            vanish();
-            if (mHandleExtra) {
-                ignoreExtraEvents = false;
+            if (mHandleExtra &&
+                    !state.mScreenOnInternal && !state.mKeyguardVisible) {
+                for (VisualizerViewWrapper vis : mExtraVisualizers) {
+                    vis.checkState();
+                }
             }
-        } else if (state.mHaveInstance && state.mScreenOnInternal &&
-                    state.mKeyguardVisible) {
-            visualizerView.checkStateChanged();
-        }
-        if (mHandleExtra &&
-                !state.mScreenOnInternal && !state.mKeyguardVisible) {
-            for (VisualizerViewWrapper vis : mExtraVisualizers) {
-                vis.checkState();
-            }
+        } catch (Exception e) {
+            // dammit
         }
     }
 

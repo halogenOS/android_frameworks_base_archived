@@ -68,31 +68,35 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
             if (!mAlive || mFFTPoints == null) return;
             if (calculatorLock) return;
             synchronized (calculatorLock) {
-                calculatorLock = true;
-                for (int i = 0; i < 32; i++) {
-                    mValueAnimators[i].cancel();
-                    rfk = fft[i * 2 + 2];
-                    ifk = fft[i * 2 + 3];
-                    magnitude = rfk * rfk + ifk * ifk;
-                    dbValue = magnitude > 0 ? (int) (10 * Math.log10(magnitude)) : 0;
-                    //\min\left(\frac{1}{480}\cdot\left(x-2\right)^{2.86},\ x-2\right)+\ 2
-                    // Filter the value so that we have less noise.
-                    // The number which we devide 1 by (1.0f/xf)
-                    // defines the cutoff (at which level we should
-                    // stop decreasing the dbValue. The higher the number,
-                    // the higher the cutoff meaning it will result in more filtering
-                    // The second value (in the exponent in the Math.pow function) defines
-                    // how hard the volume should be turned down. Note that this will ALSO
-                    // affect cutoff significantly. Use a function graph calculator.
-                    filteredValue = ((float) Math.min( (float) (1.0f/480.0f) *
-			            Math.pow(Math.max((float) dbValue - 2f, 0f), 2.86f), (float) dbValue - 2f)) + 2f;
+                try {
+                    calculatorLock = true;
+                    for (int i = 0; i < 32; i++) {
+                        mValueAnimators[i].cancel();
+                        rfk = fft[i * 2 + 2];
+                        ifk = fft[i * 2 + 3];
+                        magnitude = rfk * rfk + ifk * ifk;
+                        dbValue = magnitude > 0 ? (int) (10 * Math.log10(magnitude)) : 0;
+                        //\min\left(\frac{1}{480}\cdot\left(x-2\right)^{2.86},\ x-2\right)+\ 2
+                        // Filter the value so that we have less noise.
+                        // The number which we devide 1 by (1.0f/xf)
+                        // defines the cutoff (at which level we should
+                        // stop decreasing the dbValue. The higher the number,
+                        // the higher the cutoff meaning it will result in more filtering
+                        // The second value (in the exponent in the Math.pow function) defines
+                        // how hard the volume should be turned down. Note that this will ALSO
+                        // affect cutoff significantly. Use a function graph calculator.
+                        filteredValue = ((float) Math.min( (float) (1.0f/480.0f) *
+			                Math.pow(Math.max((float) dbValue - 2f, 0f), 2.86f), (float) dbValue - 2f)) + 2f;
 
-                    mValueAnimators[i].setFloatValues(mFFTPoints[i * 4 + 1],
-                            mFFTPoints[3] - (filteredValue * 16f));
-                    mValueAnimators[i].setDuration(92);
-                    mValueAnimators[i].start();
+                        mValueAnimators[i].setFloatValues(mFFTPoints[i * 4 + 1],
+                                mFFTPoints[3] - (filteredValue * 16f));
+                        mValueAnimators[i].setDuration(92);
+                        mValueAnimators[i].start();
+                    }
+                } catch (Exception e) {
+                } finally {
+                    calculatorLock = false;
                 }
-                calculatorLock = false;
             }
         }
     };
@@ -223,16 +227,19 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
 
         if (!mAlive) return;
         if (mPaint == null) return;
+        try {
+            float barUnit = w / 32f;
+            float barWidth = barUnit * 8f / 9f;
+            barUnit = barWidth + (barUnit - barWidth) * 32f / 31f;
+            mPaint.setStrokeWidth(barWidth);
 
-        float barUnit = w / 32f;
-        float barWidth = barUnit * 8f / 9f;
-        barUnit = barWidth + (barUnit - barWidth) * 32f / 31f;
-        mPaint.setStrokeWidth(barWidth);
-
-        for (int i = 0; i < 32; i++) {
-            mFFTPoints[i * 4] = mFFTPoints[i * 4 + 2] = i * barUnit + (barWidth / 2);
-            mFFTPoints[i * 4 + 1] = h;
-            mFFTPoints[i * 4 + 3] = h;
+            for (int i = 0; i < 32; i++) {
+                mFFTPoints[i * 4] = mFFTPoints[i * 4 + 2] = i * barUnit + (barWidth / 2);
+                mFFTPoints[i * 4 + 1] = h;
+                mFFTPoints[i * 4 + 3] = h;
+            }
+        } catch (Exception e) {
+            // Oops
         }
     }
 
@@ -247,24 +254,32 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
         if (!mAlive) return;
 
         if (mVisualizer != null) {
-            canvas.drawLines(mFFTPoints, mPaint);
+            try {
+                canvas.drawLines(mFFTPoints, mPaint);
+            } catch (Exception e) {
+                // Oopsie whoopsie
+            }
         }
     }
 
     public void setVisible(boolean visible) {
         if (!mAlive) return;
-        if (mState.mVisible != visible) {
+        if (mState != null && mState.mVisible != visible) {
             if (DEBUG) {
                 Log.i(TAG, "setVisible() called with visible = [" + visible + "]");
             }
-            mState.mVisible = visible;
-            if (mState.mScreenOn) checkStateChanged();
+            try {
+                mState.mVisible = visible;
+                if (mState.mScreenOn) checkStateChanged();
+            } catch (Exception e) {
+                // uh oh
+            }
         }
     }
 
     public void setPlaying(boolean playing) {
         if (!mAlive) return;
-        if (mState.mPlaying != playing) {
+        if (mState != null && mState.mPlaying != playing) {
             if (DEBUG) {
                 Log.i(TAG, "setPlaying() called with playing = [" + playing + "]");
             }
@@ -275,7 +290,7 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
 
     public void setPowerSaveMode(boolean powerSaveMode) {
         if (!mAlive) return;
-        if (mState.mPowerSaveMode != powerSaveMode) {
+        if (mState != null && mState.mPowerSaveMode != powerSaveMode) {
             if (DEBUG) {
                 Log.i(TAG, "setPowerSaveMode() called with powerSaveMode = [" + powerSaveMode + "]");
             }
@@ -286,7 +301,7 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
 
     public void setOccluded(boolean occluded) {
         if (!mAlive) return;
-        if (mState.mOccluded != occluded) {
+        if (mState != null && mState.mOccluded != occluded) {
             if (DEBUG) {
                 Log.i(TAG, "setOccluded() called with occluded = [" + occluded + "]");
             }
@@ -297,24 +312,32 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
 
     public void refreshColor() {
         if (!mAlive) return;
-        if (mState.mCurrentBitmap != null) {
-            Palette.generateAsync(mState.mCurrentBitmap, this);
-        } else {
-            setColor(mState.mColor);
+        try {
+            if (mState.mCurrentBitmap != null) {
+                Palette.generateAsync(mState.mCurrentBitmap, this);
+            } else {
+                setColor(mState.mColor);
+            }
+        } catch (Exception e) {
+            // Damn...
         }
     }
 
     public void setBitmap(Bitmap bitmap) {
         if (!mAlive) return;
         if (DEBUG) Log.d(TAG, "setBitmap, bitmap=[null: " + (bitmap == null) + "]");
-        if (mState.mCurrentBitmap == bitmap) {
+        if (mState == null || mState.mCurrentBitmap == bitmap) {
             return;
         }
-        mState.mCurrentBitmap = bitmap;
-        if (bitmap != null) {
-            Palette.generateAsync(bitmap, this);
-        } else {
-            setColor(Color.WHITE);
+        try {
+            mState.mCurrentBitmap = bitmap;
+            if (bitmap != null) {
+                Palette.generateAsync(bitmap, this);
+            } else {
+                setColor(Color.WHITE);
+            }
+        } catch (Exception e) {
+            // oh no
         }
     }
 
@@ -325,16 +348,20 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
 
         int color = Color.TRANSPARENT;
 
-        color = palette.getLightVibrantColor(color);
-        if (color == Color.TRANSPARENT) {
-            color = palette.getVibrantColor(color);
+        try {
+            color = palette.getLightVibrantColor(color);
             if (color == Color.TRANSPARENT) {
-                color = palette.getDarkVibrantColor(color);
+                color = palette.getVibrantColor(color);
+                if (color == Color.TRANSPARENT) {
+                    color = palette.getDarkVibrantColor(color);
+                }
             }
-        }
 
-        if (DEBUG) Log.d(TAG, "Generated color: " + color);
-        setColor(color);
+            if (DEBUG) Log.d(TAG, "Generated color: " + color);
+            setColor(color);
+        } catch (Exception e) {
+            Log.e(TAG, "Could not set a good color!");
+        }
     }
 
     protected void setColor(int color) {
@@ -346,37 +373,41 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
             color = Color.WHITE;
         }
 
-        if (color != Color.WHITE) {
-            float[] hsl = new float[3];
-            if (ColorUtils.calculateLuminance(color) < 0.46f) {
-                ColorUtils.colorToHSL(color, hsl);
-                hsl[2] = 0.46f;
-                color = ColorUtils.HSLToColor(hsl);
-            }
-        }
-
-        color = ColorUtils.setAlphaComponent(color, 128);
-
-        if (mState.mColor != color) {
-            mState.mColor = color;
-            if (mVisualizer != null) {
-                if (mVisualizerColorAnimator != null) {
-                    mVisualizerColorAnimator.cancel();
+        try {
+            if (color != Color.WHITE) {
+                float[] hsl = new float[3];
+                if (ColorUtils.calculateLuminance(color) < 0.46f) {
+                    ColorUtils.colorToHSL(color, hsl);
+                    hsl[2] = 0.46f;
+                    color = ColorUtils.HSLToColor(hsl);
                 }
-
-                mVisualizerColorAnimator = ObjectAnimator.ofArgb(mPaint, "color",
-                        mPaint.getColor(), mState.mColor);
-                mVisualizerColorAnimator.setDuration(800);
-                mVisualizerColorAnimator.start();
-            } else {
-                mPaint.setColor(mState.mColor);
             }
+
+            color = ColorUtils.setAlphaComponent(color, 128);
+
+            if (mState.mColor != color) {
+                mState.mColor = color;
+                if (mVisualizer != null) {
+                    if (mVisualizerColorAnimator != null) {
+                        mVisualizerColorAnimator.cancel();
+                    }
+
+                    mVisualizerColorAnimator = ObjectAnimator.ofArgb(mPaint, "color",
+                            mPaint.getColor(), mState.mColor);
+                    mVisualizerColorAnimator.setDuration(800);
+                    mVisualizerColorAnimator.start();
+                } else {
+                    mPaint.setColor(mState.mColor);
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Could not process color!");
         }
     }
 
     protected void checkStateChanged() {
         if (!mAlive) return;
-        if (DEBUG)
+        if (DEBUG) {
             Log.d(TAG,
                  "mState.mVisible: " + mState.mVisible +
                 " mState.mPlaying: " + mState.mPlaying +
@@ -387,32 +418,41 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
                 " visible:  " + (getVisibility() == View.VISIBLE) +
                 " color: " + mState.mColor
             );
-        if (getVisibility() == View.VISIBLE && mState.mScreenOn &&
-                mState.mVisible && mState.mPlaying) {
-            if (DEBUG) Log.d(TAG, "We are good!");
-            if (!mState.mDisplaying) {
-                if(DEBUG) Log.d(TAG, "Setting visualizer on fire!");
-                mState.mDisplaying = true;
-                AsyncTask.execute(mLinkVisualizer);
-                animate()
-                        .alpha(1f)
-                        .withEndAction(null)
-                        .setDuration(720);
+        }
+        try {
+            if (mState != null && getVisibility() == View.VISIBLE && mState.mScreenOn &&
+                    mState.mVisible && mState.mPlaying) {
+                if (DEBUG) Log.d(TAG, "We are good!");
+                if (!mState.mDisplaying) {
+                    if(DEBUG) Log.d(TAG, "Setting visualizer on fire!");
+                    mState.mDisplaying = true;
+                    AsyncTask.execute(mLinkVisualizer);
+                    animate()
+                            .alpha(1f)
+                            .withEndAction(null)
+                            .setDuration(720);
+                }
+            } else {
+                hideVisualizer();
             }
-        } else {
-            hideVisualizer();
+        } catch (Exception e) {
+            Log.e(TAG, "Failure while checking if state changed");
         }
     }
 
     private synchronized void hideVisualizer() {
         if (!mAlive) return;
-        if (mState.mDisplaying) {
-            if (DEBUG) Log.d(TAG, "Getting rid of visualizer");
-            mState.mDisplaying = false;
-            animate()
-                    .alpha(0f)
-                    .withEndAction(mAsyncUnlinkVisualizer)
-                    .setDuration(600);
+        if (mState != null && mState.mDisplaying) {
+            try {
+                if (DEBUG) Log.d(TAG, "Getting rid of visualizer");
+                mState.mDisplaying = false;
+                animate()
+                        .alpha(0f)
+                        .withEndAction(mAsyncUnlinkVisualizer)
+                        .setDuration(600);
+            } catch (Exception e) {
+               Log.e(TAG, "Could not hide Visualizer, consider restarting SystemUI!");
+            }
         }
     }
 
