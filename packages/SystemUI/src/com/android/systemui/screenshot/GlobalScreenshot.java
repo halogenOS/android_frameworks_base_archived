@@ -216,21 +216,21 @@ class SaveImageInBackgroundTask extends AsyncTask<Void, Void, Void> {
             mImageFileName = String.format(SCREENSHOT_FILE_NAME_TEMPLATE_APPNAME,
                     imageDate, appNameString);
         } else {
-          mImageFileName = String.format(SCREENSHOT_FILE_NAME_TEMPLATE, imageDate);
-          mScreenshotId = String.format(SCREENSHOT_ID_TEMPLATE, UUID.randomUUID());
+            mImageFileName = String.format(SCREENSHOT_FILE_NAME_TEMPLATE, imageDate);
+            mScreenshotId = String.format(SCREENSHOT_ID_TEMPLATE, UUID.randomUUID());
+        }
 
-          // Initialize screenshot notification smart actions provider.
-          mSmartActionsEnabled = DeviceConfig.getBoolean(DeviceConfig.NAMESPACE_SYSTEMUI,
-                SystemUiDeviceConfigFlags.ENABLE_SCREENSHOT_NOTIFICATION_SMART_ACTIONS, false);
-          if (mSmartActionsEnabled) {
-              mSmartActionsProvider =
-                      SystemUIFactory.getInstance()
-                              .createScreenshotNotificationSmartActionsProvider(
-                                      context, THREAD_POOL_EXECUTOR, new Handler());
-          } else {
-              // If smart actions is not enabled use empty implementation.
-              mSmartActionsProvider = new ScreenshotNotificationSmartActionsProvider();
-          }
+        // Initialize screenshot notification smart actions provider.
+        mSmartActionsEnabled = DeviceConfig.getBoolean(DeviceConfig.NAMESPACE_SYSTEMUI,
+              SystemUiDeviceConfigFlags.ENABLE_SCREENSHOT_NOTIFICATION_SMART_ACTIONS, false);
+        if (mSmartActionsEnabled) {
+            mSmartActionsProvider =
+                    SystemUIFactory.getInstance()
+                            .createScreenshotNotificationSmartActionsProvider(
+                                    context, THREAD_POOL_EXECUTOR, new Handler());
+        } else {
+            // If smart actions is not enabled use empty implementation.
+            mSmartActionsProvider = new ScreenshotNotificationSmartActionsProvider();
         }
 
         // Create the large notification icon
