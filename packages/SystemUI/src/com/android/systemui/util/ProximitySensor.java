@@ -84,6 +84,10 @@ public class ProximitySensor {
         mTag = tag;
     }
 
+    public Sensor findCustomProxSensor(Context context, SensorManager sensorManager) {
+        return findBrightnessSensor(context, sensorManager);
+    }
+
     private Sensor findBrightnessSensor(Context context, SensorManager sensorManager) {
         boolean brightnessSensorReportsProximity =
                 context.getResources().getBoolean(R.bool.doze_brightness_sensor_reports_proximity);
