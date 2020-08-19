@@ -76,7 +76,7 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
                         ifk = fft[i * 2 + 3];
                         magnitude = rfk * rfk + ifk * ifk;
                         dbValue = magnitude > 0 ? (int) (10 * Math.log10(magnitude)) : 0;
-                        //\min\left(\frac{1}{480}\cdot\left(x-2\right)^{2.86},\ x-2\right)+\ 2
+                        //\min\left(\frac{1}{560}\cdot\left(x-2\right)^{2.86},\ x-2\right)+\ 2
                         // Filter the value so that we have less noise.
                         // The number which we divide 1 by (1.0f/xf)
                         // defines the cutoff (at which level we should
