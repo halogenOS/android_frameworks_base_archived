@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2014-2022 BlissRoms Project
+     SPDX-License-Identifier: Apache-2.0
+-->
+<resources>
+
+    <!-- Build fingerprint from the stock ROM -->
+    <string name="config_stockFingerprint" translatable="false"></string>
+
+    <!-- Build properties from a GMS certified device against current platform SPL level -->
+    <string-array name="config_certifiedBuildProperties" translatable="false">
+        <item>marlin</item>   <!-- Build.DEVICE -->
+        <item>marlin</item>   <!-- Build.PRODUCT -->
+        <item>Pixel XL</item> <!-- Build.MODEL -->
+        <item>google/marlin/marlin:7.1.2/NJH47F/4146041:user/release-keys</item> <!-- Build.FINGERPRINT -->
+    </string-array>
+</resources>
