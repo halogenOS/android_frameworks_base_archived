@@ -17,4 +17,10 @@
 -->
 <resources>
     <dimen name="volume_panel_left_side_padding">8.0dp</dimen>
+
+    <!-- Maximum horizontal offset of statusbar for burn-in protection -->
+    <dimen name="status_bar_offset_max_x">4dp</dimen>
+
+    <!-- Maximum vertical offset of statusbar for burn-in protection -->
+    <dimen name="status_bar_offset_max_y">4dp</dimen>
 </resources>
