@@ -83,9 +83,7 @@ public class WifiSignalController extends SignalController<WifiState, IconGroup>
     @Override
     public void notifyListeners(SignalCallback callback) {
         if (mCurrentState.isCarrierMerged) {
-            if (mCurrentState.isDefault || !mNetworkController.isRadioOn()) {
-                notifyListenersForCarrierWifi(callback);
-            }
+            notifyListenersForCarrierWifi(callback);
         } else {
             notifyListenersForNonCarrierWifi(callback);
         }
@@ -108,18 +106,17 @@ public class WifiSignalController extends SignalController<WifiState, IconGroup>
         if (mProviderModelSetting) {
             IconState statusIcon = new IconState(
                     wifiVisible, getCurrentIconId(), contentDescription);
-            IconState qsIcon = null;
-            if (mCurrentState.isDefault || (!mNetworkController.isRadioOn()
-                    && !mNetworkController.isEthernetDefault())) {
-                qsIcon = new IconState(mCurrentState.connected,
-                        mWifiTracker.isCaptivePortal ? R.drawable.ic_qs_wifi_disconnected
-                                : getQsCurrentIconId(), contentDescription);
-            }
+            IconState qsIcon = new IconState(mCurrentState.connected,
+                    mWifiTracker.isCaptivePortal ? R.drawable.ic_qs_wifi_disconnected
+                            : getQsCurrentIconId(), contentDescription);
+            boolean isDefault = mCurrentState.isDefault || (!mNetworkController.isRadioOn()
+                    && !mNetworkController.isEthernetDefault());
             WifiIndicators wifiIndicators = new WifiIndicators(
                     mCurrentState.enabled, statusIcon, qsIcon,
                     ssidPresent && mCurrentState.activityIn,
                     ssidPresent && mCurrentState.activityOut,
-                    wifiDesc, mCurrentState.isTransient, mCurrentState.statusLabel
+                    wifiDesc, mCurrentState.isTransient, mCurrentState.statusLabel,
+                    isDefault
             );
             callback.setWifiIndicators(wifiIndicators);
         } else {
@@ -132,7 +129,8 @@ public class WifiSignalController extends SignalController<WifiState, IconGroup>
                     mCurrentState.enabled, statusIcon, qsIcon,
                     ssidPresent && mCurrentState.activityIn,
                     ssidPresent && mCurrentState.activityOut,
-                    wifiDesc, mCurrentState.isTransient, mCurrentState.statusLabel
+                    wifiDesc, mCurrentState.isTransient, mCurrentState.statusLabel,
+                    false
             );
             callback.setWifiIndicators(wifiIndicators);
         }
@@ -148,8 +146,7 @@ public class WifiSignalController extends SignalController<WifiState, IconGroup>
         if (mCurrentState.inetCondition == 0) {
             dataContentDescription = mContext.getString(R.string.data_connection_no_internet);
         }
-        boolean sbVisible = mCurrentState.enabled && mCurrentState.connected
-                && mCurrentState.isDefault;
+        boolean sbVisible = mCurrentState.enabled && mCurrentState.connected;
         IconState statusIcon =
                 new IconState(sbVisible, getCurrentIconIdForCarrierWifi(), contentDescription);
         int typeIcon = sbVisible ? icons.dataType : 0;
@@ -162,11 +159,13 @@ public class WifiSignalController extends SignalController<WifiState, IconGroup>
         }
         CharSequence description =
                 mNetworkController.getNetworkNameForCarrierWiFi(mCurrentState.subId);
+        boolean isDefault = mCurrentState.isDefault || !mNetworkController.isRadioOn();
         MobileDataIndicators mobileDataIndicators = new MobileDataIndicators(
                 statusIcon, qsIcon, typeIcon, qsTypeIcon,
                 mCurrentState.activityIn, mCurrentState.activityOut, dataContentDescription,
                 dataContentDescriptionHtml, description,
-                mCurrentState.subId, /* roaming= */ false, /* showTriangle= */ true
+                mCurrentState.subId, /* roaming= */ false, /* showTriangle= */ true,
+                isDefault
         );
         callback.setMobileDataIndicators(mobileDataIndicators);
     }
