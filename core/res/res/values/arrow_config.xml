@@ -19,4 +19,10 @@
     <!-- Whether to cancel fingerprint operation if not idle -->
     <bool name="config_fpCancelIfNotIdle">false</bool>
 
+    <!-- PixelPropUtils -->
+    <java-symbol type="array" name="gaaps_package_names" />
+    <java-symbol type="string" name="build_device" />
+    <java-symbol type="string" name="build_fp" />
+    <java-symbol type="string" name="build_model" />
+
 </resources>
