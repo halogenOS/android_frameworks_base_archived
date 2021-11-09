@@ -38,21 +38,28 @@ public final class PixelPropsUtils {
     private static final String build_model =
             Resources.getSystem().getString(com.android.internal.R.string.build_model);
 
-    private static final String marlin_device =
-            Resources.getSystem().getString(com.android.internal.R.string.marlin_build_device);
-    private static final String marlin_fp =
-            Resources.getSystem().getString(com.android.internal.R.string.marlin_build_fp);
-    private static final String marlin_model =
-            Resources.getSystem().getString(com.android.internal.R.string.marlin_build_model);
+    private static final String redfin_device =
+            Resources.getSystem().getString(com.android.internal.R.string.redfin_device);
+    private static final String redfin_fp =
+            Resources.getSystem().getString(com.android.internal.R.string.redfin_fp);
+    private static final String redfin_model =
+            Resources.getSystem().getString(com.android.internal.R.string.redfin_model);
 
     private static final Map<String, String> marlinProps = Map.of(
-        "DEVICE", marlin_device,
-        "PRODUCT", marlin_device,
-        "MODEL", marlin_model,
-        "FINGERPRINT", marlin_fp
+        "DEVICE", "marlin",
+        "PRODUCT", "marlin",
+        "MODEL", "Pixel XL",
+        "FINGERPRINT", "google/marlin/marlin:10/QP1A.191005.007.A3/5972272:user/release-keys"
     );
 
     private static final Map<String, String> redfinProps = Map.of(
+        "DEVICE", redfin_device,
+        "PRODUCT", redfin_device,
+        "MODEL", redfin_model,
+        "FINGERPRINT", redfin_fp
+    );
+
+    private static final Map<String, String> buildProps = Map.of(
         "DEVICE", build_device,
         "PRODUCT", build_device,
         "MODEL", build_model,
@@ -67,6 +74,10 @@ public final class PixelPropsUtils {
         "IS_USERDEBUG", false,
         "IS_USER", true,
         "TYPE", "user"
+    );
+
+    private static final Map<String, ArrayList<String>> propsToKeep = Map.of(
+        "com.google.android.settings.intelligence", new ArrayList<String>(Arrays.asList("FINGERPRINT"))
     );
 
     private static final String[] extraPackagesToChange = {
@@ -86,12 +97,11 @@ public final class PixelPropsUtils {
         "com.samsung.android.waterplugin"
     };
 
-    private static final Map<String, ArrayList<String>> propsToKeep;
-    static {
-        propsToKeep = new HashMap<>();
-        propsToKeep.put("com.google.android.settings.intelligence",
-                new ArrayList<String>(Arrays.asList("FINGERPRINT")));
-    }
+    private static final String[] redfinPackagesToChange = {
+            "com.google.android.tts",
+            "com.google.android.googlequicksearchbox",
+            "com.google.android.apps.recorder"
+    };
 
     public static void setProps(String packageName) {
         if (packageName == null) return;
@@ -99,10 +109,13 @@ public final class PixelPropsUtils {
         if (Arrays.asList(marlinPackagesToChange).contains(packageName)) {
             commonProps.forEach(PixelPropsUtils::setPropValue);
             marlinProps.forEach(PixelPropsUtils::setPropValue);
+        } else if (Arrays.asList(redfinPackagesToChange).contains(packageName)) {
+            commonProps.forEach(PixelPropsUtils::setPropValue);
+            redfinProps.forEach(PixelPropsUtils::setPropValue);
         } else if (packageName.startsWith("com.google.")
                 || Arrays.asList(extraPackagesToChange).contains(packageName)) {
             commonProps.forEach(PixelPropsUtils::setPropValue);
-            redfinProps.forEach((key, value) -> {
+            buildProps.forEach((key, value) -> {
                 if (propsToKeep.containsKey(packageName)
                         && propsToKeep.get(packageName).contains(key)) {
                     if (DEBUG) Log.d(TAG, "Not defining " + key + " prop for: " + packageName);
