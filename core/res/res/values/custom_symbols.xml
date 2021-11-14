@@ -27,4 +27,7 @@
     <java-symbol type="integer" name="config_deviceSupportsButtonBrightnessControl" />
     <java-symbol type="dimen" name="config_buttonBrightnessSettingDefaultFloat" />
 
+    <!-- Whether devices suports in-display fingerprint when screen is off -->
+    <java-symbol type="bool" name="config_supportsScreenOffUdfps" />
+
 </resources>
