@@ -29,9 +29,27 @@ public final class PixelPropsUtils {
     private static final String TAG = "PixelPropsUtils";
     private static final boolean DEBUG = false;
 
-    private static final String build_device = Resources.getSystem().getString(com.android.internal.R.string.build_device);
-    private static final String build_fp = Resources.getSystem().getString(com.android.internal.R.string.build_fp);
-    private static final String build_model = Resources.getSystem().getString(com.android.internal.R.string.build_model);
+    private static final String build_device =
+            Resources.getSystem().getString(com.android.internal.R.string.build_device);
+    private static final String build_fp =
+            Resources.getSystem().getString(com.android.internal.R.string.build_fp);
+    private static final String build_model =
+            Resources.getSystem().getString(com.android.internal.R.string.build_model);
+
+    private static final String marlin_device =
+            Resources.getSystem().getString(com.android.internal.R.string.marlin_build_device);
+    private static final String marlin_fp =
+            Resources.getSystem().getString(com.android.internal.R.string.marlin_build_fp);
+    private static final String marlin_model =
+            Resources.getSystem().getString(com.android.internal.R.string.marlin_build_model);
+
+    private static final Map<String, String> marlinProps = Map.of(
+        "DEVICE", marlin_device,
+        "PRODUCT", marlin_device,
+        "MODEL", marlin_model,
+        "FINGERPRINT", marlin_fp
+    );
+
     private static final Map<String, String> redfinProps = Map.of(
         "DEVICE", build_device,
         "PRODUCT", build_device,
@@ -49,7 +67,10 @@ public final class PixelPropsUtils {
         "TYPE", "user"
     );
 
-    private static final List<String> packagesToChange = Arrays.asList(Resources.getSystem().getStringArray(com.android.internal.R.array.gaaps_package_names));
+    private static final List<String> packagesToChange = Arrays.asList(
+            Resources.getSystem().getStringArray(com.android.internal.R.array.gaaps_package_names));
+    private static final List<String> marlinPackagesToChange = Arrays.asList(
+            Resources.getSystem().getStringArray(com.android.internal.R.array.marlin_package_names));
 
     public static void setProps(String packageName) {
         if (packageName == null) {
@@ -67,6 +88,9 @@ public final class PixelPropsUtils {
                     setPropValue(key, value);
                 }
             });
+        } else if (marlinPackagesToChange.contains(packageName)) {
+            commonProps.forEach(PixelPropsUtils::setPropValue);
+            marlinProps.forEach(PixelPropsUtils::setPropValue);
         }
         // Set proper indexing fingerprint
         if (packageName.equals("com.google.android.settings.intelligence")) {
