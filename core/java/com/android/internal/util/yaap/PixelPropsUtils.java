@@ -20,7 +20,9 @@ import android.os.Build;
 import android.util.Log;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -67,30 +69,48 @@ public final class PixelPropsUtils {
         "TYPE", "user"
     );
 
-    private static final List<String> packagesToChange = Arrays.asList(
-            Resources.getSystem().getStringArray(com.android.internal.R.array.gaaps_package_names));
-    private static final List<String> marlinPackagesToChange = Arrays.asList(
-            Resources.getSystem().getStringArray(com.android.internal.R.array.marlin_package_names));
+    private static final String[] extraPackagesToChange = {
+        "com.android.vending",
+        "com.breel.wallpapers20"
+    };
+
+    private static final String[] marlinPackagesToChange = {
+        "com.google.android.apps.photos",
+        "com.samsung.accessory.berrymgr",
+        "com.samsung.accessory.fridaymgr",
+        "com.samsung.accessory.neobeanmg",
+        "com.samsung.android.app.watchma",
+        "com.samsung.android.gearnplugin",
+        "com.samsung.android.modenplugin",
+        "com.samsung.android.neatplugin",
+        "com.samsung.android.waterplugin"
+    };
+
+    private static final Map<String, ArrayList<String>> propsToKeep;
+    static {
+        propsToKeep = new HashMap<>();
+        propsToKeep.put("com.google.android.settings.intelligence",
+                new ArrayList<String>(Arrays.asList("FINGERPRINT")));
+    }
 
     public static void setProps(String packageName) {
-        if (packageName == null) {
-            return;
-        }
-        if (DEBUG) {
-            Log.d(TAG, "Package = " + packageName);
-        }
-        if (packagesToChange.contains(packageName)) {
-            commonProps.forEach(PixelPropsUtils::setPropValue);
-            redfinProps.forEach((key, value) -> {
-                if (packageName.equals("com.google.android.gms") && key.equals("MODEL")) {
-                    return;
-                } else {
-                    setPropValue(key, value);
-                }
-            });
-        } else if (marlinPackagesToChange.contains(packageName)) {
+        if (packageName == null) return;
+        if (DEBUG) Log.d(TAG, "Package = " + packageName);
+        if (Arrays.asList(marlinPackagesToChange).contains(packageName)) {
             commonProps.forEach(PixelPropsUtils::setPropValue);
             marlinProps.forEach(PixelPropsUtils::setPropValue);
+        } else if (packageName.startsWith("com.google.")
+                || Arrays.asList(extraPackagesToChange).contains(packageName)) {
+            commonProps.forEach(PixelPropsUtils::setPropValue);
+            redfinProps.forEach((key, value) -> {
+                if (propsToKeep.containsKey(packageName)
+                        && propsToKeep.get(packageName).contains(key)) {
+                    if (DEBUG) Log.d(TAG, "Not defining " + key + " prop for: " + packageName);
+                    return;
+                }
+                if (DEBUG) Log.d(TAG, "Defining " + key + " prop for: " + packageName);
+                setPropValue(key, value);
+            });
         }
         // Set proper indexing fingerprint
         if (packageName.equals("com.google.android.settings.intelligence")) {
@@ -100,9 +120,7 @@ public final class PixelPropsUtils {
 
     private static void setPropValue(String key, Object value) {
         try {
-            if (DEBUG) {
-                Log.d(TAG, "Setting prop " + key + " to " + value);
-            }
+            if (DEBUG) Log.d(TAG, "Setting prop " + key + " to " + value);
             final Field field = Build.class.getDeclaredField(key);
             field.setAccessible(true);
             field.set(null, value);
