@@ -22,8 +22,8 @@ import android.util.Log;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public final class PixelPropsUtils {
@@ -76,9 +76,26 @@ public final class PixelPropsUtils {
         "TYPE", "user"
     );
 
-    private static final Map<String, ArrayList<String>> propsToKeep = Map.of(
-        "com.google.android.settings.intelligence", new ArrayList<String>(Arrays.asList("FINGERPRINT"))
-    );
+    private static final Map<String, ArrayList<String>> propsToKeep;
+
+    static {
+        // null means skip the package
+        Map<String, ArrayList<String>> tMap = new HashMap<>();
+        tMap.put("com.google.android.settings.intelligence",
+                new ArrayList<String>(Arrays.asList("FINGERPRINT")));
+        tMap.put("com.google.android.GoogleCamera", null);
+        tMap.put("com.google.android.GoogleCamera.Cameight", null);
+        tMap.put("com.google.android.GoogleCamera.Go", null);
+        tMap.put("com.google.android.GoogleCamera.Urnyx", null);
+        tMap.put("com.google.android.GoogleCameraAsp", null);
+        tMap.put("com.google.android.GoogleCameraCVM", null);
+        tMap.put("com.google.android.GoogleCameraEng", null);
+        tMap.put("com.google.android.GoogleCameraEng2", null);
+        tMap.put("com.google.android.MTCL83", null);
+        tMap.put("com.google.android.UltraCVM", null);
+        tMap.put("com.google.android.apps.cameralite", null);
+        propsToKeep = Collections.unmodifiableMap(tMap);
+    }
 
     private static final String[] extraPackagesToChange = {
         "com.breel.wallpapers20"
@@ -113,6 +130,11 @@ public final class PixelPropsUtils {
             redfinProps.forEach(PixelPropsUtils::setPropValue);
         } else if (packageName.startsWith("com.google.")
                 || Arrays.asList(extraPackagesToChange).contains(packageName)) {
+            if (propsToKeep.containsKey(packageName)
+                    && propsToKeep.get(packageName) == null) {
+                if (DEBUG) Log.d(TAG, "Skipping all props for: " + packageName);
+                return;
+            }
             commonProps.forEach(PixelPropsUtils::setPropValue);
             buildProps.forEach((key, value) -> {
                 if (propsToKeep.containsKey(packageName)
