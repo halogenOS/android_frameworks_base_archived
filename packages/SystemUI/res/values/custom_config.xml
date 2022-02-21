@@ -25,4 +25,8 @@
     <!-- StatusBar burn-in protection -->
     <bool name="config_statusBarBurnInProtection">false</bool>
     <integer name="config_shift_interval">60</integer>
+
+    <!-- Udfps HBM provider class name -->
+    <string name="config_udfpsHbmProviderComponent">com.android.systemui.biometrics.DummyUdfpsHbmProvider</string>
+
 </resources>
