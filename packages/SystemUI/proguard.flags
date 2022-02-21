@@ -5,6 +5,10 @@
     *;
 }
 
+-keep class * implements com.android.systemui.biometrics.UdfpsDisplayModeProvider {
+    public <init>(...);
+}
+
 -keep class com.android.systemui.tv.TvSystemUIInitializer {
     *;
 }
