@@ -59,5 +59,7 @@
           <item>255,33</item>
           -->
     </string-array>
+    <!-- Udfps HBM provider class name -->
+    <string name="config_udfpsHbmProviderComponent">com.android.systemui.biometrics.DummyUdfpsHbmProvider</string>
 
 </resources>
