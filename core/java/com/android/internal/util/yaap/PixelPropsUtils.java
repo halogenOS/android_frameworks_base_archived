@@ -84,6 +84,7 @@ public final class PixelPropsUtils {
         tMap.put("com.google.android.settings.intelligence",
                 new ArrayList<String>(Arrays.asList("FINGERPRINT")));
         tMap.put("com.google.android.GoogleCamera", null);
+        tMap.put("com.google.android.GoogleCameraGood", null);
         tMap.put("com.google.android.GoogleCamera.Cameight", null);
         tMap.put("com.google.android.GoogleCamera.Go", null);
         tMap.put("com.google.android.GoogleCamera.Urnyx", null);
