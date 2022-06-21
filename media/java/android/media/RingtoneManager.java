@@ -153,7 +153,7 @@ public class RingtoneManager {
      * for this {@link Uri}. If showing an item for "Default" (@see
      * {@link #EXTRA_RINGTONE_SHOW_DEFAULT}), this can also be one of
      * {@link System#DEFAULT_RINGTONE_URI},
-     * {@link System#DEFAULT_RINGTONE2_URI},
+     * System#DEFAULT_RINGTONE2_URI,
      * {@link System#DEFAULT_NOTIFICATION_URI}, or
      * {@link System#DEFAULT_ALARM_ALERT_URI} to have the "Default" item
      * checked.
@@ -167,7 +167,7 @@ public class RingtoneManager {
      * Given to the ringtone picker as a {@link Uri}. The {@link Uri} of the
      * ringtone to play when the user attempts to preview the "Default"
      * ringtone. This can be one of {@link System#DEFAULT_RINGTONE_URI},
-     * {@link System#DEFAULT_RINGTONE2_URI}, {@link System#DEFAULT_NOTIFICATION_URI}, or
+     * System#DEFAULT_RINGTONE2_URI, {@link System#DEFAULT_NOTIFICATION_URI}, or
      * {@link System#DEFAULT_ALARM_ALERT_URI} to have the "Default" point to
      * the current sound for the given default sound type. If you are showing a
      * ringtone picker for some other type of sound, you are free to provide any
@@ -206,7 +206,7 @@ public class RingtoneManager {
      * It will be one of:
      * <li> the picked ringtone,
      * <li> a {@link Uri} that equals {@link System#DEFAULT_RINGTONE_URI},
-     * {@link System#DEFAULT_RINGTONE2_URI}, {@link System#DEFAULT_NOTIFICATION_URI}, or
+     * System#DEFAULT_RINGTONE2_URI, {@link System#DEFAULT_NOTIFICATION_URI}, or
      * {@link System#DEFAULT_ALARM_ALERT_URI} if the default was chosen,
      * <li> null if the "Silent" item was picked.
      * 
@@ -780,7 +780,7 @@ public class RingtoneManager {
     /**
      * Gets the current default sound's {@link Uri}. This will give the actual
      * sound {@link Uri}, instead of using this, most clients can use
-     * {@link System#DEFAULT_RINGTONE_URI} or {@link System#DEFAULT_RINGTONE2_URI}.
+     * {@link System#DEFAULT_RINGTONE_URI} or System#DEFAULT_RINGTONE2_URI.
      *
      * @param context A context used for querying.
      * @param type The type whose default sound should be returned. One of
@@ -797,7 +797,7 @@ public class RingtoneManager {
     /**
      * Gets the current default sound's {@link Uri} by slotId. This will give the actual
      * sound {@link Uri}, instead of using this, most clients can use
-     * {@link System#DEFAULT_RINGTONE_URI} or {@link System#DEFAULT_RINGTONE2_URI}.
+     * {@link System#DEFAULT_RINGTONE_URI} or System#DEFAULT_RINGTONE2_URI.
      *
      * @param context A context used for querying.
      * @param type The type whose default sound should be returned. One of
@@ -1053,7 +1053,7 @@ public class RingtoneManager {
      * 
      * @param defaultRingtoneUri The default {@link Uri}. For example,
      *            {@link System#DEFAULT_RINGTONE_URI},
-     *            {@link System#DEFAULT_RINGTONE2_URI},
+     *            System#DEFAULT_RINGTONE2_URI,
      *            {@link System#DEFAULT_NOTIFICATION_URI}, or
      *            {@link System#DEFAULT_ALARM_ALERT_URI}.
      * @return The type of the defaultRingtoneUri, or -1.

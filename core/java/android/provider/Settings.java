@@ -4688,7 +4688,7 @@ public final class Settings {
          * Persistent store for the system-wide default ringtone for Slot2 URI.
          *
          * @see #RINGTONE
-         * @see #DEFAULT_RINGTONE2_URI
+         * see #DEFAULT_RINGTONE2_URI
          *
          */
         /** {@hide} */
