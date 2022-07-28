@@ -32,15 +32,18 @@ import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 
 import com.android.settingslib.Utils;
+import com.android.systemui.Dependency;
 import com.android.systemui.R;
+import com.android.systemui.colorextraction.SysuiColorExtractor;
 import com.android.systemui.plugins.qs.QSIconView;
 import com.android.systemui.plugins.qs.QSTile;
 import com.android.systemui.plugins.qs.QSTile.State;
 import com.android.systemui.qs.AlphaControlledSignalTileView.AlphaControlledSlashImageView;
+import com.android.systemui.statusbar.policy.ConfigurationController;
 
 import java.util.Objects;
 
-public class QSIconViewImpl extends QSIconView {
+public class QSIconViewImpl extends QSIconView implements ConfigurationController.ConfigurationListener {
 
     public static final long QS_ANIM_LENGTH = 350;
 
@@ -50,12 +53,15 @@ public class QSIconViewImpl extends QSIconView {
     private int mState = -1;
     private int mTint;
     private QSTile.Icon mLastIcon;
+    private boolean isDark;
 
     public QSIconViewImpl(Context context) {
         super(context);
 
         final Resources res = context.getResources();
         mIconSizePx = res.getDimensionPixelSize(R.dimen.qs_icon_size);
+
+        Dependency.get(ConfigurationController.class).addCallback(this);
 
         mIcon = createIcon();
         addView(mIcon);
@@ -69,6 +75,11 @@ public class QSIconViewImpl extends QSIconView {
 
     public void disableAnimation() {
         mAnimationEnabled = false;
+    }
+
+    @Override
+    public void onThemeChanged() {
+
     }
 
     public View getIconView() {
@@ -245,6 +256,7 @@ public class QSIconViewImpl extends QSIconView {
      * Color to tint the tile icon based on state
      */
     public static int getIconColorForState(Context context, int state) {
+        final boolean useDarkText = Dependency.get(SysuiColorExtractor.class).getNeutralColors().supportsDarkText();
         switch (state) {
             case Tile.STATE_UNAVAILABLE:
                 return Utils.applyAlpha(QSTileViewImpl.UNAVAILABLE_ALPHA,
@@ -252,7 +264,11 @@ public class QSIconViewImpl extends QSIconView {
             case Tile.STATE_INACTIVE:
                 return Utils.getColorAttrDefaultColor(context, android.R.attr.textColorPrimary);
             case Tile.STATE_ACTIVE:
-                return Utils.getColorAttrDefaultColor(context, android.R.attr.textColorPrimary);
+                if (useDarkText) {
+                    return Utils.getColorAttrDefaultColor(context, android.R.attr.textColorPrimary);
+                } else {
+                    return Utils.getColorAttrDefaultColor(context, android.R.attr.textColorPrimaryInverse);
+                }
             default:
                 Log.e("QSIconView", "Invalid state " + state);
                 return 0;

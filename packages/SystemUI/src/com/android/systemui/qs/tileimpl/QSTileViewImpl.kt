@@ -40,9 +40,11 @@ import android.widget.Switch
 import android.widget.TextView
 import androidx.annotation.VisibleForTesting
 import com.android.settingslib.Utils
+import com.android.systemui.Dependency
 import com.android.systemui.FontSizeUtils
 import com.android.systemui.R
 import com.android.systemui.animation.LaunchableView
+import com.android.systemui.colorextraction.SysuiColorExtractor;
 import com.android.systemui.plugins.qs.QSIconView
 import com.android.systemui.plugins.qs.QSTile
 import com.android.systemui.plugins.qs.QSTile.BooleanState
@@ -82,13 +84,18 @@ open class QSTileViewImpl @JvmOverloads constructor(
             updateHeight()
         }
 
+    private val sysUiColorExtractor get() = Dependency.get(SysuiColorExtractor::class.java)
+    private val useDarkMode get() = sysUiColorExtractor.getNeutralColors().supportsDarkText()
+
     private val colorActive = Utils.getColorAttrDefaultColor(context,
             android.R.attr.colorAccent)
     private val colorInactive = Utils.getColorAttrDefaultColor(context, R.attr.offStateColor)
     private val colorUnavailable = Utils.applyAlpha(UNAVAILABLE_ALPHA, colorInactive)
 
     private val colorLabelActive =
-            Utils.getColorAttrDefaultColor(context, android.R.attr.textColorPrimary)
+            Utils.getColorAttrDefaultColor(context,
+                if (useDarkMode) android.R.attr.textColorPrimary
+                else android.R.attr.textColorPrimaryInverse)
     private val colorLabelInactive =
             Utils.getColorAttrDefaultColor(context, android.R.attr.textColorPrimary)
     private val colorLabelUnavailable = Utils.applyAlpha(UNAVAILABLE_ALPHA, colorLabelInactive)
