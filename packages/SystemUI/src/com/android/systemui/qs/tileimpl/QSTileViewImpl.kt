@@ -85,10 +85,10 @@ open class QSTileViewImpl @JvmOverloads constructor(
         }
 
     private val sysUiColorExtractor get() = Dependency.get(SysuiColorExtractor::class.java)
-    private val useDarkMode get() = sysUiColorExtractor.getNeutralColors().supportsDarkText()
+    private val useDarkMode get() = (getContext().getResources()
+        .getConfiguration().uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
 
-    private val colorActive = Utils.getColorAttrDefaultColor(context,
-            android.R.attr.colorAccent)
+    private val colorActive = Utils.getColorAttrDefaultColor(context, android.R.attr.colorAccent)
     private val colorInactive = Utils.getColorAttrDefaultColor(context, R.attr.offStateColor)
     private val colorUnavailable = Utils.applyAlpha(UNAVAILABLE_ALPHA, colorInactive)
 
@@ -101,7 +101,9 @@ open class QSTileViewImpl @JvmOverloads constructor(
     private val colorLabelUnavailable = Utils.applyAlpha(UNAVAILABLE_ALPHA, colorLabelInactive)
 
     private val colorSecondaryLabelActive =
-            Utils.getColorAttrDefaultColor(context, android.R.attr.textColorSecondary)
+            Utils.getColorAttrDefaultColor(context,
+                if (useDarkMode) android.R.attr.textColorSecondary
+                else android.R.attr.textColorSecondaryInverse)
     private val colorSecondaryLabelInactive =
             Utils.getColorAttrDefaultColor(context, android.R.attr.textColorSecondary)
     private val colorSecondaryLabelUnavailable =

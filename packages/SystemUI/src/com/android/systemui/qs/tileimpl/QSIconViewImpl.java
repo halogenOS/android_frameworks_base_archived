@@ -53,7 +53,6 @@ public class QSIconViewImpl extends QSIconView implements ConfigurationControlle
     private int mState = -1;
     private int mTint;
     private QSTile.Icon mLastIcon;
-    private boolean isDark;
 
     public QSIconViewImpl(Context context) {
         super(context);
@@ -256,7 +255,8 @@ public class QSIconViewImpl extends QSIconView implements ConfigurationControlle
      * Color to tint the tile icon based on state
      */
     public static int getIconColorForState(Context context, int state) {
-        final boolean useDarkText = Dependency.get(SysuiColorExtractor.class).getNeutralColors().supportsDarkText();
+        final boolean useDarkText = (context.getResources()
+            .getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
         switch (state) {
             case Tile.STATE_UNAVAILABLE:
                 return Utils.applyAlpha(QSTileViewImpl.UNAVAILABLE_ALPHA,
