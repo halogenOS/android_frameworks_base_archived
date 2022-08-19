@@ -6179,6 +6179,14 @@ public class Intent implements Parcelable, Cloneable {
     public static final String ACTION_SCREEN_CAMERA_GESTURE =
             "android.intent.action.SCREEN_CAMERA_GESTURE";
 
+    /**
+     * Broadcast action: notify system apps that the battery charge level has changed
+     * Requires {@link Manifest.permission#RECEIVE_BATTERY_CHARGE_UPDATES} permission.
+     * @hide
+     */
+    public static final String ACTION_BATTERY_CHARGE_CHANGED =
+            "custom.intent.action.BATTERY_CHARGE_CHANGED";
+
     // ---------------------------------------------------------------------
     // ---------------------------------------------------------------------
     // Intent flags (see mFlags variable).
