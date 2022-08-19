@@ -6694,6 +6694,14 @@ public class Intent implements Parcelable, Cloneable {
     public static final String EXTRA_IS_RESTORE =
             "android.intent.extra.IS_RESTORE";
 
+    /**
+     * Broadcast action: notify system apps that the battery charge level has changed
+     *
+     * @hide
+     */
+    public static final String ACTION_BATTERY_CHARGE_CHANGED =
+            "custom.intent.action.BATTERY_CHARGE_CHANGED";
+
     // ---------------------------------------------------------------------
     // ---------------------------------------------------------------------
     // Intent flags (see mFlags variable).

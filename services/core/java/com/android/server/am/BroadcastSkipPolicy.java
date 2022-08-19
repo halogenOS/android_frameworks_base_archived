@@ -339,7 +339,8 @@ public class BroadcastSkipPolicy {
      * Determine if the given {@link BroadcastRecord} is eligible to launch processes.
      */
     public boolean disallowBackgroundStart(@NonNull BroadcastRecord r) {
-        return ((r.intent.getFlags() & Intent.FLAG_RECEIVER_EXCLUDE_BACKGROUND) != 0)
+        return r.intent.getAction() != Intent.ACTION_BATTERY_CHARGE_CHANGED && 
+		((r.intent.getFlags() & Intent.FLAG_RECEIVER_EXCLUDE_BACKGROUND) != 0)
                 || (r.intent.getComponent() == null
                         && r.intent.getPackage() == null
                         && ((r.intent.getFlags()

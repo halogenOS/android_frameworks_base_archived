@@ -598,6 +598,9 @@ public final class BatteryService extends SystemService {
                         mHealthInfo.batteryLevel,
                         mHealthInfo.batteryVoltageMillivolts,
                         mHealthInfo.batteryTemperatureTenthsCelsius);
+
+                // Notify system apps about battery level change
+                sendBatteryChargeChangedIntentLocked();
             }
             if (mBatteryLevelCritical && !mLastBatteryLevelCritical &&
                     mPlugType == BATTERY_PLUGGED_NONE) {
@@ -717,6 +720,36 @@ public final class BatteryService extends SystemService {
             mLastBatteryCycleCount = mHealthInfo.batteryCycleCount;
             mLastCharingState = mHealthInfo.chargingState;
         }
+    }
+
+    // This one is only for system apps and does not require registering a receiver
+    private void sendBatteryChargeChangedIntentLocked() {
+        final Intent intent = new Intent(Intent.ACTION_BATTERY_CHARGE_CHANGED);
+
+        intent.putExtra(BatteryManager.EXTRA_STATUS, mHealthInfo.batteryStatus);
+        intent.putExtra(BatteryManager.EXTRA_HEALTH, mHealthInfo.batteryHealth);
+        intent.putExtra(BatteryManager.EXTRA_PRESENT, mHealthInfo.batteryPresent);
+        intent.putExtra(BatteryManager.EXTRA_LEVEL, mHealthInfo.batteryLevel);
+        intent.putExtra(BatteryManager.EXTRA_BATTERY_LOW, mSentLowBatteryBroadcast);
+        intent.putExtra(BatteryManager.EXTRA_SCALE, BATTERY_SCALE);
+        intent.putExtra(BatteryManager.EXTRA_PLUGGED, mPlugType);
+        intent.putExtra(BatteryManager.EXTRA_VOLTAGE, mHealthInfo.batteryVoltageMillivolts);
+        intent.putExtra(
+                BatteryManager.EXTRA_TEMPERATURE, mHealthInfo.batteryTemperatureTenthsCelsius);
+        intent.putExtra(BatteryManager.EXTRA_TECHNOLOGY, mHealthInfo.batteryTechnology);
+        intent.putExtra(BatteryManager.EXTRA_INVALID_CHARGER, mInvalidCharger);
+        intent.putExtra(
+                BatteryManager.EXTRA_MAX_CHARGING_CURRENT, mHealthInfo.maxChargingCurrentMicroamps);
+        intent.putExtra(
+                BatteryManager.EXTRA_MAX_CHARGING_VOLTAGE,
+                mHealthInfo.maxChargingVoltageMicrovolts);
+        intent.putExtra(BatteryManager.EXTRA_CHARGE_COUNTER, mHealthInfo.batteryChargeCounterUah);
+        if (DEBUG) {
+            Slog.d(TAG, "Sending ACTION_BATTERY_CHARGE_CHANGED. scale:" + BATTERY_SCALE
+                    + ", info:" + mHealthInfo.toString());
+        }
+
+        mHandler.post(() -> mContext.sendBroadcastAsUser(intent, UserHandle.ALL));
     }
 
     private void sendBatteryChangedIntentLocked() {
