@@ -52,6 +52,13 @@ public final class PixelPropsUtils {
         "FINGERPRINT", "google/marlin/marlin:10/QP1A.191005.007.A3/5972272:user/release-keys"
     );
 
+    private static final Map<String, String> walleyeProps = Map.of(
+        "DEVICE", "walleye",
+        "PRODUCT", "walleye",
+        "MODEL", "Pixel 2",
+        "FINGERPRINT", "google/walleye/walleye:8.1.0/OPM1.171019.011/4448085:user/release-keys"
+    );
+
     private static final Map<String, String> redfinProps = Map.of(
         "DEVICE", redfin_device,
         "PRODUCT", redfin_device,
@@ -115,10 +122,15 @@ public final class PixelPropsUtils {
         "com.samsung.android.waterplugin"
     };
 
+    private static final String[] walleyePackagesToChange = {
+        "com.android.vending",
+        "com.google.android.gms"
+    };
+
     private static final String[] redfinPackagesToChange = {
-            "com.google.android.tts",
-            "com.google.android.googlequicksearchbox",
-            "com.google.android.apps.recorder"
+        "com.google.android.tts",
+        "com.google.android.googlequicksearchbox",
+        "com.google.android.apps.recorder"
     };
 
     public static void setProps(String packageName) {
@@ -130,6 +142,9 @@ public final class PixelPropsUtils {
         } else if (Arrays.asList(redfinPackagesToChange).contains(packageName)) {
             commonProps.forEach(PixelPropsUtils::setPropValue);
             redfinProps.forEach(PixelPropsUtils::setPropValue);
+        } else if (Arrays.asList(walleyePackagesToChange).contains(packageName)) {
+            commonProps.forEach(PixelPropsUtils::setPropValue);
+            walleyeProps.forEach(PixelPropsUtils::setPropValue);
         } else if (packageName.startsWith("com.google.")
                 || Arrays.asList(extraPackagesToChange).contains(packageName)) {
             if (propsToKeep.containsKey(packageName)
