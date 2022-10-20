@@ -177,4 +177,8 @@
     <bool name="allow_clear_initial_attach_data_profile">false</bool>
     <java-symbol type="bool" name="allow_clear_initial_attach_data_profile" />
 
+    <!-- Whether "Virtual DSDA", i.e. in-call IMS connectivity can be provided on both subs with
+         only single logical modem, by using its data connection in addition to cellular IMS. -->
+    <bool name="config_enable_virtual_dsda">false</bool>
+    <java-symbol type="bool" name="config_enable_virtual_dsda" />
 </resources>
