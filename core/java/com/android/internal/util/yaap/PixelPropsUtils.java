@@ -20,11 +20,10 @@ import android.os.Build;
 import android.util.Log;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public final class PixelPropsUtils {
 
@@ -83,13 +82,13 @@ public final class PixelPropsUtils {
         "TYPE", "user"
     );
 
-    private static final Map<String, ArrayList<String>> propsToKeep;
+    private static final Map<String, Set<String>> propsToKeep;
 
     static {
         // null means skip the package
-        Map<String, ArrayList<String>> tMap = new HashMap<>();
+        Map<String, Set<String>> tMap = new HashMap<>();
         tMap.put("com.google.android.settings.intelligence",
-                new ArrayList<String>(Arrays.asList("FINGERPRINT")));
+                Set.of("FINGERPRINT"));
         tMap.put("com.google.android.GoogleCamera", null);
         tMap.put("com.google.android.GoogleCameraGood", null);
         tMap.put("com.google.android.GoogleCamera.Cameight", null);
@@ -106,13 +105,13 @@ public final class PixelPropsUtils {
         propsToKeep = Collections.unmodifiableMap(tMap);
     }
 
-    private static final String[] extraPackagesToChange = {
+    private static final Set<String> extraPackagesToChange = Set.of(
         "com.breel.wallpapers20",
         "com.google.android.gms.persistent",
         "com.google.android.as"
-    };
+    );
 
-    private static final String[] marlinPackagesToChange = {
+    private static final Set<String> marlinPackagesToChange = Set.of(
         "com.google.android.apps.photos",
         "com.samsung.accessory.berrymgr",
         "com.samsung.accessory.fridaymgr",
@@ -122,33 +121,33 @@ public final class PixelPropsUtils {
         "com.samsung.android.modenplugin",
         "com.samsung.android.neatplugin",
         "com.samsung.android.waterplugin"
-    };
+    );
 
-    private static final String[] walleyePackagesToChange = {
+    private static final Set<String> walleyePackagesToChange = Set.of(
         "com.android.vending",
         "com.google.android.gms"
-    };
+    );
 
-    private static final String[] redfinPackagesToChange = {
+    private static final Set<String> redfinPackagesToChange = Set.of(
         "com.google.android.tts",
         "com.google.android.googlequicksearchbox",
         "com.google.android.apps.recorder"
-    };
+    );
 
     public static void setProps(String packageName) {
         if (packageName == null) return;
         if (DEBUG) Log.d(TAG, "Package = " + packageName);
-        if (Arrays.asList(marlinPackagesToChange).contains(packageName)) {
+        if (marlinPackagesToChange.contains(packageName)) {
             commonProps.forEach(PixelPropsUtils::setPropValue);
             marlinProps.forEach(PixelPropsUtils::setPropValue);
-        } else if (Arrays.asList(redfinPackagesToChange).contains(packageName)) {
+        } else if (redfinPackagesToChange.contains(packageName)) {
             commonProps.forEach(PixelPropsUtils::setPropValue);
             redfinProps.forEach(PixelPropsUtils::setPropValue);
-        } else if (Arrays.asList(walleyePackagesToChange).contains(packageName)) {
+        } else if (walleyePackagesToChange.contains(packageName)) {
             commonProps.forEach(PixelPropsUtils::setPropValue);
             walleyeProps.forEach(PixelPropsUtils::setPropValue);
         } else if (packageName.startsWith("com.google.")
-                || Arrays.asList(extraPackagesToChange).contains(packageName)) {
+                || extraPackagesToChange.contains(packageName)) {
             if (propsToKeep.containsKey(packageName)
                     && propsToKeep.get(packageName) == null) {
                 if (DEBUG) Log.d(TAG, "Skipping all props for: " + packageName);
