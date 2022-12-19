@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 package com.android.internal.util.yaap;
+
+import android.app.Application;
 import android.content.res.Resources;
 import android.os.Build;
 import android.util.Log;
@@ -29,6 +31,9 @@ public final class PixelPropsUtils {
 
     private static final String TAG = "PixelPropsUtils";
     private static final boolean DEBUG = false;
+
+    public static final String PACKAGE_GMS = "com.google.android.gms";
+    public static final String PROCESS_GMS_UNSTABLE = PACKAGE_GMS + ".unstable";
 
     private static final String build_device =
             Resources.getSystem().getString(com.android.internal.R.string.build_device);
@@ -52,8 +57,6 @@ public final class PixelPropsUtils {
     );
 
     private static final Map<String, String> walleyeProps = Map.of(
-        "DEVICE", "walleye",
-        "PRODUCT", "walleye",
         "MODEL", "Pixel 2",
         "FINGERPRINT", "google/walleye/walleye:8.1.0/OPM1.171019.011/4448085:user/release-keys"
     );
@@ -106,9 +109,7 @@ public final class PixelPropsUtils {
     }
 
     private static final Set<String> extraPackagesToChange = Set.of(
-        "com.breel.wallpapers20",
-        "com.google.android.gms.persistent",
-        "com.google.android.as"
+        "com.breel.wallpapers20"
     );
 
     private static final Set<String> marlinPackagesToChange = Set.of(
@@ -121,11 +122,6 @@ public final class PixelPropsUtils {
         "com.samsung.android.modenplugin",
         "com.samsung.android.neatplugin",
         "com.samsung.android.waterplugin"
-    );
-
-    private static final Set<String> walleyePackagesToChange = Set.of(
-        "com.android.vending",
-        "com.google.android.gms"
     );
 
     private static final Set<String> redfinPackagesToChange = Set.of(
@@ -143,7 +139,9 @@ public final class PixelPropsUtils {
         } else if (redfinPackagesToChange.contains(packageName)) {
             commonProps.forEach(PixelPropsUtils::setPropValue);
             redfinProps.forEach(PixelPropsUtils::setPropValue);
-        } else if (walleyePackagesToChange.contains(packageName)) {
+        } else if (packageName.equals(PACKAGE_GMS) 
+                && PROCESS_GMS_UNSTABLE.equals(Application.getProcessName())) {
+            // GMS specific spoofing
             commonProps.forEach(PixelPropsUtils::setPropValue);
             walleyeProps.forEach(PixelPropsUtils::setPropValue);
         } else if (packageName.startsWith("com.google.")
