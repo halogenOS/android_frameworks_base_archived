@@ -139,9 +139,10 @@ public final class PixelPropsUtils {
         } else if (redfinPackagesToChange.contains(packageName)) {
             commonProps.forEach(PixelPropsUtils::setPropValue);
             redfinProps.forEach(PixelPropsUtils::setPropValue);
-        } else if (packageName.equals(PACKAGE_GMS) 
-                && PROCESS_GMS_UNSTABLE.equals(Application.getProcessName())) {
+        } else if (packageName.equals(PACKAGE_GMS)) {
             // GMS specific spoofing
+            if (!PROCESS_GMS_UNSTABLE.equals(Application.getProcessName()))
+                return;
             commonProps.forEach(PixelPropsUtils::setPropValue);
             walleyeProps.forEach(PixelPropsUtils::setPropValue);
         } else if (packageName.startsWith("com.google.")
