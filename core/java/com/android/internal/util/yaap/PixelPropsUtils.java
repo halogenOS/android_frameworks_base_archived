@@ -32,8 +32,9 @@ public final class PixelPropsUtils {
     private static final String TAG = "PixelPropsUtils";
     private static final boolean DEBUG = false;
 
-    public static final String PACKAGE_GMS = "com.google.android.gms";
-    public static final String PROCESS_GMS_UNSTABLE = PACKAGE_GMS + ".unstable";
+    private static final String PACKAGE_GMS = "com.google.android.gms";
+    private static final String PROCESS_GMS_UNSTABLE = PACKAGE_GMS + ".unstable";
+    private static final String PROCESS_GMS_PERSISTENT = PACKAGE_GMS + ".persistent";
 
     private static final String build_device =
             Resources.getSystem().getString(com.android.internal.R.string.build_device);
@@ -140,8 +141,10 @@ public final class PixelPropsUtils {
             commonProps.forEach(PixelPropsUtils::setPropValue);
             redfinProps.forEach(PixelPropsUtils::setPropValue);
         } else if (packageName.equals(PACKAGE_GMS)) {
+            final String procName = Application.getProcessName();
             // GMS specific spoofing
-            if (!PROCESS_GMS_UNSTABLE.equals(Application.getProcessName()))
+            if (!PROCESS_GMS_UNSTABLE.equals(procName) &&
+                !PROCESS_GMS_PERSISTENT.equals(procName))
                 return;
             commonProps.forEach(PixelPropsUtils::setPropValue);
             walleyeProps.forEach(PixelPropsUtils::setPropValue);
