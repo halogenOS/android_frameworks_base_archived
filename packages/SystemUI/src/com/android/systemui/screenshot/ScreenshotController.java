@@ -295,6 +295,10 @@ public class ScreenshotController {
     private final TaskStackChangeListener mTaskListener = new TaskStackChangeListener() {
         @Override
         public void onTaskStackChanged() {
+            // Check if mBgExecutor can be used to avoid rejection of the task
+            if (mBgExecutor.isShutdown()) {
+                return;
+            }
             mBgExecutor.execute(() -> updateForegroundTaskSync());
         }
     };
