@@ -58,8 +58,12 @@ public final class PixelPropsUtils {
     );
 
     private static final Map<String, String> walleyeProps = Map.of(
+        "ID", "OPM1.171019.011",
         "MODEL", "Pixel 2",
-        "FINGERPRINT", "google/walleye/walleye:8.1.0/OPM1.171019.011/4448085:user/release-keys"
+        "PRODUCT", "walleye",
+        "DEVICE", "walleye",
+        "FINGERPRINT", "google/walleye/walleye:8.1.0/OPM1.171019.011/4448085:user/release-keys",
+        "SECURITY_PATCH", "2017-12-05"
     );
 
     private static final Map<String, String> redfinProps = Map.of(
@@ -83,7 +87,8 @@ public final class PixelPropsUtils {
         "IS_ENG", false,
         "IS_USERDEBUG", false,
         "IS_USER", true,
-        "TYPE", "user"
+        "TYPE", "user",
+        "TAGS", "release-keys"
     );
 
     private static final Map<String, Set<String>> propsToKeep;
