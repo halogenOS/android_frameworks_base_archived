@@ -21,6 +21,8 @@ import android.content.res.Resources;
 import android.os.Build;
 import android.util.Log;
 
+import com.android.internal.R;
+
 import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.HashMap;
@@ -30,31 +32,34 @@ import java.util.Set;
 public final class PixelPropsUtils {
 
     private static final String TAG = "PixelPropsUtils";
-    private static final boolean DEBUG = false;
 
+    private static final String PACKAGE_FINSKY = "com.android.vending";
+    private static final String PACKAGE_SI = "com.google.android.settings.intelligence";
     private static final String PACKAGE_GMS = "com.google.android.gms";
     private static final String PROCESS_GMS_UNSTABLE = PACKAGE_GMS + ".unstable";
     private static final String PROCESS_GMS_PERSISTENT = PACKAGE_GMS + ".persistent";
 
     private static final String build_device =
-            Resources.getSystem().getString(com.android.internal.R.string.build_device);
+            Resources.getSystem().getString(R.string.build_device);
     private static final String build_fp =
-            Resources.getSystem().getString(com.android.internal.R.string.build_fp);
+            Resources.getSystem().getString(R.string.build_fp);
     private static final String build_model =
-            Resources.getSystem().getString(com.android.internal.R.string.build_model);
+            Resources.getSystem().getString(R.string.build_model);
 
-    private static final String redfin_device =
-            Resources.getSystem().getString(com.android.internal.R.string.redfin_device);
-    private static final String redfin_fp =
-            Resources.getSystem().getString(com.android.internal.R.string.redfin_fp);
-    private static final String redfin_model =
-            Resources.getSystem().getString(com.android.internal.R.string.redfin_model);
+    private static final String persist_device =
+            Resources.getSystem().getString(R.string.persist_device);
+    private static final String persist_fp =
+            Resources.getSystem().getString(R.string.persist_fp);
+    private static final String persist_model =
+            Resources.getSystem().getString(R.string.persist_model);
 
     private static final Map<String, String> marlinProps = Map.of(
+        "ID", "QP1A.191005.007.A3",
         "DEVICE", "marlin",
         "PRODUCT", "marlin",
         "MODEL", "Pixel XL",
-        "FINGERPRINT", "google/marlin/marlin:10/QP1A.191005.007.A3/5972272:user/release-keys"
+        "FINGERPRINT", "google/marlin/marlin:10/QP1A.191005.007.A3/5972272:user/release-keys",
+        "SECURITY_PATCH", "2019-12-05"
     );
 
     private static final Map<String, String> walleyeProps = Map.of(
@@ -66,23 +71,25 @@ public final class PixelPropsUtils {
         "SECURITY_PATCH", "2017-12-05"
     );
 
-    private static final Map<String, String> ravenProps = Map.of(
-        "ID", "TQ1A.230205.002",
-        "MODEL", "Pixel 6 Pro",
-        "PRODUCT", "raven",
-        "DEVICE", "raven",
-        "FINGERPRINT", "google/raven/raven:13/TQ1A.230205.002/9471150:user/release-keys",
-        "SECURITY_PATCH", "2023-02-05"
+    private static final Map<String, String> redfinProps = Map.of(
+        "ID", "SQ1A.220105.002",
+        "DEVICE", "redfin",
+        "PRODUCT", "redfin",
+        "MODEL", "Pixel 5",
+        "FINGERPRINT", "google/redfin/redfin:12/SQ1A.220105.002/7961164:user/release-keys",
+        "SECURITY_PATCH", "2022-01-05"
     );
 
-    private static final Map<String, String> redfinProps = Map.of(
-        "DEVICE", redfin_device,
-        "PRODUCT", redfin_device,
-        "MODEL", redfin_model,
-        "FINGERPRINT", redfin_fp
+    private static final Map<String, String> persistProps = Map.of(
+        "ID", persist_fp.split("/", 5)[3],
+        "MODEL", persist_model,
+        "PRODUCT", persist_device,
+        "DEVICE", persist_device,
+        "FINGERPRINT", persist_fp
     );
 
     private static final Map<String, String> buildProps = Map.of(
+        "ID", build_fp.split("/", 5)[3],
         "DEVICE", build_device,
         "PRODUCT", build_device,
         "MODEL", build_model,
@@ -147,7 +154,8 @@ public final class PixelPropsUtils {
 
     public static void setProps(String packageName) {
         if (packageName == null) return;
-        if (DEBUG) Log.d(TAG, "Package = " + packageName);
+        if (isLoggable()) Log.d(TAG, "Package = " + packageName);
+        sIsFinsky = packageName.equals(PACKAGE_FINSKY);
         if (marlinPackagesToChange.contains(packageName)) {
             commonProps.forEach(PixelPropsUtils::setPropValue);
             marlinProps.forEach(PixelPropsUtils::setPropValue);
@@ -166,34 +174,34 @@ public final class PixelPropsUtils {
                 return;
             }
             // persistent
-            ravenProps.forEach(PixelPropsUtils::setPropValue);
+            persistProps.forEach(PixelPropsUtils::setPropValue);
         } else if (packageName.startsWith("com.google.")
                 || extraPackagesToChange.contains(packageName)) {
             if (propsToKeep.containsKey(packageName)
                     && propsToKeep.get(packageName) == null) {
-                if (DEBUG) Log.d(TAG, "Skipping all props for: " + packageName);
+                if (isLoggable()) Log.d(TAG, "Skipping all props for: " + packageName);
                 return;
             }
             commonProps.forEach(PixelPropsUtils::setPropValue);
             buildProps.forEach((key, value) -> {
                 if (propsToKeep.containsKey(packageName)
                         && propsToKeep.get(packageName).contains(key)) {
-                    if (DEBUG) Log.d(TAG, "Not defining " + key + " prop for: " + packageName);
+                    if (isLoggable()) Log.d(TAG, "Not defining " + key + " prop for: " + packageName);
                     return;
                 }
-                if (DEBUG) Log.d(TAG, "Defining " + key + " prop for: " + packageName);
+                if (isLoggable()) Log.d(TAG, "Defining " + key + " prop for: " + packageName);
                 setPropValue(key, value);
             });
         }
         // Set proper indexing fingerprint
-        if (packageName.equals("com.google.android.settings.intelligence")) {
+        if (packageName.equals(PACKAGE_SI)) {
             setPropValue("FINGERPRINT", Build.VERSION.INCREMENTAL);
         }
     }
 
     private static void setPropValue(String key, Object value) {
         try {
-            if (DEBUG) Log.d(TAG, "Setting prop " + key + " to " + value);
+            if (isLoggable()) Log.d(TAG, "Setting prop " + key + " to " + value);
             final Field field = Build.class.getDeclaredField(key);
             field.setAccessible(true);
             field.set(null, value);
@@ -201,5 +209,13 @@ public final class PixelPropsUtils {
         } catch (NoSuchFieldException | IllegalAccessException e) {
             Log.e(TAG, "Failed to set prop " + key, e);
         }
+    }
+
+    public static boolean getIsFinsky() {
+        return sIsFinsky;
+    }
+
+    private static boolean isLoggable() {
+        return Log.isLoggable(TAG, Log.DEBUG);
     }
 }

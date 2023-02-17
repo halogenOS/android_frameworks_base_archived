@@ -18,23 +18,10 @@
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <!-- Strings for PixelPropUtils -->
-    <string name="build_device">raven</string>
-    <string name="build_fp">google/raven/raven:12/SQ1D.211205.016.A1/7957957:user/release-keys</string>
-    <string name="build_model">Pixel 6 Pro</string>
-    <string name="redfin_device">redfin</string>
-    <string name="redfin_fp">google/redfin/redfin:12/SQ1A.220105.002/7961164:user/release-keys</string>
-    <string name="redfin_model">Pixel 5</string>
-    <string name="marlin_build_device">marlin</string>
-    <string name="marlin_build_fp">google/marlin/marlin:10/QP1A.191005.007.A3/5972272:user/release-keys</string>
-    <string name="marlin_build_model">Pixel XL</string>
-    <string name="marlin_package_1">com.google.android.apps.photos</string>
-    <string name="marlin_package_2">com.samsung.accessory.berrymgr</string>
-    <string name="marlin_package_3">com.samsung.accessory.fridaymgr</string>
-    <string name="marlin_package_4">com.samsung.accessory.neobeanmgr</string>
-    <string name="marlin_package_5">com.samsung.android.app.watchmanager</string>
-    <string name="marlin_package_6">com.samsung.android.geargplugin</string>
-    <string name="marlin_package_7">com.samsung.android.gearnplugin</string>
-    <string name="marlin_package_8">com.samsung.android.modenplugin</string>
-    <string name="marlin_package_9">com.samsung.android.neatplugin</string>
-    <string name="marlin_package_10">com.samsung.android.waterplugin</string>
+    <string name="build_device"></string>
+    <string name="build_fp"></string>
+    <string name="build_model"></string>
+    <string name="persist_device"></string>
+    <string name="persist_fp"></string>
+    <string name="persist_model"></string>
 </resources>

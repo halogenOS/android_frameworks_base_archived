@@ -23,8 +23,8 @@
     <java-symbol type="string" name="build_device" />
     <java-symbol type="string" name="build_fp" />
     <java-symbol type="string" name="build_model" />
-    <java-symbol type="string" name="redfin_device" />
-    <java-symbol type="string" name="redfin_fp" />
-    <java-symbol type="string" name="redfin_model" />
+    <java-symbol type="string" name="persist_device" />
+    <java-symbol type="string" name="persist_fp" />
+    <java-symbol type="string" name="persist_model" />
 
 </resources>
