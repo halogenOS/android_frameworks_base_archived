@@ -152,6 +152,13 @@ public final class PixelPropsUtils {
         "com.google.android.apps.recorder"
     );
 
+    private static final Set<String> extraGMSProcToChange = Set.of(
+        "com.google.android.gms.ui",
+        "com.google.android.gms.learning"
+    );
+
+    private static volatile boolean sIsFinsky = false;
+
     public static void setProps(String packageName) {
         if (packageName == null) return;
         if (isLoggable()) Log.d(TAG, "Package = " + packageName);
@@ -166,11 +173,17 @@ public final class PixelPropsUtils {
             final String procName = Application.getProcessName();
             final boolean isUnstable = PROCESS_GMS_UNSTABLE.equals(procName);
             final boolean isPersistent = !isUnstable && PROCESS_GMS_PERSISTENT.equals(procName);
+            final boolean isExtra = !isUnstable && !isPersistent
+                    && extraGMSProcToChange.contains(procName);
             // GMS specific spoofing
-            if (!isUnstable && !isPersistent) return;
+            if (!isUnstable && !isPersistent && !isExtra) return;
             commonProps.forEach(PixelPropsUtils::setPropValue);
             if (isUnstable) {
                 walleyeProps.forEach(PixelPropsUtils::setPropValue);
+                return;
+            }
+            if (isExtra) {
+                buildProps.forEach(PixelPropsUtils::setPropValue);
                 return;
             }
             // persistent
