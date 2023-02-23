@@ -53,15 +53,6 @@ public final class PixelPropsUtils {
     private static final String persist_model =
             Resources.getSystem().getString(R.string.persist_model);
 
-    private static final Map<String, String> marlinProps = Map.of(
-        "ID", "QP1A.191005.007.A3",
-        "DEVICE", "marlin",
-        "PRODUCT", "marlin",
-        "MODEL", "Pixel XL",
-        "FINGERPRINT", "google/marlin/marlin:10/QP1A.191005.007.A3/5972272:user/release-keys",
-        "SECURITY_PATCH", "2019-12-05"
-    );
-
     private static final Map<String, String> walleyeProps = Map.of(
         "ID", "OPM1.171019.011",
         "MODEL", "Pixel 2",
@@ -134,22 +125,11 @@ public final class PixelPropsUtils {
         "com.breel.wallpapers20"
     );
 
-    private static final Set<String> marlinPackagesToChange = Set.of(
-        "com.google.android.apps.photos",
-        "com.samsung.accessory.berrymgr",
-        "com.samsung.accessory.fridaymgr",
-        "com.samsung.accessory.neobeanmg",
-        "com.samsung.android.app.watchma",
-        "com.samsung.android.gearnplugin",
-        "com.samsung.android.modenplugin",
-        "com.samsung.android.neatplugin",
-        "com.samsung.android.waterplugin"
-    );
-
     private static final Set<String> redfinPackagesToChange = Set.of(
         "com.google.android.tts",
         "com.google.android.googlequicksearchbox",
-        "com.google.android.apps.recorder"
+        "com.google.android.apps.recorder",
+        "com.google.android.apps.photos"
     );
 
     private static final Set<String> extraGMSProcToChange = Set.of(
@@ -163,10 +143,7 @@ public final class PixelPropsUtils {
         if (packageName == null) return;
         if (isLoggable()) Log.d(TAG, "Package = " + packageName);
         sIsFinsky = packageName.equals(PACKAGE_FINSKY);
-        if (marlinPackagesToChange.contains(packageName)) {
-            commonProps.forEach(PixelPropsUtils::setPropValue);
-            marlinProps.forEach(PixelPropsUtils::setPropValue);
-        } else if (redfinPackagesToChange.contains(packageName)) {
+        if (redfinPackagesToChange.contains(packageName)) {
             commonProps.forEach(PixelPropsUtils::setPropValue);
             redfinProps.forEach(PixelPropsUtils::setPropValue);
         } else if (packageName.equals(PACKAGE_GMS)) {
