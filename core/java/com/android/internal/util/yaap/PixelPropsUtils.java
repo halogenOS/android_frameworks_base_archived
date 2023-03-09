@@ -24,8 +24,8 @@ import android.util.Log;
 import com.android.internal.R;
 
 import java.lang.reflect.Field;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -53,41 +53,41 @@ public final class PixelPropsUtils {
     private static final String persist_model =
             Resources.getSystem().getString(R.string.persist_model);
 
-    private static final Map<String, String> walleyeProps = Map.of(
+    private static final HashMap<String, String> walleyeProps = new HashMap<>(Map.of(
         "ID", "OPM1.171019.011",
         "MODEL", "Pixel 2",
         "PRODUCT", "walleye",
         "DEVICE", "walleye",
         "FINGERPRINT", "google/walleye/walleye:8.1.0/OPM1.171019.011/4448085:user/release-keys",
         "SECURITY_PATCH", "2017-12-05"
-    );
+    ));
 
-    private static final Map<String, String> redfinProps = Map.of(
+    private static final HashMap<String, String> redfinProps = new HashMap<>(Map.of(
         "ID", "SQ1A.220105.002",
         "DEVICE", "redfin",
         "PRODUCT", "redfin",
         "MODEL", "Pixel 5",
         "FINGERPRINT", "google/redfin/redfin:12/SQ1A.220105.002/7961164:user/release-keys",
         "SECURITY_PATCH", "2022-01-05"
-    );
+    ));
 
-    private static final Map<String, String> persistProps = Map.of(
+    private static final HashMap<String, String> persistProps = new HashMap<>(Map.of(
         "ID", persist_fp.split("/", 5)[3],
         "MODEL", persist_model,
         "PRODUCT", persist_device,
         "DEVICE", persist_device,
         "FINGERPRINT", persist_fp
-    );
+    ));
 
-    private static final Map<String, String> buildProps = Map.of(
+    private static final HashMap<String, String> buildProps = new HashMap<>(Map.of(
         "ID", build_fp.split("/", 5)[3],
         "DEVICE", build_device,
         "PRODUCT", build_device,
         "MODEL", build_model,
         "FINGERPRINT", build_fp
-    );
+    ));
 
-    private static final Map<String, Object> commonProps = Map.of(
+    private static final HashMap<String, Object> commonProps = new HashMap<>(Map.of(
         "BRAND", "google",
         "MANUFACTURER", "Google",
         "IS_DEBUGGABLE", false,
@@ -96,15 +96,14 @@ public final class PixelPropsUtils {
         "IS_USER", true,
         "TYPE", "user",
         "TAGS", "release-keys"
-    );
+    ));
 
-    private static final Map<String, Set<String>> propsToKeep;
-
+    private static final HashMap<String, HashMap<String, String>> propsToKeep;
     static {
         // null means skip the package
-        Map<String, Set<String>> tMap = new HashMap<>();
-        tMap.put("com.google.android.settings.intelligence",
-                Set.of("FINGERPRINT"));
+        Map<String, HashMap<String, String>> tMap = new HashMap<>();
+        tMap.put("com.google.android.settings.intelligence", // Set proper indexing fingerprint
+                new HashMap<>(Map.of("FINGERPRINT", Build.VERSION.INCREMENTAL)));
         tMap.put("com.google.android.GoogleCamera", null);
         tMap.put("com.google.android.GoogleCameraGood", null);
         tMap.put("com.google.android.GoogleCamera.Cameight", null);
@@ -118,24 +117,23 @@ public final class PixelPropsUtils {
         tMap.put("com.google.android.UltraCVM", null);
         tMap.put("com.google.android.apps.cameralite", null);
         tMap.put("com.google.ar.core", null);
-        propsToKeep = Collections.unmodifiableMap(tMap);
+        tMap.put("com.google.android.tts", null);
+        propsToKeep = new HashMap<>(tMap);
     }
 
-    private static final Set<String> extraPackagesToChange = Set.of(
+    private static final HashSet<String> extraPackagesToChange = new HashSet<>(Set.of(
         "com.breel.wallpapers20"
-    );
+    ));
 
-    private static final Set<String> redfinPackagesToChange = Set.of(
-        "com.google.android.tts",
+    private static final HashSet<String> redfinPackagesToChange = new HashSet<>(Set.of(
         "com.google.android.googlequicksearchbox",
-        "com.google.android.apps.recorder",
-        "com.google.android.apps.photos"
-    );
+        "com.google.android.apps.recorder"
+    ));
 
-    private static final Set<String> extraGMSProcToChange = Set.of(
+    private static final HashSet<String> extraGMSProcToChange = new HashSet<>(Set.of(
         "com.google.android.gms.ui",
         "com.google.android.gms.learning"
-    );
+    ));
 
     private static volatile boolean sIsFinsky = false;
 
@@ -167,25 +165,27 @@ public final class PixelPropsUtils {
             persistProps.forEach(PixelPropsUtils::setPropValue);
         } else if (packageName.startsWith("com.google.")
                 || extraPackagesToChange.contains(packageName)) {
-            if (propsToKeep.containsKey(packageName)
-                    && propsToKeep.get(packageName) == null) {
+            final boolean isInKeep = propsToKeep.containsKey(packageName);
+            final HashMap<String, String> keepMap = isInKeep ? propsToKeep.get(packageName) : null;
+            if (isInKeep && keepMap == null) {
                 if (isLoggable()) Log.d(TAG, "Skipping all props for: " + packageName);
                 return;
             }
             commonProps.forEach(PixelPropsUtils::setPropValue);
             buildProps.forEach((key, value) -> {
-                if (propsToKeep.containsKey(packageName)
-                        && propsToKeep.get(packageName).contains(key)) {
-                    if (isLoggable()) Log.d(TAG, "Not defining " + key + " prop for: " + packageName);
-                    return;
+                if (isInKeep && keepMap.containsKey(key)) {
+                    final String keyValue = keepMap.get(key);
+                    if (keyValue == null) {
+                        if (isLoggable())
+                            Log.d(TAG, "Not defining " + key + " prop for: " + packageName);
+                        return;
+                    } else {
+                        key = keyValue;
+                    }
                 }
                 if (isLoggable()) Log.d(TAG, "Defining " + key + " prop for: " + packageName);
                 setPropValue(key, value);
             });
-        }
-        // Set proper indexing fingerprint
-        if (packageName.equals(PACKAGE_SI)) {
-            setPropValue("FINGERPRINT", Build.VERSION.INCREMENTAL);
         }
     }
 
