@@ -58,9 +58,7 @@ public final class PixelPropsUtils {
         "MODEL", "Pixel 2",
         "PRODUCT", "walleye",
         "DEVICE", "walleye",
-        "FINGERPRINT", "google/walleye/walleye:8.1.0/OPM1.171019.011/4448085:user/release-keys",
-        "SECURITY_PATCH", "2017-12-05"
-    ));
+        "FINGERPRINT", "google/walleye/walleye:8.1.0/OPM1.171019.011/4448085:user/release-keys"
     ));
 
     private static final HashMap<String, String> persistProps = new HashMap<>(Map.of(
@@ -79,16 +77,24 @@ public final class PixelPropsUtils {
         "FINGERPRINT", build_fp
     ));
 
-    private static final HashMap<String, Object> commonProps = new HashMap<>(Map.of(
-        "BRAND", "google",
-        "MANUFACTURER", "Google",
-        "IS_DEBUGGABLE", false,
-        "IS_ENG", false,
-        "IS_USERDEBUG", false,
-        "IS_USER", true,
-        "TYPE", "user",
-        "TAGS", "release-keys"
-    ));
+    private static final HashMap<String, Object> commonProps;
+    static {
+        Map<String, Object> tMap = new HashMap<>();
+        tMap.put("BRAND", "google");
+        tMap.put("MANUFACTURER", "Google");
+        // conditionally spoofing if different
+        if (Build.IS_DEBUGGABLE)
+            tMap.put("IS_DEBUGGABLE", false);
+        if (Build.IS_ENG)
+            tMap.put("IS_ENG", false);
+        if (!Build.IS_USER)
+            tMap.put("IS_USER", true);
+        if (!Build.TYPE.equals("user"))
+            tMap.put("TYPE", "user");
+        if (!Build.TAGS.equals("release-keys"))
+            tMap.put("TAGS", "release-keys");
+        commonProps = new HashMap<>(tMap);
+    }
 
     private static final HashMap<String, HashMap<String, String>> propsToKeep;
     static {
@@ -163,9 +169,8 @@ public final class PixelPropsUtils {
                         if (isLoggable())
                             Log.d(TAG, "Not defining " + key + " prop for: " + packageName);
                         return;
-                    } else {
-                        key = keyValue;
                     }
+                    value = keyValue;
                 }
                 if (isLoggable()) Log.d(TAG, "Defining " + key + " prop for: " + packageName);
                 setPropValue(key, value);
