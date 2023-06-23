@@ -39,6 +39,7 @@ import com.android.systemui.biometrics.dagger.UdfpsModule;
 import com.android.systemui.classifier.FalsingModule;
 import com.android.systemui.clipboardoverlay.dagger.ClipboardOverlayModule;
 import com.android.systemui.controls.dagger.ControlsModule;
+import com.android.systemui.custom.CustomModule;
 import com.android.systemui.dagger.qualifiers.Main;
 import com.android.systemui.demomode.dagger.DemoModeModule;
 import com.android.systemui.doze.dagger.DozeComponent;
@@ -148,6 +149,7 @@ import dagger.Provides;
             CoroutinesModule.class,
             DreamModule.class,
             ControlsModule.class,
+            CustomModule.class,
             DemoModeModule.class,
             FalsingModule.class,
             FlagsModule.class,
