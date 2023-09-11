@@ -185,7 +185,7 @@ class SaveImageInBackgroundTask extends AsyncTask<Void, Void, Void> {
                     smartActionsEnabled);
             mImageData.deleteAction = createDeleteAction(mContext, mContext.getResources(), uri,
                     smartActionsEnabled);
-            mImageData.quickShareAction = createQuickShareAction(mContext,
+            mImageData.quickShareAction = createQuickShareAction(
                     mQuickShareData.quickShareAction, mScreenshotId, uri, mImageTime, image,
                     user);
             mImageData.subject = getSubjectString();
@@ -497,7 +497,8 @@ class SaveImageInBackgroundTask extends AsyncTask<Void, Void, Void> {
             String screenshotId, Bitmap image, UserHandle user, Uri uri) {
         CompletableFuture<List<Notification.Action>> quickShareActionsFuture =
                 mScreenshotSmartActions.getSmartActionsFuture(
-                        screenshotId, uri, image, mSmartActionsProvider, QUICK_SHARE_ACTION,
+                        screenshotId, uri, image, mSmartActionsProvider,
+			ScreenshotSmartActionType.QUICK_SHARE_ACTION,
                         true /* smartActionsEnabled */, user);
         int timeoutMs = DeviceConfig.getInt(
                 DeviceConfig.NAMESPACE_SYSTEMUI,
