@@ -276,6 +276,8 @@ public class VolumeDialogImpl implements VolumeDialog, Dumpable,
     private ViewStub mODICaptionsTooltipViewStub;
     private View mODICaptionsTooltipView = null;
 
+    private boolean mVolumePanelOnLeftSide;
+
     private final boolean mUseBackgroundBlur;
     private Consumer<Boolean> mCrossWindowBlurEnabledListener;
     private BackgroundBlurDrawable mDialogRowsViewBackground;
@@ -349,6 +351,8 @@ public class VolumeDialogImpl implements VolumeDialog, Dumpable,
                 mDialogRowsView.invalidate();
             };
         }
+
+        mVolumePanelOnLeftSide = mContext.getResources().getBoolean(R.bool.config_audioPanelOnLeftSide);
 
         initDimens();
 
@@ -440,7 +444,7 @@ public class VolumeDialogImpl implements VolumeDialog, Dumpable,
         final int[] locInWindow = new int[2];
         view.getLocationInWindow(locInWindow);
 
-        float x = locInWindow[0];
+        float x = mVolumePanelOnLeftSide ? 0f : locInWindow[0];
         float y = locInWindow[1];
 
         // The ringer and rows container has extra height at the top to fit the expanded ringer
