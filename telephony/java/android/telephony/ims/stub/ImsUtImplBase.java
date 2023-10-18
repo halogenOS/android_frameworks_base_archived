@@ -19,6 +19,7 @@ package android.telephony.ims.stub;
 import android.annotation.IntDef;
 import android.annotation.NonNull;
 import android.annotation.Nullable;
+import android.annotation.SuppressLint;
 import android.annotation.SystemApi;
 import android.os.Bundle;
 import android.os.RemoteException;
@@ -147,6 +148,13 @@ public class ImsUtImplBase {
         public int queryCallForward(int condition, String number) throws RemoteException {
             return executeMethodAsyncForResult(() -> ImsUtImplBase.this.queryCallForward(
                     condition, number), "queryCallForward");
+        }
+
+        @Override
+        public int queryCFForServiceClass(int condition, String number, int serviceClass) throws
+                RemoteException {
+             return executeMethodAsyncForResult(() -> ImsUtImplBase.this.queryCFForServiceClass(
+                    condition, number, serviceClass), "queryCFForServiceClass");
         }
 
         @Override
@@ -331,6 +339,15 @@ public class ImsUtImplBase {
      * Retrieves the configuration of the call forward.
      */
     public int queryCallForward(int condition, String number) {
+        return -1;
+    }
+
+    /**
+     * Retrieves the configuration of the call forward for specified service class.
+     */
+    @SuppressLint("AcronymName")
+    public int queryCFForServiceClass(int condition, @Nullable String number,
+            int serviceClass) {
         return -1;
     }
 

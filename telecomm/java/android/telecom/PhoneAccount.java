@@ -448,6 +448,16 @@ public final class PhoneAccount implements Parcelable {
     /* NEXT CAPABILITY: [0x100000, 0x200000, 0x400000] */
 
     /**
+     * Flag indicating that this {@link PhoneAccount} is capable of downgrading a call to voice
+     * from an RTT (Real-time text) session.
+     * When set, Dialer can check for this capability to display the downgrade to voice option
+     * in an RTT call, this capability is set from Telephony based on the carrier config support.
+     * To avoid conflict with AOSP changes, setting it to a large value.
+     * @hide
+     */
+    public static final int CAPABILITY_DOWNGRADE_RTT = 0x40000000;
+
+    /**
      * URI scheme for telephone number URIs.
      */
     public static final String SCHEME_TEL = "tel";

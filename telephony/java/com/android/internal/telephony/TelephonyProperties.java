@@ -241,4 +241,10 @@ public interface TelephonyProperties
      * Type: int
      */
     static final String PROPERTY_MAX_ACTIVE_MODEMS = "telephony.active_modems.max_count";
+
+    /**
+     * Property to store multi sim voice capability configuration.
+     * Type: int posssible values are @link TelephonyManager#MultiSimVoiceCapability.
+     */
+    static final String PROPERTY_MULTISIM_VOICE_CAPABILITY = "ril.multisim.voice_capability";
 }

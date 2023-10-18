@@ -2553,7 +2553,8 @@ public abstract class ConnectionService extends Service {
         findConnectionForAction(callId, "abort").onAbort();
     }
 
-    private void answerVideo(String callId, int videoState) {
+    /** {@hide} */
+    protected void answerVideo(String callId, int videoState) {
         Log.i(this, "answerVideo %s", callId);
         if (mConnectionById.containsKey(callId)) {
             findConnectionForAction(callId, "answer").onAnswer(videoState);
@@ -2562,7 +2563,8 @@ public abstract class ConnectionService extends Service {
         }
     }
 
-    private void answer(String callId) {
+    /** {@hide} */
+    protected void answer(String callId) {
         Log.i(this, "answer %s", callId);
         if (mConnectionById.containsKey(callId)) {
             findConnectionForAction(callId, "answer").onAnswer();
@@ -2621,7 +2623,8 @@ public abstract class ConnectionService extends Service {
         }
     }
 
-    private void hold(String callId) {
+    /** {@hide} */
+    protected void hold(String callId) {
         Log.i(this, "hold %s", callId);
         if (mConnectionById.containsKey(callId)) {
             findConnectionForAction(callId, "hold").onHold();
@@ -2630,7 +2633,8 @@ public abstract class ConnectionService extends Service {
         }
     }
 
-    private void unhold(String callId) {
+    /** {@hide} */
+    protected void unhold(String callId) {
         Log.i(this, "unhold %s", callId);
         if (mConnectionById.containsKey(callId)) {
             findConnectionForAction(callId, "unhold").onUnhold();
@@ -3733,7 +3737,8 @@ public abstract class ConnectionService extends Service {
         }
     }
 
-    private Connection findConnectionForAction(String callId, String action) {
+    /** {@hide} */
+    protected Connection findConnectionForAction(String callId, String action) {
         if (callId != null && mConnectionById.containsKey(callId)) {
             return mConnectionById.get(callId);
         }
@@ -3748,7 +3753,8 @@ public abstract class ConnectionService extends Service {
         return sNullConnection;
     }
 
-    private Conference findConferenceForAction(String conferenceId, String action) {
+    /** {@hide} */
+    protected Conference findConferenceForAction(String conferenceId, String action) {
         if (mConferenceById.containsKey(conferenceId)) {
             return mConferenceById.get(conferenceId);
         }
@@ -3794,7 +3800,8 @@ public abstract class ConnectionService extends Service {
         return ids;
     }
 
-    private Conference getNullConference() {
+    /** {@hide} */
+    protected Conference getNullConference() {
         if (sNullConference == null) {
             sNullConference = new Conference(null) {};
         }

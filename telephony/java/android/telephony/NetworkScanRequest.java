@@ -14,6 +14,13 @@
  * limitations under the License.
  */
 
+/*
+ * Changes from Qualcomm Innovation Center are provided under the following license:
+ *
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause-Clear
+ */
+
 package android.telephony;
 
 import android.annotation.IntDef;
@@ -74,6 +81,26 @@ public final class NetworkScanRequest implements Parcelable {
      */
     public static final int SCAN_TYPE_PERIODIC = 1;
 
+    /** Invalid access mode */
+    /** @hide */
+    public static final int ACCESS_MODE_INVALID = 0;
+
+    /** PLMN access mode */
+    /** @hide */
+    public static final int ACCESS_MODE_PLMN = 1;
+
+    /** SNPN access mode */
+    /** @hide */
+    public static final int ACCESS_MODE_SNPN = 2;
+
+    /** PLMN and CAG search */
+    /** @hide */
+    public static final int SEARCH_TYPE_PLMN_AND_CAG = 0;
+
+    /** PLMN search*/
+    /** @hide */
+    public static final int SEARCH_TYPE_PLMN_ONLY = 1;
+
     /** Defines the type of the scan. */
     private int mScanType;
 
@@ -120,6 +147,16 @@ public final class NetworkScanRequest implements Parcelable {
     private ArrayList<String> mMccMncs;
 
     /**
+     * Describes the access mode
+     */
+    private int mAccessMode;
+
+    /**
+     * Describes the search type
+     */
+    private int mSearchType;
+
+    /**
      * Creates a new NetworkScanRequest with mScanType and network mSpecifiers
      *
      * @param scanType The type of the scan, can be either one shot or periodic
@@ -157,6 +194,21 @@ public final class NetworkScanRequest implements Parcelable {
         } else {
             this.mMccMncs = new ArrayList<>();
         }
+    }
+
+    /** @hide */
+    public NetworkScanRequest(int scanType, RadioAccessSpecifier[] specifiers,
+                    int searchPeriodicity,
+                    int maxSearchTime,
+                    boolean incrementalResults,
+                    int incrementalResultsPeriodicity,
+                    ArrayList<String> mccMncs,
+                    int accessMode,
+                    int searchType) {
+        this(scanType, specifiers, searchPeriodicity, maxSearchTime,
+                incrementalResults, incrementalResultsPeriodicity, mccMncs);
+        this.mAccessMode = accessMode;
+        this.mSearchType = searchType;
     }
 
     /** Returns the type of the scan. */
@@ -203,6 +255,18 @@ public final class NetworkScanRequest implements Parcelable {
         return (ArrayList<String>) mMccMncs.clone();
     }
 
+    /** Returns the access mode */
+    /** @hide */
+    public int getAccessMode() {
+        return mAccessMode;
+    }
+
+    /** Returns the search type */
+    /** @hide */
+    public int getSearchType() {
+        return mSearchType;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -217,6 +281,8 @@ public final class NetworkScanRequest implements Parcelable {
         dest.writeBoolean(mIncrementalResults);
         dest.writeInt(mIncrementalResultsPeriodicity);
         dest.writeStringList(mMccMncs);
+        dest.writeInt(mAccessMode);
+        dest.writeInt(mSearchType);
     }
 
     private NetworkScanRequest(Parcel in) {
@@ -237,6 +303,8 @@ public final class NetworkScanRequest implements Parcelable {
         mIncrementalResultsPeriodicity = in.readInt();
         mMccMncs = new ArrayList<>();
         in.readStringList(mMccMncs);
+        mAccessMode = in.readInt();
+        mSearchType = in.readInt();
     }
 
     @Override
@@ -260,7 +328,9 @@ public final class NetworkScanRequest implements Parcelable {
                 && mIncrementalResults == nsr.mIncrementalResults
                 && mIncrementalResultsPeriodicity == nsr.mIncrementalResultsPeriodicity
                 && (((mMccMncs != null)
-                && mMccMncs.equals(nsr.mMccMncs))));
+                && mMccMncs.equals(nsr.mMccMncs)))
+                && mAccessMode == nsr.mAccessMode
+                && mSearchType == nsr.mSearchType);
     }
 
     @Override
@@ -271,7 +341,9 @@ public final class NetworkScanRequest implements Parcelable {
                 + (mMaxSearchTime * 43)
                 + ((mIncrementalResults == true? 1 : 0) * 47)
                 + (mIncrementalResultsPeriodicity * 53)
-                + (mMccMncs.hashCode() * 59));
+                + (mMccMncs.hashCode() * 59)
+                + (mAccessMode * 61)
+                + (mSearchType * 63));
     }
 
     public static final @android.annotation.NonNull Creator<NetworkScanRequest> CREATOR =

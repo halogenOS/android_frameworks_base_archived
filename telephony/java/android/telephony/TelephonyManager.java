@@ -639,6 +639,98 @@ public class TelephonyManager {
     }
 
     /**
+     * The allowed values for multi sim voice capability
+     *
+     * @hide
+     */
+    public interface MultiSimVoiceCapability {
+        /** default */
+        static final int UNKNOWN = 0;
+        /** Concurrent calls on both subscriptions are not possbile. */
+        static final int DSDS = 1;
+        /** Concurrent calls on both subscriptions are not possible but user will have option to
+         * accept MT call on one subscription when there is an ongoing call on another subscription.
+         */
+        static final int PSEUDO_DSDA = 2;
+        /** Concurrent calls on both subscriptions are possible */
+        static final int DSDA = 3;
+    }
+
+    /**
+     * Returns true if concurrent calls on both subscriptions are possible (ex: DSDA).
+     * Returns false for other cases.
+     */
+    /** {@hide} */
+    public static boolean isConcurrentCallsPossible() {
+        int mSimVoiceConfig = TelephonyProperties.multi_sim_voice_capability().orElse(
+                MultiSimVoiceCapability.UNKNOWN);
+        return mSimVoiceConfig == MultiSimVoiceCapability.DSDA;
+    }
+
+
+    /**
+     * Returns true if device is in DSDA mode where concurrent calls on both subscriptions are
+     * possible or if device is in a mode that supports DSDA features ex.DSDS Transition mode
+     * Returns false for other cases.
+     */
+    /** {@hide} */
+    public boolean isDsdaOrDsdsTransitionMode() {
+        return isConcurrentCallsPossible() || isDsdsTransitionMode();
+    }
+
+    /**
+     * DSDS Transition mode is a mode when the device in DSDA transitions into DSDS mode due
+     * to temporary RAT changes while still retaining the calls on both subscriptions.
+     * In this mode, incoming calls and call swap work like DSDA mode but outgoing concurrent
+     * calls are only allowed on the subscription that has a call in ACTIVE state. Outgoing
+     * calls made on the subscription with call(s) in non-ACTIVE state will result in framework
+     * disconnecting calls on the other subscription.
+     * This API is not guaranteed to work when invoked from ImsPhoneCallTracker as the call states
+     * might not be updated at the time of invocation.
+     *
+     * Returns true if there are calls on both subscriptions in DSDS mode
+     * Returns false otherwise
+     */
+    /** {@hide} */
+    public boolean isDsdsTransitionMode() {
+        if (!isDsdsTransitionSupported()) {
+            return false;
+        }
+
+        if (TelephonyProperties.multi_sim_voice_capability().orElse(
+                MultiSimVoiceCapability.UNKNOWN) != MultiSimVoiceCapability.DSDS) {
+            return false;
+        }
+
+        for (int i = 0; i < getActiveModemCount(); i++) {
+            if (getCallState(SubscriptionManager.getSubscriptionId(i))== CALL_STATE_IDLE) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Returns true if on multisim devices, DSDA features are supported in non-DSDA modes
+     * Returns false otherwise
+     */
+    /** {@hide} */
+    public static boolean isDsdsTransitionSupported() {
+        return TelephonyProperties.dsds_transition_supported().orElse(false);
+    }
+
+    /**
+     * Returns true if Multi SIM voice capability is DSDS.
+     * Returns false for other cases.
+     */
+    /** {@hide} */
+    public static boolean isDsdsMode() {
+        int mSimVoiceConfig = TelephonyProperties.multi_sim_voice_capability().orElse(
+                MultiSimVoiceCapability.UNKNOWN);
+        return mSimVoiceConfig == MultiSimVoiceCapability.DSDS;
+    }
+
+    /**
      * Returns the number of phones available.
      * Returns 0 if none of voice, sms, data is not supported
      * Returns 1 for Single standby mode (Single SIM functionality).

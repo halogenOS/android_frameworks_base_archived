@@ -902,6 +902,14 @@ public final class ImsReasonInfo implements Parcelable {
      */
     public static final int CODE_RETRY_ON_IMS_WITHOUT_RTT = 3001;
 
+    /**
+     * Call failed due to concurrent calls not possible, this value should be in sync with {link@
+     * QtiCallConstants.CODE_CONCURRENT_CALLS_NOT_POSSIBLE}.
+     *
+     * @hide
+     */
+    public static final int CODE_CONCURRENT_CALLS_NOT_POSSIBLE = 3002;
+
     /*
      * OEM specific error codes. To be used by OEMs when they don't want to reveal error code which
      * would be replaced by ERROR_UNSPECIFIED.
@@ -1084,6 +1092,7 @@ public final class ImsReasonInfo implements Parcelable {
             CODE_REJECT_ONGOING_CS_CALL,
             CODE_NETWORK_CONGESTION,
             CODE_RETRY_ON_IMS_WITHOUT_RTT,
+            CODE_CONCURRENT_CALLS_NOT_POSSIBLE,
             CODE_OEM_CAUSE_1,
             CODE_OEM_CAUSE_2,
             CODE_OEM_CAUSE_3,
@@ -1277,6 +1286,7 @@ public final class ImsReasonInfo implements Parcelable {
         sImsCodeMap.put(CODE_REJECT_ONGOING_CS_CALL, "CODE_REJECT_ONGOING_CS_CALL");
         sImsCodeMap.put(CODE_NETWORK_CONGESTION, "CODE_NETWORK_CONGESTION");
         sImsCodeMap.put(CODE_RETRY_ON_IMS_WITHOUT_RTT, "CODE_RETRY_ON_IMS_WITHOUT_RTT");
+        sImsCodeMap.put(CODE_CONCURRENT_CALLS_NOT_POSSIBLE, "CODE_CONCURRENT_CALLS_NOT_POSSIBLE");
         sImsCodeMap.put(CODE_OEM_CAUSE_1, "CODE_OEM_CAUSE_1");
         sImsCodeMap.put(CODE_OEM_CAUSE_2, "CODE_OEM_CAUSE_2");
         sImsCodeMap.put(CODE_OEM_CAUSE_3, "CODE_OEM_CAUSE_3");

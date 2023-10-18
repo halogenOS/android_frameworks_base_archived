@@ -398,7 +398,6 @@ public class CallerInfo {
      */
     @UnsupportedAppUsage(maxTargetSdk = Build.VERSION_CODES.R, trackingBug = 170729553)
     public static CallerInfo getCallerInfo(Context context, String number, int subId) {
-
         if (TextUtils.isEmpty(number)) {
             return null;
         }

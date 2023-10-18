@@ -14,6 +14,13 @@
  * limitations under the License.
  */
 
+/*
+ * Changes from Qualcomm Innovation Center are provided under the following license:
+ *
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause-Clear
+ */
+
 package android.telephony;
 
 import static android.text.TextUtils.formatSimple;
@@ -48,6 +55,8 @@ public final class CellIdentityNr extends CellIdentity {
     private final int mTac;
     private final long mNci;
     private final int[] mBands;
+    private SnpnInfo mSnpnInfo;
+    private CagInfo mCagInfo;
 
     // a list of additional PLMN-IDs reported for this cell
     private final ArraySet<String> mAdditionalPlmns;
@@ -62,6 +71,8 @@ public final class CellIdentityNr extends CellIdentity {
         mBands = new int[] {};
         mAdditionalPlmns = new ArraySet();
         mGlobalCellId = null;
+        mSnpnInfo = new SnpnInfo();
+        mCagInfo = new CagInfo();
     }
 
     /**
@@ -99,11 +110,22 @@ public final class CellIdentityNr extends CellIdentity {
     }
 
     /** @hide */
+    public CellIdentityNr(int pci, int tac, int nrArfcn, @NonNull @NgranBand int[] bands,
+                          @Nullable String mccStr, @Nullable String mncStr, long nci,
+                          @Nullable String alphal, @Nullable String alphas,
+                          @NonNull Collection<String> additionalPlmns,
+                          SnpnInfo snpnInfo,CagInfo cagInfo) {
+        this(pci, tac, nrArfcn, bands, mccStr, mncStr, nci, alphal, alphas, additionalPlmns);
+        mSnpnInfo = snpnInfo;
+        mCagInfo = cagInfo;
+    }
+
+    /** @hide */
     @Override
     public @NonNull CellIdentityNr sanitizeLocationInfo() {
         return new CellIdentityNr(CellInfo.UNAVAILABLE, CellInfo.UNAVAILABLE, mNrArfcn,
                 mBands, mMccStr, mMncStr, CellInfo.UNAVAILABLE_LONG, mAlphaLong, mAlphaShort,
-                mAdditionalPlmns);
+                mAdditionalPlmns, mSnpnInfo, mCagInfo);
     }
 
     /** @hide */
@@ -134,7 +156,8 @@ public final class CellIdentityNr extends CellIdentity {
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), mPci, mTac,
-                mNrArfcn, Arrays.hashCode(mBands), mNci, mAdditionalPlmns.hashCode());
+                mNrArfcn, Arrays.hashCode(mBands), mNci, mAdditionalPlmns.hashCode(),
+                mSnpnInfo, mCagInfo);
     }
 
     @Override
@@ -150,7 +173,20 @@ public final class CellIdentityNr extends CellIdentity {
         CellIdentityNr o = (CellIdentityNr) other;
         return super.equals(o) && mPci == o.mPci && mTac == o.mTac && mNrArfcn == o.mNrArfcn
                 && Arrays.equals(mBands, o.mBands) && mNci == o.mNci
-                && mAdditionalPlmns.equals(o.mAdditionalPlmns);
+                && mAdditionalPlmns.equals(o.mAdditionalPlmns)
+                && equalsHandlesNulls(mSnpnInfo, o.mSnpnInfo)
+                && equalsHandlesNulls(mCagInfo, o.mCagInfo);
+    }
+
+    /**
+     * Test whether two objects hold the same data values or both are null.
+     *
+     * @param a first obj
+     * @param b second obj
+     * @return true if two objects equal or both are null
+     */
+    private static boolean equalsHandlesNulls (Object a, Object b) {
+        return (a == null) ? (b == null) : a.equals (b);
     }
 
     /**
@@ -238,6 +274,22 @@ public final class CellIdentityNr extends CellIdentity {
         return Collections.unmodifiableSet(mAdditionalPlmns);
     }
 
+    /**
+     * Returns the SNPN information.
+     * @hide
+     */
+    public SnpnInfo getSnpnInfo() {
+        return mSnpnInfo;
+    }
+
+    /**
+     * Returns the CAG information.
+     * @hide
+     */
+    public CagInfo getCagInfo() {
+        return mCagInfo;
+    }
+
     @Override
     public String toString() {
         return new StringBuilder(TAG + ":{")
@@ -251,6 +303,8 @@ public final class CellIdentityNr extends CellIdentity {
                 .append(" mAlphaLong = ").append(mAlphaLong)
                 .append(" mAlphaShort = ").append(mAlphaShort)
                 .append(" mAdditionalPlmns = ").append(mAdditionalPlmns)
+                .append(" mSnpnInfo = ").append(mSnpnInfo)
+                .append(" mCagInfo = ").append(mCagInfo)
                 .append(" }")
                 .toString();
     }
@@ -264,6 +318,8 @@ public final class CellIdentityNr extends CellIdentity {
         dest.writeIntArray(mBands);
         dest.writeLong(mNci);
         dest.writeArraySet(mAdditionalPlmns);
+        dest.writeParcelable(mSnpnInfo, 0);
+        dest.writeParcelable(mCagInfo, 0);
     }
 
     /** Construct from Parcel, type has already been processed */
@@ -275,7 +331,8 @@ public final class CellIdentityNr extends CellIdentity {
         mBands = in.createIntArray();
         mNci = in.readLong();
         mAdditionalPlmns = (ArraySet<String>) in.readArraySet(null);
-
+        mSnpnInfo = in.readParcelable(SnpnInfo.class.getClassLoader(), SnpnInfo.class);
+        mCagInfo = in.readParcelable(CagInfo.class.getClassLoader(), CagInfo.class);
         updateGlobalCellId();
     }
 
