@@ -445,7 +445,9 @@ public class VolumeDialogImpl implements VolumeDialog, Dumpable,
         view.getLocationInWindow(locInWindow);
 
         float x = mVolumePanelOnLeftSide ?
-            (float) mContext.getResources().getDimensionPixelSize(4) : locInWindow[0];
+            (float) mContext.getResources().getDimensionPixelSize(
+			    R.dimen.volume_panel_left_side_padding
+	        ) : locInWindow[0];
         float y = locInWindow[1];
 
         // The ringer and rows container has extra height at the top to fit the expanded ringer
