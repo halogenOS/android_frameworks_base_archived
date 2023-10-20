@@ -150,6 +150,7 @@ public class ImsUtImplBase {
                     condition, number), "queryCallForward");
         }
 
+	/** @hide */
         @Override
         public int queryCFForServiceClass(int condition, String number, int serviceClass) throws
                 RemoteException {
@@ -344,6 +345,7 @@ public class ImsUtImplBase {
 
     /**
      * Retrieves the configuration of the call forward for specified service class.
+     * @hide
      */
     @SuppressLint("AcronymName")
     public int queryCFForServiceClass(int condition, @Nullable String number,
