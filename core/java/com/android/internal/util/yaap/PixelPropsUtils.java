@@ -63,8 +63,10 @@ public final class PixelPropsUtils {
         "FINGERPRINT", "google/marlin/marlin:7.1.2/NJH47F/4146041:user/release-keys"
     ));
 
+    private static final String[] buildFpSplit = build_fp.split("/");
+
     private static final HashMap<String, String> buildProps = new HashMap<>(Map.of(
-        "ID", build_fp.split("/", 5)[3],
+        "ID", buildFpSplit.length >= 4 ? buildFpSplit[3] : "ABCDEF",
         "DEVICE", build_device,
         "PRODUCT", build_device,
         "MODEL", build_model,
