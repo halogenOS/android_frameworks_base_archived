@@ -44,6 +44,7 @@ import com.android.systemui.clipboardoverlay.dagger.ClipboardOverlayModule;
 import com.android.systemui.common.ui.data.repository.CommonRepositoryModule;
 import com.android.systemui.complication.dagger.ComplicationComponent;
 import com.android.systemui.controls.dagger.ControlsModule;
+import com.android.systemui.custom.CustomModule;
 import com.android.systemui.dagger.qualifiers.Main;
 import com.android.systemui.dagger.qualifiers.SystemUser;
 import com.android.systemui.demomode.dagger.DemoModeModule;
@@ -172,6 +173,7 @@ import javax.inject.Named;
             DisplayModule.class,
             ConnectivityModule.class,
             CoroutinesModule.class,
+	    CustomModule.class,
             DreamModule.class,
             ControlsModule.class,
             DemoModeModule.class,
