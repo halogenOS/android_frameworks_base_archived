@@ -7,6 +7,5 @@
 
     <!-- AttestationHooks -->
     <java-symbol type="string" name="config_netflixSpoofModel" />
-    <java-symbol type="array" name="config_certifiedBuildProperties" />
     <java-symbol type="string" name="config_stockFingerprint" />
 </resources>
