@@ -88,7 +88,7 @@ public class BackAnimationController implements RemoteCallable<BackAnimationCont
                     SETTING_VALUE_ON) == SETTING_VALUE_ON;
 
     public static final float FLING_MAX_LENGTH_SECONDS = 0.1f;     // 100ms
-    public static final float FLING_SPEED_UP_FACTOR = 0.6f;
+    public static final float FLING_SPEED_UP_FACTOR = 0.75f;
 
     /**
      * The maximum additional progress in case of fling gesture.
@@ -102,7 +102,7 @@ public class BackAnimationController implements RemoteCallable<BackAnimationCont
     /**
      * Max duration to wait for an animation to finish before triggering the real back.
      */
-    private static final long MAX_ANIMATION_DURATION = 2000;
+    private static final long MAX_ANIMATION_DURATION = 1800;
 
     /** True when a back gesture is ongoing */
     private boolean mBackGestureStarted = false;
