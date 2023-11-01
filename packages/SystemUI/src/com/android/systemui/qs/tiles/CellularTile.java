@@ -60,6 +60,7 @@ import com.android.systemui.statusbar.connectivity.NetworkController;
 import com.android.systemui.statusbar.connectivity.SignalCallback;
 import com.android.systemui.statusbar.phone.SystemUIDialog;
 import com.android.systemui.statusbar.policy.KeyguardStateController;
+import com.android.systemui.qs.QsEventLogger;
 
 import javax.inject.Inject;
 
