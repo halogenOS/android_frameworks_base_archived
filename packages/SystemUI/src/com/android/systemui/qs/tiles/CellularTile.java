@@ -78,6 +78,7 @@ public class CellularTile extends QSTileImpl<SignalState> {
     @Inject
     public CellularTile(
             QSHost host,
+            QsEventLogger uiEventLogger,
             @Background Looper backgroundLooper,
             @Main Handler mainHandler,
             FalsingManager falsingManager,
