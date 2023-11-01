@@ -73,6 +73,7 @@ public class WifiTile extends QSTileImpl<SignalState> {
     @Inject
     public WifiTile(
             QSHost host,
+            QsEventLogger uiEventLogger,
             @Background Looper backgroundLooper,
             @Main Handler mainHandler,
             FalsingManager falsingManager,
