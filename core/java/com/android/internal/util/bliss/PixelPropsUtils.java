@@ -359,7 +359,6 @@ public class PixelPropsUtils {
             gmsUid = context.getPackageManager().getApplicationInfo(PACKAGE_GMS, 0).uid;
             dlog("shouldBypassTaskPermission: gmsUid:" + gmsUid + " callingUid:" + callingUid);
         } catch (Exception e) {
-            Log.e(TAG, "shouldBypassTaskPermission: unable to get gms uid", e);
             return false;
         }
         return gmsUid == callingUid;
