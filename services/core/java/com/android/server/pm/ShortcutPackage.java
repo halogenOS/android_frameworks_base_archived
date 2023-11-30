@@ -33,6 +33,7 @@ import android.app.appsearch.SearchResult;
 import android.app.appsearch.SearchResults;
 import android.app.appsearch.SearchSpec;
 import android.app.appsearch.SetSchemaRequest;
+import android.app.usage.UsageStatsManagerInternal;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -47,6 +48,7 @@ import android.graphics.drawable.Icon;
 import android.os.Binder;
 import android.os.PersistableBundle;
 import android.os.StrictMode;
+import android.os.SystemClock;
 import android.text.format.Formatter;
 import android.util.ArrayMap;
 import android.util.ArraySet;
@@ -162,6 +164,9 @@ class ShortcutPackage extends ShortcutPackageItem {
 
     private final Executor mExecutor;
 
+    @VisibleForTesting
+    public static final int REPORT_USAGE_BUFFER_SIZE = 3;
+
     /**
      * An in-memory copy of shortcuts for this package that was loaded from xml, keyed on IDs.
      */
@@ -197,6 +202,9 @@ class ShortcutPackage extends ShortcutPackageItem {
 
     @GuardedBy("mLock")
     private boolean mIsAppSearchSchemaUpToDate;
+
+    @GuardedBy("mLock")
+    private List<Long> mLastReportedTime = new ArrayList<>();
 
     private ShortcutPackage(ShortcutUser shortcutUser,
             int packageUserId, String packageName, ShortcutPackageInfo spi) {
@@ -1675,6 +1683,30 @@ class ShortcutPackage extends ShortcutPackageItem {
             return false;
         });
         return condition[0];
+    }
+
+    void reportShortcutUsed(@NonNull final UsageStatsManagerInternal usageStatsManagerInternal,
+            @NonNull final String shortcutId) {
+        synchronized (mLock) {
+            final long currentTS = SystemClock.elapsedRealtime();
+            final ShortcutService s = mShortcutUser.mService;
+            if (mLastReportedTime.isEmpty()
+                    || mLastReportedTime.size() < REPORT_USAGE_BUFFER_SIZE) {
+                mLastReportedTime.add(currentTS);
+            } else if (currentTS - mLastReportedTime.get(0) > s.mSaveDelayMillis) {
+                mLastReportedTime.remove(0);
+                mLastReportedTime.add(currentTS);
+            } else {
+                return;
+            }
+            final long token = s.injectClearCallingIdentity();
+            try {
+                usageStatsManagerInternal.reportShortcutUsage(getPackageName(), shortcutId,
+                        getUser().getUserId());
+            } finally {
+                s.injectRestoreCallingIdentity(token);
+            }
+        }
     }
 
     public void dump(@NonNull PrintWriter pw, @NonNull String prefix, DumpFilter filter) {
