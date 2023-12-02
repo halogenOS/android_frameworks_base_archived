@@ -232,14 +232,14 @@ public class PixelPropsUtils {
                 }
                 if (was) return true;
 	        // Alter model name and fingerprint to avoid hardware attestation enforcement
-        	setPropValue("PRODUCT", "sailfish");
-        	setPropValue("PRODUCT_FOR_ATTESTATION", "sailfish");
-        	setPropValue("DEVICE", "sailfish");
-        	setPropValue("DEVICE_FOR_ATTESTATION", "sailfish");
-        	setPropValue("MODEL", "Pixel");
-        	setPropValue("MODEL_FOR_ATTESTATION", "Pixel");
-        	setPropValue("FINGERPRINT", "google/sailfish/sailfish:8.1.0/OPM2.171019.029/4657601:user/release-keys");
-        	setVersionField("DEVICE_INITIAL_SDK_INT", Build.VERSION_CODES.O_MR1);
+        	setPropValue("PRODUCT", "angler");
+        	setPropValue("PRODUCT_FOR_ATTESTATION", "angler");
+        	setPropValue("DEVICE", "angler");
+        	setPropValue("DEVICE_FOR_ATTESTATION", "angler");
+        	setPropValue("MODEL", "Nexus 6P");
+        	setPropValue("MODEL_FOR_ATTESTATION", "Nexus 6P");
+        	setPropValue("FINGERPRINT", "google/angler/angler:7.0/NPD90G/3051502:user/release-keys");
+        	setVersionField("DEVICE_INITIAL_SDK_INT", Build.VERSION_CODES.M);
                 return true;
             }
         }
