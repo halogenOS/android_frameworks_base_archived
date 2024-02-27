@@ -32,6 +32,7 @@ import android.os.Process;
 import android.os.UserHandle;
 import android.permission.PermissionManager;
 import android.util.ArraySet;
+import android.util.Log;
 
 import com.android.internal.annotations.Immutable;
 
@@ -88,6 +89,8 @@ import java.util.Set;
  */
 @Immutable
 public final class AttributionSource implements Parcelable {
+    private static final String TAG = "AttributionSource";
+
     private static final String DESCRIPTOR = "android.content.AttributionSource";
 
     private static final Binder sDefaultToken = new Binder(DESCRIPTOR);
@@ -169,23 +172,28 @@ public final class AttributionSource implements Parcelable {
         this(AttributionSourceState.CREATOR.createFromParcel(in));
 
         if (!Binder.isDirectlyHandlingTransaction()) {
-            throw new SecurityException("AttributionSource should be unparceled during a binder "
-                    + "transaction for proper verification.");
+            Log.e(TAG, "Unable to verify calling UID #" + mAttributionSourceState.uid + " PID #"
+                    + mAttributionSourceState.pid + " when not handling Binder transaction; "
+                    + "clearing.");
+            mAttributionSourceState.pid = -1;
+            mAttributionSourceState.uid = -1;
+            mAttributionSourceState.packageName = null;
+            mAttributionSourceState.attributionTag = null;
+            mAttributionSourceState.next = null;
+        } else {
+            // Since we just unpacked this object as part of it transiting a Binder
+            // call, this is the perfect time to enforce that its UID and PID can be trusted
+            enforceCallingUid();
+
+            // If this object is being constructed as part of a oneway Binder call, getCallingPid will
+            // return 0 instead of the true PID. In that case, invalidate the PID by setting it to
+            // INVALID_PID (-1).
+            final int callingPid = Binder.getCallingPid();
+            if (callingPid == 0) {
+                mAttributionSourceState.pid = Process.INVALID_PID;
+            }
+            enforceCallingPid();
         }
-
-        // Since we just unpacked this object as part of it transiting a Binder
-        // call, this is the perfect time to enforce that its UID and PID can be trusted
-        enforceCallingUid();
-
-        // If this object is being constructed as part of a oneway Binder call, getCallingPid will
-        // return 0 instead of the true PID. In that case, invalidate the PID by setting it to
-        // INVALID_PID (-1).
-        final int callingPid = Binder.getCallingPid();
-        if (callingPid == 0) {
-            mAttributionSourceState.pid = Process.INVALID_PID;
-        }
-
-        enforceCallingPid();
     }
 
     /** @hide */
