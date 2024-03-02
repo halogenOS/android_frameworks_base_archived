@@ -231,15 +231,18 @@ public class PixelPropsUtils {
                     Log.e(TAG, "Failed to register task stack listener!", e);
                 }
                 if (was) return true;
-	        // Alter model name and fingerprint to avoid hardware attestation enforcement
-        	setPropValue("PRODUCT", "angler");
-        	setPropValue("PRODUCT_FOR_ATTESTATION", "angler");
-        	setPropValue("DEVICE", "angler");
-        	setPropValue("DEVICE_FOR_ATTESTATION", "angler");
-        	setPropValue("MODEL", "Nexus 6P");
-        	setPropValue("MODEL_FOR_ATTESTATION", "Nexus 6P");
-        	setPropValue("FINGERPRINT", "google/angler/angler:7.0/NPD90G/3051502:user/release-keys");
-        	setVersionField("DEVICE_INITIAL_SDK_INT", Build.VERSION_CODES.M);
+                // Alter model name and fingerprint to avoid hardware attestation enforcement
+                setPropValue("PRODUCT", "griffin_retcn");
+                setPropValue("PRODUCT_FOR_ATTESTATION", "griffin_retcn");
+                setPropValue("DEVICE", "griffin");
+                setPropValue("DEVICE_FOR_ATTESTATION", "griffin");
+                setPropValue("MODEL", "XT1650-05");
+                setPropValue("MODEL_FOR_ATTESTATION", "XT1650-05");
+                setPropValue("FINGERPRINT", "motorola/griffin_retcn/griffin:6.0.1/MCC24.246-37/42:user/release-keys");
+                setPropValue("ID", "MCC24.246-37");
+                setPropValue("SECURITY_PATCH", "2016-07-01");
+                setPropValue("MANUFACTURER", "motorola");
+                setPropValue("BRAND", "motorola");
                 return true;
             }
         }
