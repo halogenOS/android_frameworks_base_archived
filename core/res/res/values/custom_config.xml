@@ -1,4 +1,7 @@
 <resources>
     <!-- Whether to cleanup fingerprints upon connection to the daemon and when user switches -->
     <bool name="config_cleanupUnusedFingerprints">true</bool>
+
+    <!-- Udfps vendor code -->
+    <integer name="config_udfpsVendorCode">0</integer>
 </resources>

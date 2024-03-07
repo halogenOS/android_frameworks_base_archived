@@ -174,6 +174,10 @@ class FingerprintAuthenticationClient
     @Override
     public void onAcquired(int acquiredInfo, int vendorCode) {
         super.onAcquired(acquiredInfo, vendorCode);
+        try {
+            mUdfpsOverlayController.onAcquired(getSensorId(), acquiredInfo, vendorCode);
+        } catch (Exception e) {
+        }
 
         @LockoutTracker.LockoutMode final int lockoutMode =
                 getLockoutTracker().getLockoutModeForUser(getTargetUserId());

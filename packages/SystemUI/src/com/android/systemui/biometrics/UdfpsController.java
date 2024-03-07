@@ -227,6 +227,7 @@ public class UdfpsController implements DozeReceiver, Dumpable {
 
     private boolean mFrameworkDimming;
     private int[][] mBrightnessAlphaArray;
+    private final int mUdfpsVendorCode;
 
     @VisibleForTesting
     public static final VibrationAttributes UDFPS_VIBRATION_ATTRIBUTES =
