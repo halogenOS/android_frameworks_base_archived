@@ -55,7 +55,7 @@ import android.content.pm.PackageItemInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ParceledListSlice;
 import android.content.pm.VersionedPackage;
-import android.content.pm.parsing.ParsingPackageUtils;
+import android.content.pm.parsing.FrameworkParsingPackageUtils;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Binder;
@@ -1096,7 +1096,7 @@ public class PackageInstallerService extends IPackageInstaller.Stub implements
             return false;
         }
         // "android" is a valid package name
-        String errorMessage = ParsingPackageUtils.validateName(
+        String errorMessage = FrameworkParsingPackageUtils.validateName(
                 packageName, /* requireSeparator= */ false, /* requireFilename */ true);
         if (errorMessage != null) {
             return false;
