@@ -105,6 +105,7 @@ import com.android.server.SystemService;
 import com.android.server.SystemServiceManager;
 import com.android.server.pm.parsing.PackageParser2;
 import com.android.server.pm.pkg.PackageStateInternal;
+import com.android.server.pm.pkg.parsing.ParsingPackageUtils;
 import com.android.server.pm.utils.RequestThrottle;
 
 import libcore.io.IoUtils;
@@ -1092,6 +1093,12 @@ public class PackageInstallerService extends IPackageInstaller.Stub implements
 
     private static boolean isValidPackageName(@NonNull String packageName) {
         if (packageName.length() > SessionParams.MAX_PACKAGE_NAME_LENGTH) {
+            return false;
+        }
+        // "android" is a valid package name
+        String errorMessage = ParsingPackageUtils.validateName(
+                packageName, /* requireSeparator= */ false, /* requireFilename */ true);
+        if (errorMessage != null) {
             return false;
         }
         return true;
