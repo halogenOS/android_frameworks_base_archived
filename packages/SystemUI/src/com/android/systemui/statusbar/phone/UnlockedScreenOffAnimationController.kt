@@ -324,8 +324,8 @@ class UnlockedScreenOffAnimationController @Inject constructor(
         }
 
         // If animations are disabled system-wide, don't play this one either.
-        if (Settings.Global.getFloat(
-                context.contentResolver, Settings.Global.ANIMATOR_DURATION_SCALE) == 0f) {
+        if (Settings.Global.getString(
+                context.contentResolver, Settings.Global.ANIMATOR_DURATION_SCALE) == "0") {
             return false
         }
 
