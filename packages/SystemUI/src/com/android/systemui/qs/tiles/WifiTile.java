@@ -160,11 +160,6 @@ public class WifiTile extends QSTileImpl<SignalState> {
                 && (cb.ssid != null || cb.wifiSignalIconId != WifiIcons.QS_WIFI_NO_NETWORK);
         boolean wifiNotConnected = (cb.ssid == null)
                 && (cb.wifiSignalIconId == WifiIcons.QS_WIFI_NO_NETWORK);
-        if (state.slash == null) {
-            state.slash = new SlashState();
-            state.slash.rotation = 6;
-        }
-        state.slash.isSlashed = false;
         boolean isTransient = transientEnabling || cb.isTransient;
         state.secondaryLabel = getSecondaryLabel(isTransient, cb.statusLabel);
         state.state = Tile.STATE_ACTIVE;
@@ -180,7 +175,6 @@ public class WifiTile extends QSTileImpl<SignalState> {
                     com.android.internal.R.drawable.ic_signal_wifi_transient_animation);
             state.label = r.getString(R.string.quick_settings_wifi_label);
         } else if (!state.value) {
-            state.slash.isSlashed = true;
             state.state = Tile.STATE_INACTIVE;
             state.icon = ResourceIcon.get(WifiIcons.QS_WIFI_DISABLED);
             state.label = r.getString(R.string.quick_settings_wifi_label);
