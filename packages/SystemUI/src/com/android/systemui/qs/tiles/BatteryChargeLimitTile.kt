@@ -148,7 +148,11 @@ class BatteryChargeLimitTile @Inject constructor(
     private fun handleBatteryLevelChange() = chargingControl?.let { chargingControl ->
         Log.i(TAG, "Battery level: $currentBatteryPercentage, plugged in: $isPluggedIn, charging: $isCharging")
         backgroundHandler.post {
-            if (currentBatteryPercentage >= percentageLimit) {
+            if (percentageLimit == 100) {
+                if (!chargingControl.chargingEnabled) {
+                    chargingControl.chargingEnabled = true
+                }
+            } else if (currentBatteryPercentage >= percentageLimit) {
                 Log.i(TAG, ">= $percentageLimit, disabling charge")
                 if (chargingControl.chargingEnabled || isCharging || isPluggedIn) {
                     chargingControl.chargingEnabled = false
