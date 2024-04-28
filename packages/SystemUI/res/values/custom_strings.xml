@@ -16,7 +16,7 @@
 -->
 <resources>
     <string name="qsTileBatteryChargeLimitLabel">Charging Limit</string>
-    <string name="qsTileBatteryChargeLimitCharging">Charging</string>
+    <string name="qsTileBatteryChargeLimitCharging">Engaged</string>
     <string name="qsTileBatteryChargeLimitNotCharging">Disengaged</string>
     <string name="qsTileBatteryChargeLimitUnavailable">Unavailable</string>
 </resources>
