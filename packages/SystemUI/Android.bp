@@ -201,6 +201,7 @@ android_library {
         "LowLightDreamLib",
         "motion_tool_lib",
         "vendor.lineage.powershare-V1.0-java",
+        "vendor.lineage.health-V1-java",
     ],
     manifest: "AndroidManifest.xml",
 

@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2023 DerpFest
- * Copyright (C) 2023 The halogenOS Project
+ * Copyright (C) 2023-2024 The halogenOS Project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -10,6 +10,7 @@ import com.android.systemui.qs.tileimpl.QSTileImpl
 import com.android.systemui.qs.tiles.CellularTile
 import com.android.systemui.qs.tiles.WifiTile
 import com.android.systemui.qs.tiles.PowerShareTile
+import com.android.systemui.qs.tiles.BatteryChargeLimitTile
 
 import dagger.Binds
 import dagger.Module
@@ -35,4 +36,9 @@ interface CustomModule {
     @IntoMap
     @StringKey(PowerShareTile.TILE_SPEC)
     fun bindPowerShareTile(powerShareTile: PowerShareTile): QSTileImpl<*>
+
+    @Binds
+    @IntoMap
+    @StringKey(BatteryChargeLimitTile.TILE_SPEC)
+    fun bindBatteryChargeLimitTile(batteryChargeLimitTile: BatteryChargeLimitTile): QSTileImpl<*>
 }
