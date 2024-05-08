@@ -61,14 +61,12 @@ class BatteryChargeLimitTile @Inject constructor(
     private var percentageLimit
         get() = Settings.Secure.getInt(mContext.contentResolver, limitSettingsKey, 100)
         set(value) { Settings.Secure.putInt(mContext.contentResolver, limitSettingsKey, value) }
-    private val resumePercentage = percentageLimit - 2
     private val levels = listOf(90, 80, 75)
     private val chargingControl: IChargingControl? by lazy {
         IChargingControl.Stub.asInterface(
             ServiceManager.waitForDeclaredService(
                 IChargingControl.DESCRIPTOR + "/default"))
     }
-    private val backgroundHandler by lazy { Handler(backgroundLooper) }
     private var currentBatteryPercentage = 100
     private var isCharging = false
     private var isPluggedIn = false
@@ -84,7 +82,7 @@ class BatteryChargeLimitTile @Inject constructor(
             currentUser
         ) {
             override fun handleValueChanged(value: Int, observedChange: Boolean) {
-                handleBatteryLevelChange()
+                handleRefreshState(null)
             }
         }
     }
@@ -102,7 +100,7 @@ class BatteryChargeLimitTile @Inject constructor(
             in levels.dropLast(1) -> levels[levels.indexOf(percentageLimit) + 1]
             else -> 100
         }
-        handleBatteryLevelChange()
+        handleRefreshState(null)
     }.onFailure { it.printStackTrace() } }
 
     override fun handleUpdateState(state: QSTile.State, arg: Any?) { runCatching {
@@ -142,33 +140,7 @@ class BatteryChargeLimitTile @Inject constructor(
         currentBatteryPercentage = batteryLevel
         isCharging = charging
         isPluggedIn = pluggedIn
-        handleBatteryLevelChange()
-    }
-
-    private fun handleBatteryLevelChange() = chargingControl?.let { chargingControl ->
-        Log.i(TAG, "Battery level: $currentBatteryPercentage, plugged in: $isPluggedIn, charging: $isCharging")
-        backgroundHandler.post {
-            if (percentageLimit == 100) {
-                if (!chargingControl.chargingEnabled) {
-                    chargingControl.chargingEnabled = true
-                }
-            } else if (currentBatteryPercentage >= percentageLimit) {
-                Log.i(TAG, ">= $percentageLimit, disabling charge")
-                if (chargingControl.chargingEnabled || isCharging || isPluggedIn) {
-                    chargingControl.chargingEnabled = false
-                }
-            } else if (currentBatteryPercentage < resumePercentage) {
-                Log.i(TAG, "< $resumePercentage, enabling charge")
-                if (!chargingControl.chargingEnabled || !isCharging) {
-                    chargingControl.chargingEnabled = true
-                }
-            } else if (isPluggedIn) {
-                Log.i(TAG, "$resumePercentage < $currentBatteryPercentage < $percentageLimit, waiting to resume")
-            }
-            mainHandler.post {
-                handleRefreshState(null)
-            }
-        }
+        handleRefreshState(null)
     }
 
     override fun isAvailable(): Boolean {

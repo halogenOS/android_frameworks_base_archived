@@ -1,0 +1,24 @@
+android_app {
+    name: "BatteryChargeLimiter",
+
+    srcs: ["src/**/*.kt"],
+    resource_dirs: [],
+
+    certificate: "platform",
+    platform_apis: true,
+    privileged: true,
+    system_ext_specific: true,
+
+    defaults: [
+        "platform_app_defaults",
+    ],
+
+    static_libs: [
+        "org.lineageos.settings.resources",
+        "vendor.lineage.health-V1-java",
+    ],
+
+    optimize: {
+        proguard_flags_files: ["proguard.flags"],
+    },
+}

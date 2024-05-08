@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="org.halogenos.extra.batterychargelimit"
+          android:sharedUserId="android.uid.system_server">
+
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <application
+        android:persistent="true"
+        android:defaultToDeviceProtectedStorage="true"
+        android:directBootAware="true">
+        <service
+                android:name=".BatteryChargeLimiterService"
+                android:exported="true" />
+
+        <receiver
+                android:name=".BatteryReceiver"
+                android:exported="true">
+            <intent-filter>
+                <action android:name="custom.intent.action.BATTERY_CHARGE_CHANGED" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+    </application>
+
+</manifest>
