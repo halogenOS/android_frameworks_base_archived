@@ -232,15 +232,15 @@ public class PixelPropsUtils {
                 }
                 if (was) return true;
                 // Alter model name and fingerprint to avoid hardware attestation enforcement
-                setPropValue("PRODUCT", "griffin_retcn");
-                setPropValue("PRODUCT_FOR_ATTESTATION", "griffin_retcn");
-                setPropValue("DEVICE", "griffin");
-                setPropValue("DEVICE_FOR_ATTESTATION", "griffin");
-                setPropValue("MODEL", "XT1650-05");
-                setPropValue("MODEL_FOR_ATTESTATION", "XT1650-05");
-                setPropValue("FINGERPRINT", "motorola/griffin_retcn/griffin:6.0.1/MCC24.246-37/42:user/release-keys");
-                setPropValue("ID", "MCC24.246-37");
-                setPropValue("SECURITY_PATCH", "2016-07-01");
+                setPropValue("PRODUCT", "clark_retus");
+                setPropValue("PRODUCT_FOR_ATTESTATION", "clark_retus");
+                setPropValue("DEVICE", "clark");
+                setPropValue("DEVICE_FOR_ATTESTATION", "clark");
+                setPropValue("MODEL", "XT1575");
+                setPropValue("MODEL_FOR_ATTESTATION", "XT1575");
+                setPropValue("FINGERPRINT", "motorola/clark_retus/clark:6.0/MPHS24.49-18-8/4:user/release-keys");
+                setPropValue("ID", "MPHS24.49-18-8");
+                setPropValue("SECURITY_PATCH", "2016-09-01");
                 setPropValue("MANUFACTURER", "motorola");
                 setPropValue("BRAND", "motorola");
                 return true;
