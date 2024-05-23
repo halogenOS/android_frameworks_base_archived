@@ -232,17 +232,17 @@ public class PixelPropsUtils {
                 }
                 if (was) return true;
                 // Alter model name and fingerprint to avoid hardware attestation enforcement
-                setPropValue("PRODUCT", "clark_retus");
-                setPropValue("PRODUCT_FOR_ATTESTATION", "clark_retus");
-                setPropValue("DEVICE", "clark");
-                setPropValue("DEVICE_FOR_ATTESTATION", "clark");
-                setPropValue("MODEL", "XT1575");
-                setPropValue("MODEL_FOR_ATTESTATION", "XT1575");
-                setPropValue("FINGERPRINT", "motorola/clark_retus/clark:6.0/MPHS24.49-18-8/4:user/release-keys");
-                setPropValue("ID", "MPHS24.49-18-8");
-                setPropValue("SECURITY_PATCH", "2016-09-01");
-                setPropValue("MANUFACTURER", "motorola");
-                setPropValue("BRAND", "motorola");
+                setPropValue("PRODUCT", "sailfish");
+                setPropValue("PRODUCT_FOR_ATTESTATION", "sailfish");
+                setPropValue("DEVICE", "sailfish");
+                setPropValue("DEVICE_FOR_ATTESTATION", "sailfish");
+                setPropValue("MODEL", "Pixel");
+                setPropValue("MODEL_FOR_ATTESTATION", "Pixel");
+                setPropValue("FINGERPRINT", "google/sailfish/sailfish:8.1.0/OPM1.171019.011/4448085:user/release-keys");
+                setPropValue("ID", "OPM1.171019.011");
+                setPropValue("SECURITY_PATCH", "2017-12-05");
+                setPropValue("MANUFACTURER", "Google");
+                setPropValue("BRAND", "google");
                 return true;
             }
         }
