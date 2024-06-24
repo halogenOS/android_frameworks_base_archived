@@ -28,6 +28,7 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Trace;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.Pair;
 import android.util.TypedValue;
 import android.view.DisplayCutout;
@@ -63,6 +64,8 @@ import kotlinx.coroutines.flow.StateFlowKt;
  * The header group on Keyguard.
  */
 public class KeyguardStatusBarView extends RelativeLayout {
+
+    private static final String TAG = "KeyguardStatusBarView";
 
     private static final int LAYOUT_NONE = 0;
     private static final int LAYOUT_CUTOUT = 1;
@@ -462,6 +465,7 @@ public class KeyguardStatusBarView extends RelativeLayout {
      * Calculates the margin that isn't already accounted for in the view's padding.
      */
     private int calculateMargin(int margin, int padding) {
+	Log.d(TAG, "big margin " + margin + " big padding " + padding);
         if (padding >= margin) {
             return 0;
         } else {
