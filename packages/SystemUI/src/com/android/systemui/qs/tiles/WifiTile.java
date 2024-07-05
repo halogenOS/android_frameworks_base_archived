@@ -279,7 +279,7 @@ public class WifiTile extends QSTileImpl<SignalState> {
             mInfo.wifiSignalContentDescription = indicators.qsIcon.contentDescription;
             mInfo.isTransient = indicators.isTransient;
             mInfo.statusLabel = indicators.statusLabel;
-            refreshState();
+            refreshState(mInfo);
         }
     }
 }
