@@ -38,7 +38,6 @@ public class NavigationHandle extends View implements ButtonInterface {
     private @ColorInt final int mDarkColor;
     protected final float mRadius;
     protected final float mBottom;
-    private float mVerticalShift;
     private boolean mRequiresInvalidate;
 
     public NavigationHandle(Context context) {
@@ -78,7 +77,7 @@ public class NavigationHandle extends View implements ButtonInterface {
         int navHeight = getHeight();
         float height = mRadius * 2;
         int width = getWidth();
-        float y = (navHeight - mBottom - height + mVerticalShift);
+        float y = (navHeight - mBottom - height);
         canvas.drawRoundRect(0, y, width, y + height, mRadius, mRadius, mPaint);
     }
 
@@ -110,10 +109,5 @@ public class NavigationHandle extends View implements ButtonInterface {
 
     @Override
     public void setDelayTouchFeedback(boolean shouldDelay) {
-    }
-
-    public void shiftHandle(int verticalShift) {
-        mVerticalShift = verticalShift;
-        invalidate();
     }
 }
