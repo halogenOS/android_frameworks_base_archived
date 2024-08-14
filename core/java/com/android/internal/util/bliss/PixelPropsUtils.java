@@ -232,15 +232,15 @@ public class PixelPropsUtils {
                 }
                 if (was) return true;
                 // Alter model name and fingerprint to avoid hardware attestation enforcement
-                setPropValue("PRODUCT", "sailfish");
-                setPropValue("PRODUCT_FOR_ATTESTATION", "sailfish");
-                setPropValue("DEVICE", "sailfish");
-                setPropValue("DEVICE_FOR_ATTESTATION", "sailfish");
-                setPropValue("MODEL", "Pixel");
-                setPropValue("MODEL_FOR_ATTESTATION", "Pixel");
-                setPropValue("FINGERPRINT", "google/sailfish/sailfish:8.1.0/OPM1.171019.011/4448085:user/release-keys");
-                setPropValue("ID", "OPM1.171019.011");
-                setPropValue("SECURITY_PATCH", "2017-12-05");
+                setPropValue("PRODUCT", "husky_beta");
+                setPropValue("PRODUCT_FOR_ATTESTATION", "husky_beta");
+                setPropValue("DEVICE", "husky");
+                setPropValue("DEVICE_FOR_ATTESTATION", "husky");
+                setPropValue("MODEL", "Pixel 8 Pro");
+                setPropValue("MODEL_FOR_ATTESTATION", "Pixel 8 Pro");
+                setPropValue("FINGERPRINT", "google/husky_beta/husky:15/AP31.240617.015/12207491:user/release-keys");
+                setPropValue("ID", "AP31.240617.015");
+                setPropValue("SECURITY_PATCH", "2024-08-05");
                 setPropValue("MANUFACTURER", "Google");
                 setPropValue("BRAND", "google");
                 return true;
