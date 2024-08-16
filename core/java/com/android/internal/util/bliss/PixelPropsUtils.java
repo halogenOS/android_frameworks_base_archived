@@ -232,13 +232,13 @@ public class PixelPropsUtils {
                 }
                 if (was) return true;
                 // Alter model name and fingerprint to avoid hardware attestation enforcement
-                setPropValue("PRODUCT", "husky_beta");
-                setPropValue("PRODUCT_FOR_ATTESTATION", "husky_beta");
-                setPropValue("DEVICE", "husky");
-                setPropValue("DEVICE_FOR_ATTESTATION", "husky");
-                setPropValue("MODEL", "Pixel 8 Pro");
-                setPropValue("MODEL_FOR_ATTESTATION", "Pixel 8 Pro");
-                setPropValue("FINGERPRINT", "google/husky_beta/husky:15/AP31.240617.015/12207491:user/release-keys");
+                setPropValue("PRODUCT", "akita_beta");
+                setPropValue("PRODUCT_FOR_ATTESTATION", "akita_beta");
+                setPropValue("DEVICE", "akita");
+                setPropValue("DEVICE_FOR_ATTESTATION", "akita");
+                setPropValue("MODEL", "Pixel 8a");
+                setPropValue("MODEL_FOR_ATTESTATION", "Pixel 8a");
+                setPropValue("FINGERPRINT", "google/akita_beta/akita:15/AP31.240617.015/12207491:user/release-keys");
                 setPropValue("ID", "AP31.240617.015");
                 setPropValue("SECURITY_PATCH", "2024-08-05");
                 setPropValue("MANUFACTURER", "Google");
